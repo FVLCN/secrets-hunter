@@ -1,6 +1,9 @@
 import sys
+import os
 import argparse
 import logging
+
+from pathlib import Path
 
 from secrets_hunter.scanner import SecretsHunter
 from secrets_hunter.config.settings import ScannerConfig
@@ -8,81 +11,129 @@ from secrets_hunter.reporters.console_reporter import ConsoleReporter
 from secrets_hunter.reporters.json_reporter import JSONReporter
 
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(
-        description='Detect secrets and sensitive information in your codebase',
-        formatter_class=argparse.RawDescriptionHelpFormatter
-    )
+logo_ascii = r"""
+     ________ ___      ___ ___       ________  ________      
+    |\  _____\\  \    /  /|\  \     |\   ____\|\   ___  \    
+    \ \  \__/\ \  \  /  / | \  \    \ \  \___|\ \  \\ \  \   
+     \ \   __\\ \  \/  / / \ \  \    \ \  \    \ \  \\ \  \  
+      \ \  \_| \ \    / /   \ \  \____\ \  \____\ \  \\ \  \ 
+       \ \__\   \ \__/ /     \ \_______\ \_______\ \__\\ \__\
+        \|__|    \|__|/       \|_______|\|_______|\|__| \|__|
+                       +==============+                      
+                       |Secrets Hunter|                      
+                       +==============+                      
+"""
 
-    parser.add_argument(
-        'target',
-        nargs='?',
-        default='.',
-        help='File or directory to scan (default: current directory)'
-    )
+MAX_WORKERS_MULTIPLIER = 2
 
-    parser.add_argument(
-        '--json',
-        dest='json_output',
-        metavar='FILE',
-        help='Export results to JSON file'
-    )
+class CLI:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(
+            description="Detect secrets and sensitive information in your codebase",
+            formatter_class=argparse.RawDescriptionHelpFormatter
+        )
+        self.add_args()
 
-    parser.add_argument(
-        '--hex-entropy',
-        type=float,
-        default=ScannerConfig.HEX_ENTROPY_THRESHOLD,
-        help=f'Hex entropy threshold (default: {ScannerConfig.HEX_ENTROPY_THRESHOLD})'
-    )
+    def add_args(self):
+        p = self.parser
 
-    parser.add_argument(
-        '--b64-entropy',
-        type=float,
-        default=ScannerConfig.BASE64_ENTROPY_THRESHOLD,
-        help=f'Base64 entropy threshold (default: {ScannerConfig.BASE64_ENTROPY_THRESHOLD})'
-    )
+        p.add_argument(
+            "target",
+            nargs="?",
+            default=".",
+            help="File or directory to scan (default: current directory)",
+        )
 
-    parser.add_argument(
-        '--min-length',
-        type=int,
-        default=ScannerConfig.MIN_STRING_LENGTH,
-        help=f'Minimum string length (default: {ScannerConfig.MIN_STRING_LENGTH})'
-    )
+        p.add_argument(
+            '--json',
+            dest='json_output',
+            metavar='FILE',
+            help='Export results to JSON file'
+        )
 
-    parser.add_argument(
-        '--log-level',
-        type=str,
-        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-        default=ScannerConfig.LOG_LEVEL,
-        help=f'Log level (default: {ScannerConfig.LOG_LEVEL})'
-    )
+        p.add_argument(
+            '--hex-entropy',
+            type=float,
+            default=ScannerConfig.HEX_ENTROPY_THRESHOLD,
+            help=f'Hex entropy threshold (default: {ScannerConfig.HEX_ENTROPY_THRESHOLD})'
+        )
 
-    parser.add_argument(
-        '--workers',
-        type=int,
-        default=ScannerConfig.MAX_WORKERS,
-        help=f'Number of parallel workers (default: {ScannerConfig.MAX_WORKERS})'
-    )
+        p.add_argument(
+            '--b64-entropy',
+            type=float,
+            default=ScannerConfig.BASE64_ENTROPY_THRESHOLD,
+            help=f'Base64 entropy threshold (default: {ScannerConfig.BASE64_ENTROPY_THRESHOLD})'
+        )
 
-    return parser.parse_args()
+        p.add_argument(
+            '--min-length',
+            type=int,
+            default=ScannerConfig.MIN_STRING_LENGTH,
+            help=f'Minimum string length (default: {ScannerConfig.MIN_STRING_LENGTH})'
+        )
+
+        p.add_argument(
+            '--workers',
+            type=int,
+            default=ScannerConfig.MAX_WORKERS,
+            help=f'Number of parallel workers (default: {ScannerConfig.MAX_WORKERS})'
+        )
+
+        p.add_argument(
+            '--log-level',
+            type=str,
+            choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
+            default=ScannerConfig.LOG_LEVEL,
+            help=f'Log level (default: {ScannerConfig.LOG_LEVEL})'
+        )
+
+    def parse(self):
+        args = self.parser.parse_args()
+
+        validators = [
+            (self.validate_entropy, [args.hex_entropy, "hex-entropy"]),
+            (self.validate_entropy, [args.b64_entropy, "b64-entropy"]),
+            (self.validate_min_length, [args.min_length]),
+            (self.validate_workers, [args.workers]),
+            (self.validate_json, [args.json_output])
+        ]
+
+        for fn, params in validators:
+            fn(*params)
+
+        return args
+
+    def validate_entropy(self, value, name):
+        if not 0.0 <= value <= 8.0:
+            self.parser.error(f"--{name} must be between 0.0 and 8.0")
+
+    def validate_min_length(self, value):
+        if value <= 0:
+            self.parser.error("--min-length must be > 0")
+
+    def validate_workers(self, value):
+        max_workers = (os.cpu_count() or 1) * MAX_WORKERS_MULTIPLIER
+
+        if value <= 0:
+            self.parser.error("--workers must be > 0")
+        if value > max_workers:
+            self.parser.error(f"--workers cannot exceed {max_workers}")
+
+    def validate_json(self, path):
+        if not path:
+            return
+
+        parent = Path(path).parent or Path(".")
+
+        if not parent.exists():
+            self.parser.error(f"--json parent dir does not exist: {parent}")
 
 
 def main():
-    logo_ascii = r"""
-         ________ ___      ___ ___       ________  ________      
-        |\  _____\\  \    /  /|\  \     |\   ____\|\   ___  \    
-        \ \  \__/\ \  \  /  / | \  \    \ \  \___|\ \  \\ \  \   
-         \ \   __\\ \  \/  / / \ \  \    \ \  \    \ \  \\ \  \  
-          \ \  \_| \ \    / /   \ \  \____\ \  \____\ \  \\ \  \ 
-           \ \__\   \ \__/ /     \ \_______\ \_______\ \__\\ \__\
-            \|__|    \|__|/       \|_______|\|_______|\|__| \|__|
-                           +==============+                      
-                           |Secrets Hunter|                      
-                           +==============+                      
-    """
     print(logo_ascii)
 
-    args = parse_arguments()
+    cli = CLI()
+    args = cli.parse()
 
     config = ScannerConfig()
     config.HEX_ENTROPY_THRESHOLD = args.hex_entropy
