@@ -10,7 +10,7 @@ from secrets_hunter.detectors.pattern_detector import PatternDetector
 from secrets_hunter.detectors.entropy_detector import EntropyDetector
 from secrets_hunter.handlers.file_handler import FileHandler
 from secrets_hunter.handlers.progress import ProgressBar
-from secrets_hunter.detectors.utils import validators
+from secrets_hunter.detectors.utils import validators, StringsExtractor
 from secrets_hunter.models import Finding
 
 logger = logging.getLogger(__name__)
@@ -29,48 +29,6 @@ class SecretsHunter:
             validators.FalsePositiveValidator(),
             validators.MinLengthValidator(min_string_length=self.config.MIN_STRING_LENGTH)
         ]
-
-    @staticmethod
-    def extract_all_strings(line: str) -> List[str]:
-        """Extract all potential strings from a line"""
-        strings = []
-
-        # Extract complete multi-line PEM keys
-        pem_pattern = r'-----BEGIN[^-]+-----.*?-----END[^-]+-----'
-        pem_matches = re.findall(pem_pattern, line, re.DOTALL)
-        strings.extend(pem_matches)
-
-        # Extract quoted strings
-        quote_patterns = [
-            r'"([^"]{4,})"',  # At least 4 chars to avoid noise
-            r"'([^']{4,})'",
-        ]
-
-        for pattern in quote_patterns:
-            matches = re.findall(pattern, line)
-            # Filter out matches that are part of already-captured PEM keys
-            for match in matches:
-                if not any(match in pem for pem in pem_matches):
-                    strings.append(match)
-
-        # Extract unquoted tokens that look like secrets (alphanumeric sequences)
-        token_pattern = r'\b([A-Za-z0-9_\-]{8,})\b'  # At least 8 chars
-        token_matches = re.findall(token_pattern, line)
-
-        # Filter out tokens that are part of PEM keys
-        for token in token_matches:
-            if not any(token in existing for existing in pem_matches + strings):
-                strings.append(token)
-
-        # Remove duplicates while preserving order
-        seen = set()
-        unique_strings = []
-        for s in strings:
-            if s not in seen:
-                seen.add(s)
-                unique_strings.append(s)
-
-        return unique_strings
 
     @staticmethod
     def find_assignment_context(line: str, string: str) -> Optional[str]:
@@ -95,25 +53,31 @@ class SecretsHunter:
         lines = self.file_handler.read_file(filepath)
 
         for line_num, line in enumerate(lines, 1):
-            # Step 1: Extract ALL strings from line
-            all_strings = self.extract_all_strings(line)
+            # Step 1: Extract all strings from a line
+            string_extractor = StringsExtractor()
+            all_strings = string_extractor.extract(line)
 
             if not all_strings:
                 continue
 
             # Step 2: Filter using validators
-            filtered_strings = [string for string in all_strings if self.is_string_valid(string)]
+            filtered_strings = [
+                string for string in all_strings if self.is_string_valid(string)
+            ]
 
             if not filtered_strings:
                 continue
 
             # Step 3: Find high entropy strings
-            entropy_findings = self.entropy_detector.detect(line, line_num, str(filepath), filtered_strings)
+            entropy_findings = self.entropy_detector.detect(
+                line, line_num, str(filepath), filtered_strings
+            )
 
             # Step 4: Find pattern matching strings
-            pattern_findings = self.pattern_detector.detect(line, line_num, str(filepath), filtered_strings)
+            pattern_findings = self.pattern_detector.detect(
+                line, line_num, str(filepath), filtered_strings
+            )
 
-            # Combine all findings
             all_line_findings = pattern_findings + entropy_findings
 
             # Step 5: Check if in assignment for better confidence
