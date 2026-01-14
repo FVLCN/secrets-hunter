@@ -100,14 +100,14 @@ def main():
     findings, success = scanner.scan(args.target)
 
     if not success:
-        sys.exit(0)
+        sys.exit(1)
 
     if args.json_output:
         JSONReporter.export(findings, args.json_output)
     else:
         ConsoleReporter.format_report(findings)
 
-    sys.exit(1)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
