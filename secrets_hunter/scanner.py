@@ -29,6 +29,7 @@ class SecretsHunter:
             validators.FalsePositiveValidator(),
             validators.MinLengthValidator(min_string_length=self.config.MIN_STRING_LENGTH)
         ]
+        self.strings_extractor = StringsExtractor()
 
     @staticmethod
     def find_assignment_context(line: str, string: str) -> Optional[str]:
@@ -54,8 +55,7 @@ class SecretsHunter:
 
         for line_num, line in enumerate(lines, 1):
             # Step 1: Extract all strings from a line
-            string_extractor = StringsExtractor()
-            all_strings = string_extractor.extract(line)
+            all_strings = self.strings_extractor.extract(line)
 
             if not all_strings:
                 continue
