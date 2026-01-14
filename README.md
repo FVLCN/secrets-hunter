@@ -21,7 +21,7 @@ pip install -e .
 
 ```bash
 # Scan a file
-secrets-hunter config.py
+secrets-hunter app.py
 
 # Scan a directory
 secrets-hunter /path/to/project
