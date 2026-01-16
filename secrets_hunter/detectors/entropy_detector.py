@@ -21,7 +21,7 @@ class EntropyDetector(BaseDetector):
             if is_hex and entropy >= self.config.HEX_ENTROPY_THRESHOLD:
                 is_high_entropy = True
                 string_type = "High Entropy Hex String"
-            elif is_base64 and entropy >= self.config.BASE64_ENTROPY_THRESHOLD:
+            elif is_base64 and entropy >= self.config.B64_ENTROPY_THRESHOLD:
                 is_high_entropy = True
                 string_type = "High Entropy Base64 String"
 
@@ -30,7 +30,7 @@ class EntropyDetector(BaseDetector):
                     file=filepath,
                     line=line_num,
                     type=string_type,
-                    match=string[:50] + ('...' if len(string) > 50 else ''),
+                    match=string,
                     context=line.strip()[:100],
                     detection_method='entropy',
                     confidence=50

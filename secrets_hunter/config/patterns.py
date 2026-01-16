@@ -1,23 +1,21 @@
+import re
+
 # Regex patterns for known secret formats
 SECRET_PATTERNS = {
-    'AWS Access Key': r'AKIA[0-9A-Z]{16}',
-    'AWS Secret Key': r'aws_secret_access_key\s*=\s*["\']?([A-Za-z0-9/+=]{40})["\']?',
-    'GitHub Token': r'gh[pousr]_[A-Za-z0-9]{36,}',
-    'Generic API Key': r'(?i)(api[_-]?key|apikey)\s*[:=]\s*["\']?([a-zA-Z0-9_\-]{20,})["\']?',
-    'Private Key': r'-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----',
-    'Generic Secret': r'(?i)(secret|password|passwd|pwd)\s*[:=]\s*["\']([^"\']{8,})["\']',
-    'JWT Token': r'eyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*',
-    'Slack Token': r'xox[baprs]-[0-9a-zA-Z]{10,}',
-    'Google API Key': r'AIza[0-9A-Za-z_-]{35}',
-    'Azure Key': r'(?i)azure[_-]?(?:key|secret|password)\s*[:=]\s*["\']?([a-zA-Z0-9/+=]{40,})["\']?',
-    'Database URL': r'(?i)(postgresql|mysql|mongodb|redis)://[^\s]+:[^\s]+@[^\s]+',
-    'Stripe API Key': r'sk_live_[0-9a-zA-Z]{24,}',
-    'Twilio API Key': r'SK[0-9a-fA-F]{32}',
-    'SendGrid API Key': r'SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43}',
-    'Mailchimp API Key': r'[0-9a-f]{32}-us[0-9]{1,2}',
-    'NPM Token': r'npm_[A-Za-z0-9]{36}',
-    'PyPI Token': r'pypi-AgEIcHlwaS5vcmc[A-Za-z0-9_-]{50,}',
-    'Docker Hub Token': r'dckr_pat_[a-zA-Z0-9_-]{40}'
+    "AWS Access Key": r"\bAKIA[0-9A-Z]{16}\b",
+    "GitHub Token": r"\bgh[pousr]_[A-Za-z0-9]{36,}\b",
+    "Private Key": r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----",
+    "JWT Token": r"\beyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\b",
+    "Slack Token": r"\bxox[baprs]-[0-9A-Za-z-]{10,}\b",
+    "Google API Key": r"\bAIza[0-9A-Za-z_-]{35}\b",
+    "Stripe API Key": r"\bsk_live_[0-9a-zA-Z]{24,}\b",
+    "Twilio API Key": r"\bSK[0-9a-fA-F]{32}\b",
+    "SendGrid API Key": r"\bSG\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}\b",
+    "Mailchimp API Key": r"\b[0-9a-f]{32}-us[0-9]{1,2}\b",
+    "NPM Token": r"\bnpm_[A-Za-z0-9]{36}\b",
+    "PyPI Token": r"\bpypi-AgEIcHlwaS5vcmc[A-Za-z0-9_-]{50,}\b",
+    "Docker Hub Token": r"\bdckr_pat_[A-Za-z0-9_-]{40}\b",
+    "Database URL": r"(?i)(?:postgresql|mysql|mongodb|redis)://[^\s]+:[^\s]+@[^\s]+",
 }
 
 # False positive patterns
@@ -48,7 +46,7 @@ SECRET_KEYWORDS = [
 ]
 
 # Patterns to detect variable assignments that might contain secrets
-ASSIGNMENT_PATTERNS = [
+ASSIGNMENT_PATTERNS_RAW = [
     # API_KEY = "abc123def456" or password: "secret123"
     r'([a-zA-Z_][a-zA-Z0-9_]*)\s*[:=]\s*["\']([^"\']+)["\']',
 
@@ -79,3 +77,5 @@ ASSIGNMENT_PATTERNS = [
     # $api_key = "abc123"; (PHP/Perl variables)
     r'\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*["\']([^"\']+)["\']',
 ]
+
+ASSIGNMENT_PATTERNS = [re.compile(p) for p in ASSIGNMENT_PATTERNS_RAW]

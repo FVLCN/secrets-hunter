@@ -19,7 +19,7 @@ class PatternDetector(BaseDetector):
                         file=filepath,
                         line=line_num,
                         type=secret_type,
-                        match=string[:50] + ('...' if len(string) > 50 else ''),
+                        match=string,
                         context=line.strip()[:100],
                         detection_method='pattern',
                         confidence=100

@@ -2,7 +2,7 @@ import math
 import sys
 
 
-class ProgressBar:
+class FolderProgressBar:
     def __init__(self, bar_width: int = 40):
         self.bar_width = bar_width
 
@@ -13,5 +13,14 @@ class ProgressBar:
         percent = int(ratio * 100)
         sys.stdout.write(
             f"\r[{bar}] {percent:3d}% ({done}/{total_files})"
+        )
+        sys.stdout.flush()
+
+
+class FileProgressBar:
+    @staticmethod
+    def render(current_line: int):
+        sys.stdout.write(
+            f"\rCurrent progress: scanning line #{current_line}..."
         )
         sys.stdout.flush()

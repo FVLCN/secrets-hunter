@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 
 from secrets_hunter.scanner import SecretsHunter
+from secrets_hunter.config import settings
 from secrets_hunter.config.settings import ScannerConfig
 from secrets_hunter.reporters.console_reporter import ConsoleReporter
 from secrets_hunter.reporters.json_reporter import JSONReporter
@@ -24,7 +25,6 @@ logo_ascii = r"""
                        +==============+                      
 """
 
-MAX_WORKERS_MULTIPLIER = 2
 
 class CLI:
     def __init__(self):
@@ -61,8 +61,8 @@ class CLI:
         p.add_argument(
             '--b64-entropy',
             type=float,
-            default=ScannerConfig.BASE64_ENTROPY_THRESHOLD,
-            help=f'Base64 entropy threshold (default: {ScannerConfig.BASE64_ENTROPY_THRESHOLD})'
+            default=ScannerConfig.B64_ENTROPY_THRESHOLD,
+            help=f'Base64 entropy threshold (default: {ScannerConfig.B64_ENTROPY_THRESHOLD})'
         )
 
         p.add_argument(
@@ -91,8 +91,8 @@ class CLI:
         args = self.parser.parse_args()
 
         validators = [
-            (self.validate_entropy, [args.hex_entropy, "hex-entropy"]),
-            (self.validate_entropy, [args.b64_entropy, "b64-entropy"]),
+            (self.validate_entropy, [args.hex_entropy, "hex-entropy", settings.HEX_ENTROPY_MAX]),
+            (self.validate_entropy, [args.b64_entropy, "b64-entropy", settings.B64_ENTROPY_MAX]),
             (self.validate_min_length, [args.min_length]),
             (self.validate_workers, [args.workers]),
             (self.validate_json, [args.json_output])
@@ -103,16 +103,16 @@ class CLI:
 
         return args
 
-    def validate_entropy(self, value, name):
-        if not 0.0 <= value <= 8.0:
-            self.parser.error(f"--{name} must be between 0.0 and 8.0")
+    def validate_entropy(self, value, name, v_max):
+        if not 0.0 <= value <= v_max:
+            self.parser.error(f"--{name} must be between 0.0 and {v_max}")
 
     def validate_min_length(self, value):
         if value <= 0:
             self.parser.error("--min-length must be > 0")
 
     def validate_workers(self, value):
-        max_workers = (os.cpu_count() or 1) * MAX_WORKERS_MULTIPLIER
+        max_workers = (os.cpu_count() or 1) * settings.MAX_WORKERS_MULTIPLIER
 
         if value <= 0:
             self.parser.error("--workers must be > 0")
@@ -123,9 +123,9 @@ class CLI:
         if not path:
             return
 
-        parent = Path(path).parent or Path(".")
+        parent = Path(path).parent
 
-        if not parent.exists():
+        if not parent.exists() or not parent.is_dir():
             self.parser.error(f"--json parent dir does not exist: {parent}")
 
 
@@ -137,7 +137,7 @@ def main():
 
     config = ScannerConfig()
     config.HEX_ENTROPY_THRESHOLD = args.hex_entropy
-    config.BASE64_ENTROPY_THRESHOLD = args.b64_entropy
+    config.B64_ENTROPY_THRESHOLD = args.b64_entropy
     config.MIN_STRING_LENGTH = args.min_length
     config.MAX_WORKERS = args.workers
 

@@ -2,8 +2,20 @@ import re
 
 from typing import List
 
+from secrets_hunter.config.patterns import ASSIGNMENT_PATTERNS
+
 
 class StringsExtractor:
+    @staticmethod
+    def assignment_map(line: str) -> dict[str, set[str]]:
+        out: dict[str, set[str]] = {}
+        for pattern in ASSIGNMENT_PATTERNS:
+            for match in pattern.finditer(line):
+                var = match.group(1).lower()
+                val = match.group(2).strip().strip("'\"")
+                out.setdefault(val, set()).add(var)
+        return out
+
     @staticmethod
     def extract(line: str) -> List[str]:
         """Extract all potential strings from a line"""
