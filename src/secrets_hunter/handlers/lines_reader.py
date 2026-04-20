@@ -1,16 +1,18 @@
-import logging
-
 from typing import Iterable
 from pathlib import Path
 
-from secrets_hunter.config import PEM_BEGIN_RE, PEM_END_RE
-
-logger = logging.getLogger(__name__)
+from secrets_hunter.config import PEM_BEGIN_RE
+from secrets_hunter.models import SourceFragment
 
 
 class LinesReader:
-    def read(self, lines: Iterable[str], filtepath: Path):
-        yield from enumerate(lines, 1)
+    def read(self, lines: Iterable[str], filepath: Path):
+        for line_num, line in enumerate(lines, 1):
+            yield SourceFragment(
+                content=line,
+                start_line=line_num,
+                end_line=line_num,
+            )
 
 
 class PEMAwareLinesReader(LinesReader):
@@ -18,22 +20,39 @@ class PEMAwareLinesReader(LinesReader):
         iterator = enumerate(lines, 1)
 
         for line_num, line in iterator:
-            if not PEM_BEGIN_RE.search(line):
-                yield line_num, line
+            header_match = PEM_BEGIN_RE.search(line)
+
+            if not header_match:
+                yield SourceFragment(
+                    content=line,
+                    start_line=line_num,
+                    end_line=line_num,
+                )
                 continue
 
-            yield line_num, line
+            block_lines = [line]
+            start_line = line_num
+            end_line = line_num
+            pem_type = header_match.group(1)
+            expected_footer = f"-----END {pem_type}-----"
 
-            if PEM_END_RE.search(line):
+            if expected_footer in line:
+                yield SourceFragment(
+                    content="".join(block_lines),
+                    start_line=start_line,
+                    end_line=end_line,
+                )
                 continue
 
-            found_end = False
+            for skipped_line_num, skipped_line in iterator:
+                block_lines.append(skipped_line)
+                end_line = skipped_line_num
 
-            for _, skipped_line in iterator:
-                if PEM_END_RE.search(skipped_line):
-                    found_end = True
+                if expected_footer in skipped_line:
                     break
 
-            if not found_end:
-                print()
-                logger.warning(f"{filepath}: truncated PEM block detected after line {line_num}")
+            yield SourceFragment(
+                content="".join(block_lines),
+                start_line=start_line,
+                end_line=end_line,
+            )

@@ -45,6 +45,7 @@ class CLIDefaults:
     MIN_STRING_LENGTH = 10
     MIN_CONFIDENCE = 0
     MAX_WORKERS = 4
+    FAIL_ON_FINDINGS = False
     REVEAL_FINDINGS = False
     LOG_LEVEL = "INFO"
 
@@ -56,6 +57,7 @@ class CLIArgs:
     min_string_length: int = CLIDefaults.MIN_STRING_LENGTH
     min_confidence: int = CLIDefaults.MIN_CONFIDENCE
     max_workers: int = CLIDefaults.MAX_WORKERS
+    fail_on_findings: bool = CLIDefaults.FAIL_ON_FINDINGS
     reveal_findings: bool = CLIDefaults.REVEAL_FINDINGS
     log_level: str = CLIDefaults.LOG_LEVEL
 
@@ -67,6 +69,7 @@ class CLIArgs:
             min_string_length=args.min_length,
             min_confidence=args.min_confidence,
             max_workers=args.workers,
+            fail_on_findings=args.fail_on_findings,
             reveal_findings=args.reveal_findings,
             log_level=args.log_level
         )

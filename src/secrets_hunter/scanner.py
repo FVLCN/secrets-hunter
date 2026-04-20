@@ -10,7 +10,7 @@ from secrets_hunter.detectors.pattern_detector import PatternDetector
 from secrets_hunter.validators import FalsePositiveFindingsValidator
 from secrets_hunter.handlers.progress_bar import FileProgressBar, FolderProgressBar
 from secrets_hunter.semantics import StringSemanticsClassifier
-from secrets_hunter.models import Finding, Severity, DetectionMethod, Confidence
+from secrets_hunter.models import Finding, Severity, DetectionMethod, Confidence, SourceFragment
 from secrets_hunter.models.config import RuntimeConfig
 from secrets_hunter.handlers import (
     FileHandler, LineFragmenter, FindingsProcessor, PEMAwareLinesReader
@@ -51,38 +51,41 @@ class SecretsHunter:
 
         return False, ""
 
-    def extract_findings_from_line(self, line_num: int, line: str, filepath: Path) -> list[Finding]:
-        # Step 1: Extract all strings from a line
-        all_fragments = self.lines_fragmenter.extract(line)
+    def extract_findings_from_fragment(self, source_fragment: SourceFragment, filepath: Path) -> list[Finding]:
+        fragment_line = source_fragment.start_line
+        fragment_content = source_fragment.content
+
+        # Step 1: Extract all strings from a source fragment
+        all_fragments = self.lines_fragmenter.extract(source_fragment)
 
         if not all_fragments:
             return []
 
         # Step 2: Find high entropy strings
         entropy_findings = self.entropy_detector.detect(
-            line, line_num, str(filepath), all_fragments
+            fragment_content, fragment_line, str(filepath), all_fragments
         )
 
         # Step 3: Find pattern matching strings
         pattern_findings = self.pattern_detector.detect(
-            line, line_num, str(filepath), all_fragments
+            fragment_content, fragment_line, str(filepath), all_fragments
         )
 
         # Step 3.5: prioritize pattern findings (dedupe by match)
         pattern_matches = {f.match for f in pattern_findings if f.match}
 
-        all_line_findings = list(pattern_findings)
+        all_fragment_findings = list(pattern_findings)
 
         for ef in entropy_findings:
             if ef.match and ef.match not in pattern_matches:
-                all_line_findings.append(ef)
+                all_fragment_findings.append(ef)
 
-        if not all_line_findings:
+        if not all_fragment_findings:
             return []
 
         # Step 4: Check and process the assignment context
-        assignment_context = self.lines_fragmenter.assignment_map(line)
-        transformed_findings = self._process_assignment_context(all_line_findings, assignment_context)
+        assignment_context = self.lines_fragmenter.assignment_map(fragment_content)
+        transformed_findings = self._process_assignment_context(all_fragment_findings, assignment_context)
 
         return transformed_findings
 
@@ -177,13 +180,15 @@ class SecretsHunter:
             if lines is None:
                 logger.error(f"Failed to read file: {filepath}")
             else:
-                for line_num, line in self.lines_reader.read(lines, filepath):
-                    line_findings = self.extract_findings_from_line(line_num, line, filepath)
-                    findings.extend(line_findings)
-                    last_line_number = line_num
+                for source_fragment in self.lines_reader.read(lines, filepath):
+                    fragment_findings = self.extract_findings_from_fragment(source_fragment, filepath)
+                    findings.extend(fragment_findings)
+                    last_line_number = source_fragment.end_line
 
-                    if progress_bar and (line_num % progress_bar.STEP == 0 or line_num == 1):
-                        progress_bar.render(line_num)
+                    if progress_bar and (
+                        source_fragment.end_line % progress_bar.STEP == 0 or source_fragment.start_line == 1
+                    ):
+                        progress_bar.render(source_fragment.end_line)
 
                 if progress_bar and last_line_number:
                     progress_bar.render(last_line_number)

@@ -7,7 +7,8 @@ files = [
     "shrinkwrap.yaml",
     "checksums.txt",
     "SHA256SUMS",
-    "MD5SUMS"
+    "MD5SUMS",
+    "CHANGELOG.md"
 ]
 
 extensions = [

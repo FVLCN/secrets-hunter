@@ -27,7 +27,7 @@ class EntropyDetector(BaseDetector):
         findings = []
 
         for fragment in fragments:
-            cleaned = self.ignore_prefixes.sub('', fragment.text)
+            cleaned = self.ignore_prefixes.sub('', fragment.content)
 
             entropy = entropy_utils.calculate_shannon_entropy(cleaned)
             is_hex = entropy_utils.is_hex_string(cleaned)
@@ -55,8 +55,8 @@ class EntropyDetector(BaseDetector):
                 line=line_num,
                 severity=Severity.LOW,
                 type=string_type,
-                source=fragment.source,
-                match=fragment.text,
+                fragment=fragment,
+                match=fragment.content,
                 context=line.strip()[:100],
                 detection_method=DetectionMethod.ENTROPY,
                 confidence=Confidence.HIGH_ENTROPY_NO_ASSIGNMENT_CONTEXT,

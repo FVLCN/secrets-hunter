@@ -6,6 +6,7 @@ from secrets_hunter import __version__
 from secrets_hunter.scanner import SecretsHunter
 from secrets_hunter.config import CLIArgs, CLIDefaults, load_runtime_config
 from secrets_hunter.validators import CLIArgsValidator
+from secrets_hunter.models import Confidence
 from secrets_hunter.reporters.console_reporter import ConsoleReporter
 from secrets_hunter.reporters.json_reporter import JSONReporter
 from secrets_hunter.reporters.sarif_reporter import SARIFReporter
@@ -88,6 +89,11 @@ scan_args = {
         "type": int,
         "default": CLIDefaults.MIN_CONFIDENCE,
         "help": f"minimum confidence of findings to display (default: {CLIDefaults.MIN_CONFIDENCE})"
+    },
+    "--fail-on-findings": {
+        "action": "store_true",
+        "default": CLIDefaults.FAIL_ON_FINDINGS,
+        "help": "exit with code 2 if reported findings remain after filtering"
     }
 }
 
@@ -125,7 +131,7 @@ def display_logo_with_version(logo, version):
 class CLI:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
-            description="Detect secrets and sensitive information in your codebase",
+            description="The Secrets Scanner that respects your time",
             formatter_class=argparse.RawDescriptionHelpFormatter
         )
         self.parser.add_argument(
@@ -207,6 +213,11 @@ def main():
         SARIFReporter.export(findings, args.sarif_output)
     else:
         ConsoleReporter.format_report(findings)
+
+    if cli_args.fail_on_findings:
+        for finding in findings:
+            if finding.confidence > Confidence.REJECTED:
+                sys.exit(2)
 
     sys.exit(0)
 

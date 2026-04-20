@@ -1,6 +1,12 @@
 from .finding import Finding, DetectionMethod, Severity, Confidence
 from .semantics_classification import StringSemanticsClassification, StringKind
-from .line_fragment import LineFragment, StringSource
+from .line_fragment import (
+    LineFragment,
+    GenericStringFragment,
+    DBConnectionFragment,
+    PEMKeyFragment,
+    SourceFragment
+)
 
 __all__ = [
     'Finding',
@@ -10,5 +16,8 @@ __all__ = [
     'StringSemanticsClassification',
     'StringKind',
     'LineFragment',
-    'StringSource'
+    'GenericStringFragment',
+    'DBConnectionFragment',
+    'PEMKeyFragment',
+    'SourceFragment'
 ]

@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "secrets-hunter"
-version = "0.6.0"
-description = "Detect secrets and sensitive information in your codebase"
+version = "0.7.0"
+description = "The Secrets Scanner that respects your time"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.11"
 license = "MIT"

@@ -1,9 +1,9 @@
 from dataclasses import dataclass, replace, asdict
 from enum import Enum, IntEnum
 
-from .line_fragment import StringSource
+from .line_fragment import LineFragment
 
-DISPLAY_EXCLUDED_FIELDS = {"source"}
+REPORT_EXCLUDED_FIELDS = {"fragment"}
 
 
 class Severity(str, Enum):
@@ -41,13 +41,13 @@ class Finding:
     confidence_reasoning: str
     detection_method: DetectionMethod
     confidence: Confidence
-    source: StringSource = StringSource.GENERIC
+    fragment: LineFragment
     context_var: str | None = None
 
     def to_display(self) -> dict[str, object]:
         data = asdict(self)
 
-        for field in DISPLAY_EXCLUDED_FIELDS:
+        for field in REPORT_EXCLUDED_FIELDS:
             data.pop(field, None)
 
         return data

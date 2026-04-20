@@ -13,26 +13,6 @@ secrets-hunter . --config team-overrides.toml
 
 Overlays are applied **in the order provided**. Overlays don't replace the entire configuration, but merge on top of existing settings instead.
 
-## Table of Contents
-
-- [Viewing Current Configuration](#viewing-current-configuration)
-- [Full Schema](#full-schema)
-  - [Pattern Table](#pattern-table)
-  - [Secret Patterns](#secret-patterns)
-  - [Exclude Patterns](#exclude-patterns)
-  - [Secret Keywords](#secret-keywords)
-  - [Exclude Keywords](#exclude-keywords)
-  - [Assignment Patterns](#assignment-patterns)
-  - [Ignore Rules](#ignore-rules)
-- [Overlays](#overlays)
-  - [Arrays of Tables](#arrays-of-tables)
-  - [Lists of Strings](#lists-of-strings)
-  - [Removals](#removals)
-- [Practical Examples](#practical-examples)
-- [Keep Things Clean](#keep-things-clean)
-
----
-
 ## Viewing Current Configuration
 
 The `showconfig` command displays the scanner's active configuration. You can view the complete configuration or specific sections.

@@ -9,6 +9,7 @@ exclude_keywords = [
     'sum',
     'version',
     'public',
+    'pubkey',
     'certificate',
     'cert',
     'example',
@@ -19,7 +20,9 @@ exclude_keywords = [
     'placeholder',
     'template',
     'timestamp',
-    'created'
+    'created',
+    'revision',
+    'revises'
 ]
 
 # Keywords that suggest secrets
@@ -60,7 +63,7 @@ secret_keywords = [
 # Patterns to detect variable assignments that might contain secrets
 assignment_patterns = [
     # Assignment operators: a = "secret" or "a" = "secret" or key => "value" or key =: "value" etc.
-    '''["']?([a-zA-Z_][a-zA-Z0-9_]*)["']?\s*(?:=|:=|=>|=:)\s*["'`]([^"'`]+)["'`]''',
+    '''["']?([a-zA-Z_][a-zA-Z0-9_]*)["']?\s*(?:==|=|:=|=>|=:)\s*["'`]([^"'`]+)["'`]''',
 
     # Colon key-value pairs: a: "secret" or "a": "secret" (JSON, YAML)
     '''["']?([a-zA-Z_][a-zA-Z0-9_]*)["']?\s*:\s*["']([^"']+)["']''',
@@ -77,8 +80,8 @@ assignment_patterns = [
     # C/C++ preprocessor defines: #define API_KEY "secret123"
     '''#define\s+([A-Z_][A-Z0-9_]*)\s+["']([^"']+)["']''',
 
-    # Python with type hints: api_key: str = "secret123"
-    '''([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*\w+\s*=\s*["']([^"']+)["']''',
+    # Python with type hints: api_key: str | None = "secret123"
+    '''([a-zA-Z_][a-zA-Z0-9_]*)\s*:\s*[^=\n]+\s*=\s*["']([^"']+)["']''',
 ]
 
 # Regex patterns for known secret formats
@@ -189,16 +192,6 @@ pattern = '''(.)\1{4,}'''
 
 [[exclude_patterns]]
 category = "hash"
-name = "Base64 encoded MD5"
-pattern = '''(?<![A-Za-z0-9+/])[A-Za-z0-9+/]{27}=(?![A-Za-z0-9+/=])'''
-
-[[exclude_patterns]]
-category = "hash"
-name = "Base64 encoded SHA256"
-pattern = '''(?<![A-Za-z0-9+/])[A-Za-z0-9+/]{43}=(?![A-Za-z0-9+/=])'''
-
-[[exclude_patterns]]
-category = "hash"
 name = "MD5"
 pattern = '''\b[0-9a-f]{32}\b'''
 
@@ -245,6 +238,22 @@ name = "Qwen"
 pattern = 'qwen'
 
 [[exclude_patterns]]
+category = "model name"
+name = "Mistral"
+pattern = 'mistral'
+
+[[exclude_patterns]]
+category = "model name"
+name = "Ministral"
+pattern = 'ministral'
+
+[[exclude_patterns]]
+category = "model name"
+name = "Hugging Face"
+pattern = 'huggingface'
+flags = ['IGNORECASE']
+
+[[exclude_patterns]]
 category = "call"
 name = "OpenAI tool"
 pattern = '''\bcall_[a-z0-9]{20,}\b'''
@@ -275,3 +284,8 @@ pattern = 'blob'
 category = "(misc)"
 name = "webpack"
 pattern = 'webpack'
+
+[[exclude_patterns]]
+category = "ID"
+name = "Stripe price"
+pattern = '\bprice_[A-Za-z0-9]{24}\b'

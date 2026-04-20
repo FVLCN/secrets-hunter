@@ -1,12 +1,14 @@
 import re
 
 from secrets_hunter.config import STRIP, PEM_BEGIN_RE, DB_URI_RE
-from secrets_hunter.models.line_fragment import LineFragment, StringSource
+from secrets_hunter.models.line_fragment import (
+    LineFragment, GenericStringFragment, DBConnectionFragment, PEMKeyFragment, SourceFragment
+)
 
 
 class LineFragmenter:
     """
-    Extracts candidate secret fragments from a single source line.
+    Extracts candidate secret fragments from a SourceFragment.
     """
 
     def __init__(self, assignment_patterns, min_token_length, entropy_detector):
@@ -48,17 +50,51 @@ class LineFragmenter:
     def _extract_and_blank(
         line: str,
         pattern,
-        source: StringSource
+        fragment_factory
     ) -> tuple[str, list[LineFragment]]:
         """Match all occurrences of pattern, collect as LineFragments, blank them out."""
         fragments = []
 
         for m in pattern.finditer(line):
-            fragments.append(LineFragment(m.group(0), source))
+            fragments.append(fragment_factory(m.group(0)))
             start, end = m.span()
             line = line[:start] + " " * (end - start) + line[end:]
 
         return line, fragments
+
+    @staticmethod
+    def _extract_pem_and_blank(source_fragment: SourceFragment) -> tuple[str, list[PEMKeyFragment]]:
+        content = source_fragment.content
+        fragments: list[PEMKeyFragment] = []
+        header_match = PEM_BEGIN_RE.search(content)
+
+        while header_match is not None:
+            pem_type = header_match.group(1)
+            expected_footer = f"-----END {pem_type}-----"
+            footer_start = content.find(expected_footer, header_match.end())
+
+            fragment_end = footer_start + len(expected_footer) if footer_start != -1 else len(content)
+            fragment_content = content[header_match.start():fragment_end]
+            body = content[header_match.end():footer_start if footer_start != -1 else fragment_end].strip() or None
+            footer = expected_footer if footer_start != -1 else None
+
+            fragments.append(PEMKeyFragment(
+                content=fragment_content,
+                header=header_match.group(0),
+                body=body,
+                footer=footer,
+                inline=source_fragment.start_line == source_fragment.end_line,
+            ))
+
+            content = (
+                content[:header_match.start()]
+                + " " * (fragment_end - header_match.start())
+                + content[fragment_end:]
+            )
+
+            header_match = PEM_BEGIN_RE.search(content)
+
+        return content, fragments
 
     def _looks_like_identifier(self, s: str) -> bool:
         if not self._identifier_re.match(s):
@@ -68,7 +104,7 @@ class LineFragmenter:
             return False
 
         # high entropy - likely not an identifier but a token chunk
-        findings = self.entropy_detector.detect("", 0, "", [LineFragment(s)])
+        findings = self.entropy_detector.detect("", 0, "", [GenericStringFragment(s)])
 
         return len(findings) == 0
 
@@ -85,13 +121,13 @@ class LineFragmenter:
 
         return None
 
-    def extract(self, line: str) -> list[LineFragment]:
+    def extract(self, source_fragment: SourceFragment) -> list[LineFragment]:
         fragments = []
 
         # PEM headers, DB URIs
-        line, pem = self._extract_and_blank(line, PEM_BEGIN_RE, StringSource.PEM_HEADER)
+        line, pem = self._extract_pem_and_blank(source_fragment)
         fragments.extend(pem)
-        line, db_conn = self._extract_and_blank(line, DB_URI_RE, StringSource.DB_CONNECTION)
+        line, db_conn = self._extract_and_blank(line, DB_URI_RE, DBConnectionFragment)
         fragments.extend(db_conn)
 
         # 1) collect quoted strings + blank them out
@@ -103,9 +139,9 @@ class LineFragmenter:
                 result = self._split_assignment(s)
 
                 if result:
-                    fragments.append(LineFragment(result))
+                    fragments.append(GenericStringFragment(result))
                 elif result is None:
-                    fragments.append(LineFragment(s))
+                    fragments.append(GenericStringFragment(s))
 
             # remove whole quoted span to avoid extracting them twice
             start, end = m.span()
@@ -118,16 +154,16 @@ class LineFragmenter:
             result = self._split_assignment(cleaned)
 
             if result:
-                fragments.append(LineFragment(result))
+                fragments.append(GenericStringFragment(result))
             elif result is None and len(cleaned) >= self.min_token_length:
-                fragments.append(LineFragment(cleaned))
+                fragments.append(GenericStringFragment(cleaned))
 
         seen = set()
         unique_strings = []
 
         for f in fragments:
-            if f.text not in seen:
-                seen.add(f.text)
+            if f.content not in seen:
+                seen.add(f.content)
                 unique_strings.append(f)
 
         return unique_strings
