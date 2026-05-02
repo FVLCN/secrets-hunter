@@ -93,7 +93,13 @@ scan_args = {
     "--fail-on-findings": {
         "action": "store_true",
         "default": CLIDefaults.FAIL_ON_FINDINGS,
-        "help": "exit with code 2 if reported findings remain after filtering"
+        "help": "exit with code 2 if report contains non-rejected findings"
+    },
+    "--truncate-long-matches": {
+        "action": "store_true",
+        "dest": "truncate_long_matches",
+        "default": CLIDefaults.TRUNCATE_LONG_MATCHES,
+        "help": "truncate long finding matches in output"
     }
 }
 

@@ -73,10 +73,18 @@ class LineFragmenter:
             expected_footer = f"-----END {pem_type}-----"
             footer_start = content.find(expected_footer, header_match.end())
 
-            fragment_end = footer_start + len(expected_footer) if footer_start != -1 else len(content)
-            fragment_content = content[header_match.start():fragment_end]
-            body = content[header_match.end():footer_start if footer_start != -1 else fragment_end].strip() or None
-            footer = expected_footer if footer_start != -1 else None
+            if footer_start != -1:
+                fragment_end = footer_start + len(expected_footer)
+                fragment_content = content[header_match.start():fragment_end]
+                body = content[header_match.end():footer_start].strip() or None
+                footer = expected_footer
+                blank_end = fragment_end
+            else:
+                fragment_end = header_match.end()
+                fragment_content = header_match.group(0)
+                body = None
+                footer = None
+                blank_end = len(content)
 
             fragments.append(PEMKeyFragment(
                 content=fragment_content,
@@ -88,8 +96,8 @@ class LineFragmenter:
 
             content = (
                 content[:header_match.start()]
-                + " " * (fragment_end - header_match.start())
-                + content[fragment_end:]
+                + " " * (blank_end - header_match.start())
+                + content[blank_end:]
             )
 
             header_match = PEM_BEGIN_RE.search(content)

@@ -15,16 +15,12 @@ class ConsoleReporter(BaseConsoleReporter):
     @staticmethod
     def format_report(findings: list[Finding]) -> None:
         if not findings:
-            print("No secrets detected!")
             return
-
-        total = len(findings)
-        plural = "s" if total != 1 else ""
 
         sep = "=" * ConsoleReporter.WIDTH
         dash = "-" * ConsoleReporter.WIDTH
 
-        lines: list[str] = [f"\nFound {total} potential secret{plural}:\n", sep]
+        lines: list[str] = [f"\n{sep}"]
 
         for i, f in enumerate(findings, 1):
             lines.append(f"[{i}] {f.title}")

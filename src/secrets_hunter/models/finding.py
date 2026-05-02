@@ -67,6 +67,9 @@ class Finding:
             context="***MASKED***"
         )
 
+    def with_match(self, match: str) -> 'Finding':
+        return replace(self, match=match)
+
     def with_context(
         self,
         var: str,

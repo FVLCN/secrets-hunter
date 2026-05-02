@@ -2,6 +2,7 @@ import logging
 import time
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from collections import Counter
 from pathlib import Path
 
 from secrets_hunter.config import CLIArgs, STRIP
@@ -299,10 +300,29 @@ class SecretsHunter:
         logger.info(f"Scan duration: {duration}")
 
         if success:
-            if not self.cli_args.min_confidence:
-                logger.info("Showing all findings, including rejected ones. "
-                            "To exclude them from the report, use --min-confidence argument")
-
             findings = FindingsProcessor.process(findings, self.cli_args)
+            severity_counts = Counter(f.severity for f in findings)
+            total_findings = len(findings)
+
+            if total_findings == 0:
+                logger.info("No secrets found")
+            elif total_findings == 1:
+                finding = findings[0]
+                logger.info(f"1 {finding.severity.lower()} severity secret was found")
+            else:
+                severity_summary = " ".join(
+                    f"{severity_counts[severity]} {severity.lower()},"
+                    for severity in Severity
+                    if severity_counts[severity]
+                )
+
+                if severity_summary.endswith(","):
+                    severity_summary = severity_summary[:-1]
+
+                logger.info(f"Found {total_findings} secrets: {severity_summary}")
+
+            if total_findings > 0 and not self.cli_args.min_confidence:
+                logger.info("Showing all findings, including rejected ones. "
+                            "Use the --min-confidence flag to exclude them from the report.")
 
         return findings, success

@@ -3,6 +3,7 @@ import re
 
 from binascii import Error as BinasciiError
 
+from secrets_hunter.config.settings import MIN_PEM_BODY_BYTES
 from secrets_hunter.models import Finding, DBConnectionFragment, PEMKeyFragment
 from secrets_hunter.models.config import ExcludePattern
 
@@ -11,8 +12,9 @@ PUBLIC_PEM = ExcludePattern(name="Public", category="Key", pattern=re.compile("P
 CERT = ExcludePattern(name="Public", category="Certificate", pattern=re.compile("CERTIFICATE"))
 SEMANTICS = ExcludePattern(name="Semantics -", category="string with English-like words", pattern=re.compile(''))
 MISSING_PEM_BODY = ExcludePattern(name="Missing", category="PEM body", pattern=re.compile(''))
-MISSING_PEM_FOOTER = ExcludePattern(name="Missing", category="PEM footer", pattern=re.compile(''))
+TOO_SHORT_PEM_BODY = ExcludePattern(name="Too short", category="PEM body", pattern=re.compile(''))
 INVALID_PEM_BODY = ExcludePattern(name="Invalid", category="PEM base64 body", pattern=re.compile(''))
+MISSING_PEM_FOOTER = ExcludePattern(name="Missing", category="PEM footer", pattern=re.compile(''))
 DB_CONN_PLACEHOLDER = ExcludePattern(
     name="db connection", category="placeholder", pattern=re.compile(r'%[a-zA-Z]|\{.*?}|\$\{.*?}')
 )
@@ -35,35 +37,46 @@ class FalsePositiveFindingsValidator:
         return False, None
 
     def check_rejection_for_pem_key(self, pem_key: PEMKeyFragment) -> tuple[bool, ExcludePattern | None]:
+        if not pem_key.footer:
+            return True, MISSING_PEM_FOOTER
+
+        if not pem_key.body:
+            return True, MISSING_PEM_BODY
+
         pem_header = pem_key.header or ""
         rejected, reason = self.check_rejection_for_pem_header(pem_header)
 
         if rejected:
             return True, reason
 
-        if not pem_key.body:
-            return True, MISSING_PEM_BODY
+        normalized_body = (
+            pem_key.body
+            .replace("\\r\\n", "\n")
+            .replace("\\n", "\n")
+            .replace("\\r", "\n")
+        )
+        normalized_body = "".join(normalized_body.split())
 
-        if not pem_key.footer:
-            return True, MISSING_PEM_FOOTER
+        decoded_body = self.decode_base64_body(normalized_body)
 
-        normalized_body = "".join(pem_key.body.split())
-
-        if not self.is_valid_base64_body(normalized_body):
+        if decoded_body is None:
             return True, INVALID_PEM_BODY
+
+        if len(decoded_body) < MIN_PEM_BODY_BYTES:
+            return True, TOO_SHORT_PEM_BODY
 
         return False, None
 
     @staticmethod
-    def is_valid_base64_body(body: str) -> bool:
+    def decode_base64_body(body: str) -> bytes | None:
         if not body:
-            return False
+            return None
 
         try:
-            base64.b64decode(body, validate=True)
-            return True
+            body_decoded = base64.b64decode(body, validate=True)
+            return body_decoded
         except (ValueError, BinasciiError):
-            return False
+            return None
 
     def check_rejection_for_db_conn_string(self, db_conn_string: str) -> tuple[bool, ExcludePattern | None]:
         password_match = re.search(r'://[^:/@]+:([^@/\s]+)@', db_conn_string)

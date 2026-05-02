@@ -8,6 +8,7 @@ exclude_keywords = [
     'integrity',
     'sum',
     'version',
+    'reference',
     'public',
     'pubkey',
     'certificate',
@@ -20,6 +21,7 @@ exclude_keywords = [
     'placeholder',
     'template',
     'timestamp',
+    'rootobject',
     'created',
     'revision',
     'revises'
@@ -167,6 +169,11 @@ pattern = '12345'
 category = "placeholder"
 name = "abc123"
 pattern = 'abc123'
+
+[[exclude_patterns]]
+category = "placeholder"
+name = "123abc"
+pattern = '123abc'
 
 [[exclude_patterns]]
 category = "placeholder"
