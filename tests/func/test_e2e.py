@@ -20,7 +20,7 @@ class KeyBlock:
 KEY_BLOCK_RE = re.compile(
     r"-----BEGIN (?P<type>[^-]+?)-----\s*"
     r"(?P<body>.*?)"
-    r"(?:(?P<footer>-----[A-Z]+ (?P<end_type>[^-]+?)-----)|$)",
+    r"-----END (?P=type)-----",
     re.DOTALL,
 )
 
@@ -42,6 +42,7 @@ report_json = str(SCRIPT_DIR / "results.json")
 report_sarif = str(SCRIPT_DIR / "results.sarif")
 
 
+
 class TestE2E(unittest.TestCase):
     """End-to-end tests for secrets hunter CLI"""
 
@@ -52,6 +53,90 @@ class TestE2E(unittest.TestCase):
     def tearDown(self):
         """Clean up test environment after each test"""
         self._cleanup_reports()
+
+    def _get_key_block_lines(self):
+        """
+        Return all line numbers that belong to key blocks.
+        These lines should not be checked as regular line findings.
+        """
+        key_block_lines = set()
+
+        for block in self.key_blocks:
+            key_block_lines.update(range(block.begin_line, block.end_line + 1))
+
+        return key_block_lines
+
+    def _get_key_block_start_lines(self):
+        """
+        Return lines where key block findings are expected.
+        """
+        return {block.begin_line for block in self.key_blocks}
+
+    def _validate_mixed_line_numbers(self, findings, line_extractor):
+        """
+        Validate mixed scenario:
+        - regular line findings are expected for all lines outside key blocks
+        - key findings are expected only on key block start lines
+        - lines inside key blocks must not appear as regular findings
+        """
+        all_lines = set(range(1, len(self.source_lines) + 1))
+
+        key_block_lines = self._get_key_block_lines()
+        key_start_lines = self._get_key_block_start_lines()
+
+        expected_regular_lines = all_lines - key_block_lines
+        expected_lines = expected_regular_lines | key_start_lines
+
+        actual_lines = set()
+        for finding in findings:
+            try:
+                actual_lines.add(line_extractor(finding))
+            except (KeyError, IndexError, TypeError) as e:
+                print(f"Warning: Could not extract line number from finding: {e}")
+
+        missing_lines = expected_lines - actual_lines
+        extra_lines = actual_lines - expected_lines
+
+        error_messages = []
+
+        if missing_lines:
+            missing_key_lines = missing_lines & key_start_lines
+            missing_regular_lines = missing_lines - key_start_lines
+
+            if missing_key_lines:
+                error_messages.append(
+                    f"Missing key findings for block start lines: {sorted(missing_key_lines)}"
+                )
+
+                for block in self.key_blocks:
+                    if block.begin_line in missing_key_lines:
+                        error_messages.append(
+                            f"Missed key block: {block.block_type} "
+                            f"(lines {block.begin_line}-{block.end_line})"
+                        )
+
+            if missing_regular_lines:
+                error_messages.append("\nContent of missing regular lines:")
+                for line_num in sorted(missing_regular_lines):
+                    content = self._get_line_content(line_num)
+                    error_messages.append(f"Missed line || Line {line_num}: {content}")
+
+        if extra_lines:
+            error_messages.append(
+                f"\nUnexpected lines in report: {sorted(extra_lines)} "
+                f"(total: {len(extra_lines)})"
+            )
+
+            extra_key_block_lines = extra_lines & key_block_lines
+            extra_key_block_lines = extra_key_block_lines - key_start_lines
+
+            if extra_key_block_lines:
+                error_messages.append(
+                    f"Lines inside key blocks were parsed as regular lines: "
+                    f"{sorted(extra_key_block_lines)}"
+                )
+
+        return error_messages
 
     def _load_source_lines(self, file_to_scan):
         """
@@ -99,39 +184,6 @@ class TestE2E(unittest.TestCase):
             print(f"Warning: Could not parse key blocks: {e}")
             self.key_blocks = []
 
-    def _validate_key_findings_by_start_line(self, findings, line_extractor):
-        expected_lines = {block.begin_line for block in self.key_blocks}
-        actual_lines = set()
-
-        for finding in findings:
-            try:
-                actual_lines.add(line_extractor(finding))
-            except (KeyError, IndexError, TypeError) as e:
-                print(f"Warning: Could not extract line number from finding: {e}")
-
-        missing_lines = expected_lines - actual_lines
-        extra_lines = actual_lines - expected_lines
-
-        error_messages = []
-
-        if missing_lines:
-            error_messages.append(
-                f"Missing key findings for block start lines: {sorted(missing_lines)}"
-            )
-            for block in self.key_blocks:
-                if block.begin_line in missing_lines:
-                    error_messages.append(
-                        f"Missed key block: {block.block_type} "
-                        f"(lines {block.begin_line}-{block.end_line})"
-                    )
-
-        if extra_lines:
-            error_messages.append(
-                f"Unexpected key finding lines: {sorted(extra_lines)}"
-            )
-
-        return error_messages
-
     def _get_line_content(self, line_number):
         """
         Get content of a specific line from the source file.
@@ -167,49 +219,6 @@ class TestE2E(unittest.TestCase):
                     print(f"Cleaned up report: {report_path}")
                 except Exception as e:
                     print(f"Warning: Could not delete {report_path}: {e}")
-
-    def _validate_line_numbers(self, findings, line_extractor, line_count):
-        """
-        Helper method to validate that findings have correct line numbers.
-        Collects all missing lines and reports them together with their content.
-
-        Args:
-            findings: List of findings from the report
-            line_extractor: Function to extract line number from a finding
-            line_count: Awaited line count
-        """
-        expected_lines = set(range(1, line_count + 1))
-
-        actual_lines = set()
-        for finding in findings:
-            try:
-                line_num = line_extractor(finding)
-                actual_lines.add(line_num)
-            except (KeyError, IndexError, TypeError) as e:
-                print(f"Warning: Could not extract line number from finding: {e}")
-
-        missing_lines = expected_lines - actual_lines
-
-        extra_lines = actual_lines - expected_lines
-
-        error_messages = []
-
-        if missing_lines:
-            sorted_missing = sorted(missing_lines)
-
-            error_messages.append("\nContent of missing lines:")
-            for line_num in sorted_missing:
-                content = self._get_line_content(line_num)
-                error_messages.append(f"Missed line || Line {line_num}: {content}")
-
-        if extra_lines:
-            sorted_extra = sorted(extra_lines)
-            error_messages.append(
-                f"\nUnexpected lines in report: {sorted_extra} "
-                f"(total: {len(extra_lines)})"
-            )
-
-        return error_messages
 
     def _check_confidence(self,
                           findings,
@@ -251,7 +260,7 @@ class TestE2E(unittest.TestCase):
                 __import__(MODULE, fromlist=["main"]).main()
             return cm.exception.code
 
-    def check_json(self, file_path, awaited_confidence, is_fail_on_findings=False, is_keys=False,
+    def check_json(self, file_path, awaited_confidence, is_fail_on_findings=False,
                    min_confidence=Confidence.REJECTED):
         args = [file_path, "--json", report_json, "--min-confidence", str(min_confidence.value)]
         if is_fail_on_findings:
@@ -263,9 +272,9 @@ class TestE2E(unittest.TestCase):
             msg=f"Return code not equal to awaited: {code}, is_fail_on_findings={is_fail_on_findings}"
         )
 
+        self._load_key_blocks(file_path)
         self._load_source_lines(file_path)
-        if is_keys:
-            self._load_key_blocks(file_path)
+
 
         time.sleep(0.1)
 
@@ -284,17 +293,10 @@ class TestE2E(unittest.TestCase):
                 )
                 return
 
-            if is_keys:
-                line_numbers_errors = self._validate_key_findings_by_start_line(
-                    report,
-                    lambda finding: finding["line"],
-                )
-            else:
-                line_numbers_errors = self._validate_line_numbers(
-                    report,
-                    lambda finding: finding["line"],
-                    len(self.source_lines),
-                )
+            line_numbers_errors = self._validate_mixed_line_numbers(
+                report,
+                lambda finding: finding["line"],
+            )
 
             confidence_error = self._check_confidence(
                 report,
@@ -310,7 +312,7 @@ class TestE2E(unittest.TestCase):
                     msg="\n".join(error_messages)
                 )
 
-    def check_sarif(self, file_path, awaited_confidence, is_fail_on_findings=False, is_keys=False,
+    def check_sarif(self, file_path, awaited_confidence, is_fail_on_findings=False,
                     min_confidence=Confidence.REJECTED):
         args = [file_path, "--sarif", report_sarif, "--min-confidence", str(min_confidence.value)]
         if is_fail_on_findings:
@@ -320,10 +322,9 @@ class TestE2E(unittest.TestCase):
             code == (2 if is_fail_on_findings and awaited_confidence > min_confidence else 0),
             msg=f"Return code not equal to awaited: {code}, is_fail_on_findings={is_fail_on_findings}"
         )
-
+        self._load_key_blocks(file_path)
         self._load_source_lines(file_path)
-        if is_keys:
-            self._load_key_blocks(file_path)
+
         time.sleep(0.1)
 
         self.assertTrue(
@@ -339,23 +340,11 @@ class TestE2E(unittest.TestCase):
                     msg=f"SARIF report is not empty {report_sarif}"
                 )
                 return
-            # line_numbers_errors = self._validate_line_numbers(
-            #     report,
-            #     lambda finding: finding["locations"][0]["physicalLocation"]["region"]["startLine"],
-            #     len(self.source_lines),
-            # )
 
-            if is_keys:
-                line_numbers_errors = self._validate_key_findings_by_start_line(
-                    report,
-                    lambda finding: finding["locations"][0]["physicalLocation"]["region"]["startLine"],
-                )
-            else:
-                line_numbers_errors = self._validate_line_numbers(
-                    report,
-                    lambda finding: finding["locations"][0]["physicalLocation"]["region"]["startLine"],
-                    len(self.source_lines),
-                )
+            line_numbers_errors = self._validate_mixed_line_numbers(
+                report,
+                lambda finding: finding["locations"][0]["physicalLocation"]["region"]["startLine"],
+            )
 
             confidence_error = self._check_confidence(
                 report,
@@ -363,6 +352,7 @@ class TestE2E(unittest.TestCase):
                 lambda finding: finding["locations"][0]["physicalLocation"]["region"]["startLine"],
                 awaited_confidence=awaited_confidence,
             )
+
             error_messages = line_numbers_errors + confidence_error
 
             if error_messages:
@@ -388,17 +378,17 @@ class TestE2E(unittest.TestCase):
 
     def test_sarif_rejected_confidence_zero_findings(self):
         self.check_sarif(rejected_secrets, Confidence.REJECTED, is_fail_on_findings=True,
-                         min_confidence=Confidence.VERIFIED)
+                         )
 
     def test_json_no_assignment_confidence_zero_findings(self):
         self.check_json(no_assignment_secrets, Confidence.HIGH_ENTROPY_NO_ASSIGNMENT_CONTEXT, is_fail_on_findings=True,
-                        min_confidence=Confidence.VERIFIED)
+                        )
 
     def test_json_verified_confidence_keys(self):
-        self.check_json(valid_keys, Confidence.VERIFIED, is_keys=True)
+        self.check_json(valid_keys, Confidence.VERIFIED, min_confidence=Confidence.VERIFIED)
 
     def test_sarif_rejected_confidence_keys(self):
-        self.check_sarif(invalid_keys, Confidence.REJECTED, is_keys=True)
+        self.check_sarif(invalid_keys, Confidence.REJECTED)
 
 
 if __name__ == '__main__':
