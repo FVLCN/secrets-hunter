@@ -51,15 +51,12 @@ secret_keywords = [
     'pem',
     'p12',
     'pfx',
-    'passphrase',
     'security',
     'connection',
     'database',
     'db',
     'admin',
-    'root',
-    'service',
-    'account'
+    'root'
 ]
 
 # Patterns to detect variable assignments that might contain secrets
