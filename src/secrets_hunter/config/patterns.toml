@@ -18,6 +18,7 @@ exclude_keywords = [
     'test',
     'dummy',
     'fake',
+    'path',
     'placeholder',
     'template',
     'timestamp',
