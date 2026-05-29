@@ -101,7 +101,7 @@ Fail with exit code `2` when actionable findings are present:
 secrets-hunter . --min-confidence 75 --fail-on-findings
 ```
 
-See the [Usage docs](https://docs.fvlcn.dev/secrets-hunter/usage/) for all flags and more examples.
+See the [Usage and Examples docs](https://docs.fvlcn.dev/secrets-hunter/usage-and-examples/) for all flags and more examples.
 
 ## Configuration
 
