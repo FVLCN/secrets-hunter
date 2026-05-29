@@ -45,21 +45,22 @@ The detection flow can be described by the following diagram:
                  │ Process context, rejection &        │
                  │ confidence                          │
                  │                                     │
-                 │ · check value false-positive rules  │
+                 │ · check against rejection rules     │
                  │ · find assignment/key-value context │
                  └──┬───────────────────────────────┬──┘
                     │                               │
                     │                     ┌─────────▼─────────────────┐
                     │                     │   With assignment context │
-         ┌──────────▼──────────┐          │                           │
-         │  Without assignment │          │  · entropy: assignment    │
-         │  context            │          │    context boost          │
-         │                     │          │  · mark keyword-based     │
-         │  · mark value-based │          │    false positives        │
-         │    false positives  │          │  · mark value false pos.  │
-         │                     │          │    (unless secret-like)   │
-         └─────────┬───────────┘          │  · entropy: secret-       │
-                   │                      │    keyword boost          │
+                    │                     │                           │
+         ┌──────────▼───────────┐         │  · entropy: assignment    │
+         │  Without assignment  │         │    context boost          │
+         │  context             │         │  · reject keyword-based   │
+         │                      │         │    false positives        │
+         │  · reject false-     │         │  · non-secret context:    │
+         │    positive or       │         │    reject false-positive  │
+         │    malformed values  │         │    or malformed values    │
+         └─────────┬────────────┘         │  · entropy: secret-       │
+                   │                      │    keyword bo ost         │
                    │                      └─────────┬─────────────────┘
                    │                                │
                    └────────────────┬───────────────┘
