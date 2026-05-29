@@ -1,4 +1,4 @@
-# Usage
+# Usage and Examples
 
 Secrets Hunter runs scans from the command line:
 
@@ -8,22 +8,13 @@ secrets-hunter [OPTIONS] [target]
 
 > If no target is provided, Secrets Hunter scans the current directory.
 
-Other scan modes can be enabled with flags:
-
-- `--git-revset` scans git history using the selected revision expression.
-- `--domain` scans commonly exposed paths on a host or domain.
-
-## Options
+## Common Options
 
 | Flag                      |   Type | Default | Description                                                           |
 |---------------------------|-------:|--------:|-----------------------------------------------------------------------|
 | `-h`, `--help`            |        |         | Show help and exit.                                                   |
 | `--version`               |        |         | Show version and exit.                                                |
 | `--config`                | path[] |         | Path to a TOML overlay config. Can be used multiple times.            |
-| `--git-revset`            | string |         | Scan git history using commits selected by a git revision expression. |
-| `--git-max-count`         |    int |         | Limit the number of commits selected by `--git-revset`.               |
-| `--domain`                | string |         | Scan commonly exposed paths on a host or domain.                      |
-| `--skip-tls-verify`       |   bool | `False` | Skip TLS certificate verification for domain scans.                   |
 | `--reveal-findings`       |   bool | `False` | Print raw matches in output.                                          |
 | `--json`                  |   path |         | Export results to a JSON file.                                        |
 | `--sarif`                 |   path |         | Export results to a SARIF file.                                       |
@@ -36,13 +27,11 @@ Other scan modes can be enabled with flags:
 | `--min-confidence`        |    int |     `0` | Only report findings with confidence **>=** this value (0–100).       |
 | `--fail-on-findings`      |   bool | `False` | Exit with code `2` if a report contains non-rejected findings.        |
 
----
+For git history and domain scan options, see [Scan Modes](https://docs.fvlcn.dev/secrets-hunter/scan-modes/).
 
-## Usage Examples
+## Filesystem scans
 
-### Filesystem scans
-
-#### Scan the current directory
+### Scan the current directory
 
 ```bash
 secrets-hunter .
@@ -78,13 +67,13 @@ Example output:
 ----------------------------------------------------------------------------------------
 ```
 
-#### Scan a directory
+### Scan a directory
 
 ```bash
 secrets-hunter path/to/project
 ```
 
-#### Scan a directory with Docker
+### Scan a directory with Docker
 
 Mount the directory you want to scan and pass the mounted path as the target:
 
@@ -92,17 +81,17 @@ Mount the directory you want to scan and pass the mounted path as the target:
 docker run --rm -v ~/projects/my-app:/scan ghcr.io/fvlcn/secrets-hunter:latest /scan
 ```
 
-#### Scan a single file
+### Scan a single file
 
 ```bash
 secrets-hunter path/to/file.py
 ```
 
-### Git History scans
+## Git History scans
 
 Git history scans use `--git-revset`, which accepts a git revision expression. It is not parsed as arbitrary `git rev-list` options.
 
-#### Scan a commit
+### Scan a commit
 
 Use `<commit-sha>^!` to scan only one commit:
 
@@ -110,7 +99,7 @@ Use `<commit-sha>^!` to scan only one commit:
 secrets-hunter . --git-revset '<commit-sha>^!'
 ```
 
-#### Scan a pull request
+### Scan a pull request
 
 Scan commits that are on the current branch but not on `main`:
 
@@ -120,7 +109,7 @@ secrets-hunter . --git-revset main..HEAD
 
 Replace `main` with the base branch if needed.
 
-#### Scan branch history
+### Scan branch history
 
 Scan the last 20 commits reachable from `HEAD`:
 
@@ -128,7 +117,7 @@ Scan the last 20 commits reachable from `HEAD`:
 secrets-hunter . --git-revset HEAD --git-max-count 20
 ```
 
-#### Scan git history with Docker
+### Scan git history with Docker
 
 Mount the repository, set it as the working directory, and mark the mounted path as a safe Git directory inside the container:
 
@@ -143,17 +132,17 @@ docker run --rm \
   . --git-revset main..HEAD
 ```
 
-### Domain scans
+## Domain scans
 
 Domain scans check the built-in list of commonly exposed relative paths on the target host.
 
-#### Scan exposed domain paths
+### Scan exposed domain paths
 
 ```bash
 secrets-hunter --domain example.com
 ```
 
-#### Scan exposed domain paths with Docker
+### Scan exposed domain paths with Docker
 
 Domain scans do not need a mounted local directory:
 
@@ -161,7 +150,7 @@ Domain scans do not need a mounted local directory:
 docker run --rm ghcr.io/fvlcn/secrets-hunter:latest --domain example.com
 ```
 
-#### Skip TLS verification
+### Skip TLS verification
 
 For internal or controlled environments with custom TLS, certificate verification can be skipped:
 
@@ -169,15 +158,9 @@ For internal or controlled environments with custom TLS, certificate verificatio
 secrets-hunter --domain https://internal.example --skip-tls-verify
 ```
 
-### Mode constraints
+## Output and Filtering
 
-- `--git-max-count` requires `--git-revset`.
-- `--skip-tls-verify` requires `--domain`.
-- `--domain` cannot be combined with `--git-revset`.
-
-### Common options
-
-#### Reveal findings (unmasked)
+### Reveal findings
 
 Findings are masked by default. To show raw values, use the `--reveal-findings` flag:
 
@@ -185,7 +168,7 @@ Findings are masked by default. To show raw values, use the `--reveal-findings` 
 secrets-hunter . --reveal-findings
 ```
 
-#### Export as JSON
+### Export as JSON
 
 ```bash
 secrets-hunter . --json results.json
@@ -213,37 +196,39 @@ Example output:
 ]
 ```
 
-#### Export as JSON and reveal findings
+### Export as JSON and reveal findings
 
 ```bash
 secrets-hunter . --reveal-findings --json results.json
 ```
 
-#### Export as JSON, reveal findings and truncate long matches
+### Export as JSON, reveal findings and truncate long matches
 
 ```bash
 secrets-hunter . --reveal-findings --json results.json --truncate-long-matches
 ```
 
-#### Export as JSON, reveal findings and filter out low-confidence findings
+### Export as JSON, reveal findings and filter out low-confidence findings
 
 ```bash
 secrets-hunter . --reveal-findings --json results.json --min-confidence 75
 ```
 
-#### Export as SARIF
+### Export as SARIF
 
 ```bash
 secrets-hunter . --sarif results.sarif
 ```
 
-#### Fail only on higher-confidence findings
+### Fail only on higher-confidence findings
 
 ```bash
 secrets-hunter . --min-confidence 75 --fail-on-findings
 ```
 
-#### Use overlay config
+## Config
+
+### Use overlay config
 
 Apply custom configuration using an overlay file:
 
@@ -251,7 +236,7 @@ Apply custom configuration using an overlay file:
 secrets-hunter . --config team.toml
 ```
 
-#### Stack multiple overlays
+### Stack multiple overlays
 
 Apply multiple configuration files in sequence:
 
