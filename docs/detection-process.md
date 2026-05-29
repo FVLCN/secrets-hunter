@@ -60,7 +60,7 @@ The detection flow can be described by the following diagram:
          │    positive or       │         │    reject false-positive  │
          │    malformed values  │         │    or malformed values    │
          └─────────┬────────────┘         │  · entropy: secret-       │
-                   │                      │    keyword bo ost         │
+                   │                      │    keyword boost          │
                    │                      └─────────┬─────────────────┘
                    │                                │
                    └────────────────┬───────────────┘
