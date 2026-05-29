@@ -87,7 +87,7 @@ docker run --rm -v ~/projects/my-app:/scan ghcr.io/fvlcn/secrets-hunter:latest /
 secrets-hunter path/to/file.py
 ```
 
-## Git History scans
+## Git History Scans
 
 Git history scans use `--git-revset`, which accepts a git revision expression. It is not parsed as arbitrary `git rev-list` options.
 
@@ -132,7 +132,7 @@ docker run --rm \
   . --git-revset main..HEAD
 ```
 
-## Domain scans
+## Domain Scans
 
 Domain scans check the built-in list of commonly exposed relative paths on the target host.
 

@@ -22,7 +22,7 @@ The detection flow can be described by the following diagram:
                     ┌───────────────▼─────────────┐
                     │ Extract candidate fragments │
                     └──┬────────────┬───────────┬─┘
-                       │            │           │ 
+                       │            │           │
                        │     ┌──────▼──────┐    │
         ┌──────────────▼──┐  │   Generic   │  ┌─▼───────────────┐
         │    PEM keys     │  │   strings   │  │ DB conn. strings│
