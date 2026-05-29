@@ -14,7 +14,7 @@ For each collected text target, the scanner extracts candidate fragments, runs e
 
 The detection flow can be described by the following diagram:
 
-```text
+```diagram
                     ┌─────────────────────────────┐
                     │ Text content from scan mode │
                     └───────────────┬─────────────┘
