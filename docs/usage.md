@@ -29,7 +29,7 @@ secrets-hunter [OPTIONS] [target]
 
 For git history and domain scan options, see [Scan Modes](https://docs.fvlcn.dev/secrets-hunter/scan-modes/).
 
-## Filesystem scans
+## Filesystem Scans
 
 ### Scan the current directory
 
