@@ -47,9 +47,9 @@ Example output:
     Match:      ***MASKED***
     Context:    ***MASKED***
 ----------------------------------------------------------------------------------------
-[2] Hardcoded aws access key at app.py:6
+[2] Hardcoded aws access key id at app.py:6
     Severity:   CRITICAL (confidence: 100%, reasoning: Pattern Match)
-    Variable:   aws_access_key
+    Variable:   aws_access_key_id
     Match:      ***MASKED***
     Context:    ***MASKED***
 ----------------------------------------------------------------------------------------

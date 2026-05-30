@@ -67,8 +67,8 @@ Patterns used for secret detection.
 
 ```toml
 [[secret_patterns]]
-name = "GitHub Token"
-pattern = '''\bgh[pousr]_[A-Za-z0-9]{36,}\b'''
+name = "GitLab Personal Access Token"
+pattern = '''\bglpat-[A-Za-z0-9_-]{20}\b'''
 # Optional:
 # flags = ["IGNORECASE", "MULTILINE", "DOTALL", "VERBOSE", "ASCII"]
 ```
@@ -202,7 +202,7 @@ Supported removal keys:
 Remove patterns by name:
 
 ```toml
-remove_secret_patterns = ["Private Key", "JWT Token"]
+remove_secret_patterns = ["AWS Access Key ID", "JWT Token"]
 remove_exclude_patterns = ["MD5", "dummy"]
 ```
 
@@ -247,33 +247,33 @@ secrets-hunter . --config minimal.toml
 
 ### 2) Override an existing pattern by name
 
-**override_gh_token.toml**
+**override_stripe_live_only.toml**
 
 ```toml
 [[secret_patterns]]
-name = "GitHub Token" # same name => overrides packaged one
-pattern = '''\bghp_[A-Za-z0-9]{36}\b'''
+name = "Stripe API Key" # same name => overrides packaged one
+pattern = '''\bsk_live_[A-Za-z0-9]{24,}\b'''
 flags = ["ASCII"]
 ```
 
 Run:
 
 ```bash
-secrets-hunter . --config override_gh_token.toml
+secrets-hunter . --config override_stripe_live_only.toml
 ```
 
 ### 3) Remove a built-in pattern
 
-**remove_private_keys.toml**
+**remove_aws_access_key_id.toml**
 
 ```toml
-remove_secret_patterns = ["Private Key"]
+remove_secret_patterns = ["AWS Access Key ID"]
 ```
 
 Run:
 
 ```bash
-secrets-hunter . --config remove_private_keys.toml
+secrets-hunter . --config remove_aws_access_key_id.toml
 ```
 
 ### 4) Team baseline overlay
