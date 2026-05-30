@@ -110,7 +110,7 @@ Placeholder values are treated differently — they are always rejected, regardl
 
 ```text
 secret = "123abc456def"
-aws_access_key = "AKIAIOSFODNN7EXAMPLE"
+aws_access_key_id = "AKIAIOSFODNN7EXAMPLE"
 ```
 
 Despite the secret-identifying variable names, both values are rejected: `123abc456def` matches a known placeholder pattern, and `AKIAIOSFODNN7EXAMPLE` contains a known example placeholder used in AWS documentation. In both cases, the variable name makes no difference.
