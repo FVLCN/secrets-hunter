@@ -90,7 +90,7 @@ name = "JWT Token"
 pattern = '''\beyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\b'''
 
 [[secret_patterns]]
-name = "AWS Access Key"
+name = "AWS Access Key ID"
 pattern = '''\bAKIA[0-9A-Z]{16}\b'''
 
 [[secret_patterns]]
