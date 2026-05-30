@@ -1,5 +1,5 @@
 1. [Installation](installation.md)
 2. [Scan Modes](scan-modes.md)
 3. [Detection Process](detection-process.md)
-4. [Usage](usage.md)
+4. [Usage and Examples](usage-and-examples.md)
 5. [Configuration](config.md)

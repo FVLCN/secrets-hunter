@@ -12,35 +12,52 @@ It is language agnostic and works on text content rather than language-specific 
 
 Scans do not require external dependencies to run, though git must be installed to scan git history. You can run scans from the command line, wire them into git hooks for local development, or automate them in CI to act as a security gate.
 
-## How It Works
+## Save Time With Smarter Secret Detection
+
+Secrets Hunter is built around a simple principle: only surface findings that are actually worth reviewing.
+
+Consider these two lines:
+
+```text
+api_token = "79ffdc174191ed0f2d01d465c10c80c8c9542cb9"
+hash = "79ffdc174191ed0f2d01d465c10c80c8c9542cb9"
+```
+
+The first line looks extremely suspicious: it is a high-entropy hex string assigned to the `api_token` variable, whose name suggests the value is a secret. And most likely, it is. The second line is just a random hash, so it is not even worth considering.
+
+However, in this line:
+
+```text
+api_token = "123abc456def"
+```
+
+even though the variable name suggests it is a secret, the assigned value suggests that it is not. Despite having high hex entropy, this is a placeholder or fake secret, not something worth attention. Therefore, it should not be reported as an actionable finding.
 
 Secrets are detected using a combined **regex** and **entropy** approach, though the list of built-in regex patterns is intentionally kept short for three reasons:
 
-- The number of existing secret formats is huge.
+- The number of existing secret formats is huge, so large regex catalogs can slow down scans and become hard to maintain.
 - Secret formats often overlap, so the provider cannot always be identified reliably.
-- Most generated secrets are high-entropy strings anyway.
+- Most such secrets are high-entropy strings anyway.
 
 There are a few exceptions to this, such as PEM keys, database connection strings, secrets with unusual character sets, or low-entropy secrets. This is where regex patterns come in handy.
 
-Instead, for generic secrets, Secrets Hunter gives a **confidence boost** to high-entropy strings when assignment or key/value context identifies the value as a secret through names like `API_KEY`, `secret_token`, etc.
-
-Consider this line:
+A good example is an AWS access key ID, which has a recognizable `AKIA...` shape but may fall below the entropy threshold:
 
 ```text
-github_token = "github_pat_9VRaty87LsNBXRzccREkHNN8bqRLDAZ67Yo3X0pbTqJFoFMBAzgu8RvaoSXg"
+aws_access_key_id = "AKIA9Z4X7Q2M8V6N3P1L"
 ```
 
-The value is a high-entropy string. It is assigned to a variable named `github_token`, which identifies the value as a token. In that context, Secrets Hunter can treat it as a **high-confidence** secret.
+In this case, entropy alone may not be enough, so Secrets Hunter uses a regex pattern to catch the fixed `AKIA...` format.
 
-In contrast, this line:
+Regex matches still go through the same context and rejection checks. For example:
 
 ```text
-hash = "50d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccac50fe0159"
+aws_access_key_id = "AKIAIOSFODNN7EXAMPLE"
 ```
 
-also contains an assignment and a high-entropy value, but the variable name `hash` identifies it as non-secret context. Secrets Hunter treats it as a **false positive** rather than an actionable secret.
+matches the AWS access key ID shape, but is rejected because it contains a known example placeholder. It is not treated as an actionable finding.
 
-For a deeper explanation of how regex patterns, entropy checks, assignment context, confidence levels, and scan modes work together, see the [Scan Modes](https://docs.fvlcn.dev/secrets-hunter/scan-modes/) and [Detection Process](https://docs.fvlcn.dev/secrets-hunter/detection-process/) docs.
+For a deeper explanation of how regex patterns, entropy checks, assignment context, rejection rules, and scan modes work together, see the [Scan Modes](https://docs.fvlcn.dev/secrets-hunter/scan-modes/) and [Detection Process](https://docs.fvlcn.dev/secrets-hunter/detection-process/) docs.
 
 ## Installation
 
@@ -101,7 +118,7 @@ Fail with exit code `2` when actionable findings are present:
 secrets-hunter . --min-confidence 75 --fail-on-findings
 ```
 
-See the [Usage docs](https://docs.fvlcn.dev/secrets-hunter/usage/) for all flags and more examples.
+See the [Usage and Examples docs](https://docs.fvlcn.dev/secrets-hunter/usage-and-examples/) for all flags and more examples.
 
 ## Configuration
 

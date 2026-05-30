@@ -2,71 +2,126 @@
 
 The detection process handles three kinds of candidates:
 
+- generic strings
 - PEM keys
-- generic string candidates
 - database connection strings
 
-Secrets Hunter handles different candidate types differently. PEM keys and database connection strings have recognizable structure, while generic string candidates are usually detected through entropy and assignment context.
+Secrets Hunter handles different candidate types differently. PEM keys and database connection strings have recognizable structure, while generic string candidates are usually detected through entropy and assignment context. The scanner also uses regex matches for some cases, such as low entropy secrets or secrets with non-standard character sets.
 
 ## Process Overview
 
+For each collected text target, the scanner extracts candidate fragments, runs entropy and pattern detection, merges the findings, then processes context and confidence before preparing results for output.
+
 The detection flow can be described by the following diagram:
 
-```text
-Text content from scan mode
-        |
-        v
-Extract candidate fragments
-        |
-        +--> PEM keys
-        |
-        +--> Database connection strings
-        |
-        +--> Generic string candidates
-        |
-        v
-Run entropy detector and pattern detector
-        |
-        v
-Merge findings and prefer pattern matches
-        |
-        v
-Process context, rejection, and confidence
-        |
-        +--> check value false-positive rules
-        +--> find assignment and key/value context
-        |
-        +--> without assignment context:
-        |     +--> mark value-based false positives
-        |
-        +--> with assignment context:
-        |     +--> give entropy findings an assignment-context confidence boost
-        |     +--> mark keyword-based false positives
-        |     +--> mark value-based false positives unless secret-like context permits them
-        |     +--> give entropy findings a secret-keyword confidence boost
-        |
-        v
-Prepare findings for output
-        |
-        +--> confidence filtering
-        +--> truncation
-        +--> masking
+```diagram
+                    ┌─────────────────────────────┐
+                    │ Text content from scan mode │
+                    └───────────────┬─────────────┘
+                                    │
+                    ┌───────────────▼─────────────┐
+                    │ Extract candidate fragments │
+                    └──┬────────────┬───────────┬─┘
+                       │            │           │
+                       │     ┌──────▼──────┐    │
+        ┌──────────────▼──┐  │   Generic   │  ┌─▼───────────────┐
+        │    PEM keys     │  │   strings   │  │ DB conn. strings│
+        └──────────────┬──┘  │             │  └─┬───────────────┘
+                       │     └──────┬──────┘    │
+                       │            │           │
+                       └────────────┼───────────┘
+                                    │
+                 ┌──────────────────▼──────────────────┐
+                 │           Run detectors             │
+                 │         entropy + patterns          │
+                 └──────────────────┬──────────────────┘
+                                    │
+                 ┌──────────────────▼──────────────────┐
+                 │           Merge findings            │
+                 │        prefer pattern matches       │
+                 └──────────────────┬──────────────────┘
+                                    │
+                 ┌──────────────────▼──────────────────┐
+                 │ Process context, rejection &        │
+                 │ confidence                          │
+                 │                                     │
+                 │ · check against rejection rules     │
+                 │ · find assignment/key-value context │
+                 └──┬───────────────────────────────┬──┘
+                    │                               │
+                    │                     ┌─────────▼─────────────────┐
+                    │                     │   With assignment context │
+                    │                     │                           │
+         ┌──────────▼───────────┐         │  · entropy: assignment    │
+         │  Without assignment  │         │    context boost          │
+         │  context             │         │  · reject keyword-based   │
+         │                      │         │    false positives        │
+         │  · reject false-     │         │  · non-secret context:    │
+         │    positive or       │         │    reject false-positive  │
+         │    malformed values  │         │    or malformed values    │
+         └─────────┬────────────┘         │  · entropy: secret-       │
+                   │                      │    keyword boost          │
+                   │                      └─────────┬─────────────────┘
+                   │                                │
+                   └────────────────┬───────────────┘
+                                    │
+                  ┌─────────────────▼────────────────┐
+                  │  Prepare findings for output     │
+                  │                                  │
+                  │   · Confidence filtering         │
+                  │   · Truncation                   │
+                  │   · Masking                      │
+                  └──────────────────────────────────┘
 ```
 
-For each collected text target, Secrets Hunter:
+The following sections describe how each candidate type is detected and what causes a finding to be rejected.
 
-1. Extracts candidate fragments.
-2. Runs entropy-based detection.
-3. Runs pattern and structure-aware detection.
-4. Merges findings and prefers pattern matches over duplicate entropy matches.
-5. Processes assignment context, false-positive checks, severity, and confidence together.
-6. Prepares findings for output.
+## Generic Candidates
+
+Generic candidates are arbitrary string values such as API keys, tokens, and passwords. They are detected through entropy checks or regex patterns, and the surrounding assignment or key/value context is then used to adjust confidence and reject false positives.
+
+Consider this text block:
+
+```text
+api_key = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
+value = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
+asset_integrity = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
+```
+
+Even though the assigned value is the same, the assignment context changes its meaning completely:
+
+- `api_key` certainly identifies the value as a secret.
+- `value` gives no context hinting at a secret, so further investigation is required.
+- `asset_integrity` clearly suggests a non-secret context, so the finding is marked as a false positive.
+
+In these examples, the variable name drives the confidence — the scanner uses it to treat the finding as actionable, flag it for further review, or mark it as a false positive.
+
+However, the value itself can also affect the scanner's confidence. For example:
+
+```text
+value = "c12ddf3bfeeda5a2f7dd28feee62e1d3afaf097c"
+```
+
+This string has high entropy and assignment context, but it also matches the shape of a SHA1 hash, which is a common artifact of build systems and version control, not a hardcoded secret.
+
+> Secrets Hunter treats known hash formats as false positives unless the surrounding context identifies the value as a secret.
+
+Placeholder values are treated differently — they are always rejected, regardless of the surrounding context. Consider these two lines:
+
+```text
+secret = "123abc456def"
+aws_access_key_id = "AKIAIOSFODNN7EXAMPLE"
+```
+
+Despite the secret-identifying variable names, both values are rejected: `123abc456def` matches a known placeholder pattern, and `AKIAIOSFODNN7EXAMPLE` contains a known example placeholder used in AWS documentation. In both cases, the variable name makes no difference.
+
+The built-in patterns, keywords, and assignment rules can be inspected with `secrets-hunter showconfig`, or customized through a [configuration overlay](https://docs.fvlcn.dev/secrets-hunter/config/).
 
 ## PEM Keys
 
 PEM blocks are detected by header/footer patterns. When Secrets Hunter sees a supported PEM header, it collects the whole block up to the matching footer and treats that block as one candidate.
 
-> The body lines are not reported as separate findings.
+> For well-formed PEM blocks the body lines are not reported as separate findings.
 
 A key is treated as actionable when it looks like private key material: it has a supported private-key header, a matching footer, and a base64 body that can be decoded.
 
@@ -93,11 +148,11 @@ Example inline private key:
 
 ### Rejection
 
-Some PEM blocks are rejected instead of treated as actionable secrets:
+Some PEM blocks are rejected instead of being treated as actionable findings:
 
-- Public keys and certificates are public material.
-- Blocks without a matching footer are malformed.
-- Blocks with an invalid base64 body, or a decoded body that is too short, are malformed.
+- Public keys and certificates are not secret material and are rejected as false positives.
+- Blocks where the footer is missing or doesn't match the header type are rejected as malformed.
+- Blocks whose body is not valid base64, or decodes to something too short to be a real key, are rejected as malformed.
 
 Example inline missing footer:
 
@@ -110,10 +165,6 @@ Example invalid base64 body:
 ```text
 -----BEGIN RSA PRIVATE KEY-----your_key_goes_here-----END RSA PRIVATE KEY-----
 ```
-
-### Missing or mismatched footers
-
-When a multi-line PEM block has no matching footer, Secrets Hunter rejects the PEM candidate as malformed. The same applies when the footer exists but does not match the header type.
 
 Example missing footer:
 
@@ -134,49 +185,11 @@ Xz+q6CU9cR1H5wqvtHoOqLKajo9iB6XYjPlpw8b2mvc66UPGFCUEMoWxzf3QdFXfU/veaG
 -----END RSA PRIVATE KEY-----
 ```
 
-> Malformed PEM blocks do not stop scanning; later secrets can still be found.
-
-After rejecting a malformed PEM candidate, Secrets Hunter returns the remaining lines to the normal scanning flow. Body-like lines from the malformed block are then scanned as generic strings and can still produce low-confidence entropy findings.
-
-## Generic Secrets
-
-Generic secrets are ordinary string values that are not PEM blocks or database connection strings. They are detected with regex patterns or entropy checks. The surrounding assignment or key/value context is then used to adjust confidence and reject false positives.
-
-Consider this text block:
-
-```text
-api_key = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
-value = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
-asset_integrity = "qF7xN2pL9vR4sT8mK3zY6dH1wC5bJ0uA"
-```
-
-Even though the assigned value is the same, the assignment context changes its meaning completely:
-
-- `api_key` identifies the value as a secret, so it becomes a high-confidence finding.
-- `value` is only an assignment of a high-entropy string. It becomes a medium-confidence finding that requires further investigation.
-- `asset_integrity` identifies the value as integrity-related context, so it is treated as a false positive rather than an actionable secret.
-
-A value can also be rejected because of the detected value itself, not only because of the variable name. For example:
-
-```text
-value = "c12ddf3bfeeda5a2f7dd28feee62e1d3afaf097c"
-```
-
-The assigned string has high entropy and assignment context, but it also matches the shape of a SHA1 hash.
-
-> Secrets Hunter treats known hash formats as false positives unless the surrounding context identifies the value as a secret.
-
-Regex matches are treated as high-confidence findings, but false-positive rules still apply. Consider this line:
-
-```text
-aws_access_key = "AKIAIOSFODNN7EXAMPLE"
-```
-
-This AWS-shaped value matches a built-in secret pattern, but it is rejected because it contains an example placeholder.
+For PEM blocks with a missing or mismatched footer, Secrets Hunter replays the lines it consumed after the PEM header. Those replayed lines are scanned normally as generic strings and can still produce low-confidence entropy findings.
 
 ## Database Connection Strings
 
-Database connection strings are detected structurally. Secrets Hunter looks for supported URI schemes with an embedded username and password, then treats the full URI as one candidate.
+Database connection strings are detected by matching known URI schemes. Secrets Hunter looks for URI schemes with an embedded username and password, then treats the full URI as one candidate.
 
 Example:
 
@@ -188,9 +201,9 @@ A connection URI is treated as actionable only when it contains an embedded pass
 
 ### Rejection
 
-Connection strings with placeholder or template passwords are rejected instead of treated as actionable secrets.
+The password field is subject to the same placeholder rules as generic candidates. A password like `{password}` or `%s` matches a template pattern, while a password like `example` matches a known placeholder word.
 
-Example placeholder password:
+Example template URI:
 
 ```text
 DATABASE_URL="postgresql://%s:%s@%s:%s/%s"
@@ -202,7 +215,7 @@ Example template password:
 DATABASE_URL="postgres://app_user:{password}@db.example.com:5432/app"
 ```
 
-Example non-actionable password:
+Example placeholder password:
 
 ```text
 DATABASE_URL="postgres://app_user:example@db.example.com:5432/app"
@@ -214,12 +227,12 @@ Findings are assigned confidence based on detection method, assignment context, 
 
 > Confidence is used for prioritization and filtering; it does not mean the scanner has validated that a credential is live.
 
-| Confidence | Meaning                                                    |
-|------------|------------------------------------------------------------|
-| `0`        | Rejected / false positive                                  |
-| `5`        | High entropy without assignment context                    |
-| `75`       | High entropy with assignment context                       |
-| `100`      | Pattern match or high-entropy value in secret-like context |
+| Confidence | Severity   | Meaning                                                    |
+|------------|------------|------------------------------------------------------------|
+| `0`        | `INFO`     | Rejected / false positive                                  |
+| `5`        | `LOW`      | High entropy without assignment context                    |
+| `75`       | `MEDIUM`   | High entropy with assignment context                       |
+| `100`      | `CRITICAL` | Pattern match or high-entropy value in secret-like context |
 
 
 ## Output
@@ -228,7 +241,7 @@ Before findings are reported, Secrets Hunter prepares them for output. This incl
 
 ### Filtering
 
-`--min-confidence` controls which findings are included in the report. By default, the threshold is `0`, so rejected findings are still shown. Raising the threshold hides lower-confidence findings.
+`--min-confidence` controls which findings are included in the report. By default, the threshold is `0`, so rejected results are still shown, which is useful for understanding why they were rejected. Raising the threshold hides lower-confidence findings.
 
 ```bash
 secrets-hunter . --min-confidence 75
@@ -268,4 +281,4 @@ CVidWgYbN/hJrTdYJpdxSFmetosh6wTSXAdmk/XkaVAuzmKvfnsWEpf5eUz+
 -----END RSA PRIVATE KEY-----
 ```
 
-After this step, each finding has its final confidence, rejection state, and display-safe value. The scanner can then report the same prepared finding consistently across supported output formats.
+At this point each finding is ready to be reported across all supported output formats.

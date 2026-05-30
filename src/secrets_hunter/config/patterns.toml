@@ -18,6 +18,7 @@ exclude_keywords = [
     'test',
     'dummy',
     'fake',
+    'path',
     'placeholder',
     'template',
     'timestamp',
@@ -51,15 +52,12 @@ secret_keywords = [
     'pem',
     'p12',
     'pfx',
-    'passphrase',
     'security',
     'connection',
     'database',
     'db',
     'admin',
-    'root',
-    'service',
-    'account'
+    'root'
 ]
 
 # Patterns to detect variable assignments that might contain secrets
@@ -92,7 +90,7 @@ name = "JWT Token"
 pattern = '''\beyJ[A-Za-z0-9_-]*\.eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]*\b'''
 
 [[secret_patterns]]
-name = "AWS Access Key"
+name = "AWS Access Key ID"
 pattern = '''\bAKIA[0-9A-Z]{16}\b'''
 
 [[secret_patterns]]
@@ -174,6 +172,16 @@ pattern = 'abc123'
 category = "placeholder"
 name = "123abc"
 pattern = '123abc'
+
+[[exclude_patterns]]
+category = "placeholder"
+name = "aabbcc"
+pattern = 'aabbcc'
+
+[[exclude_patterns]]
+category = "placeholder"
+name = "abcd1234"
+pattern = 'abcd1234'
 
 [[exclude_patterns]]
 category = "placeholder"

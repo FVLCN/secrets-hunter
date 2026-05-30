@@ -59,24 +59,28 @@ A reusable schema for defining regex-based patterns.
   - `VERBOSE`
   - `ASCII`
 
+> Prefer specific patterns over broad ones — broad regex means noisy scans. Pattern names appear in reports, so make them descriptive.
+
 ### Secret patterns
 
 Patterns used for secret detection.
 
 ```toml
 [[secret_patterns]]
-name = "GitHub Token"
-pattern = '''\bgh[pousr]_[A-Za-z0-9]{36,}\b'''
+name = "GitLab Personal Access Token"
+pattern = '''\bglpat-[A-Za-z0-9_-]{20}\b'''
 # Optional:
 # flags = ["IGNORECASE", "MULTILINE", "DOTALL", "VERBOSE", "ASCII"]
 ```
 
 Notes:
-- Uses the [Pattern table](#pattern-table)
+- Uses the [Pattern table](#pattern-table) schema
 
 ### Exclude patterns
 
 Findings matching these patterns will be rejected.
+
+> Keep `exclude_patterns` tight; avoid excluding generic words unless you really need it.
 
 ```toml
 [[exclude_patterns]]
@@ -93,7 +97,7 @@ pattern = 'dummy'
 ```
 
 Notes:
-- Uses the [Pattern table](#pattern-table)
+- Uses the [Pattern table](#pattern-table) schema
 - Additional field:
   - `category` — used for reporting and grouping
 
@@ -123,16 +127,15 @@ exclude_keywords = [
 
 ### Assignment patterns
 
-Used to extract candidate values from code lines (e.g. `API_KEY="..."`).
+Used to associate candidate values with variable or key names (e.g. `API_KEY="..."`).
+Each regex must capture the variable or key name in group 1 and the candidate value in group 2.
 
 ```toml
 assignment_patterns = [
   '''([a-zA-Z_][a-zA-Z0-9_]*)\s*[:=]\s*["']([^"']+)["']''',
-  '''export\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*[:=]\s*["']([^"']+)["']''',
+  '''export\s+([a-zA-Z_][a-zA-Z0-9_]*)\s*[:=]\s*["']([^"']+)["']'''
 ]
 ```
-
-`assignment_patterns` should be a list of regex patterns.
 
 ### Ignore rules
 
@@ -144,8 +147,6 @@ files = ["package-lock.json"]
 extensions = [".pdf", ".png", ".zip"]
 dirs = ["node_modules", ".git", "dist", "build"]
 ```
-
----
 
 ## Overlays
 
@@ -176,6 +177,7 @@ Applies to:
 - `ignore.extensions`
 - `ignore.dirs`
 
+> [!WARNING]
 > Lists can’t be overridden — only appended and deduplicated (first occurrence wins). To undo something from an earlier file, use the matching `remove_*` key.
 
 ### Removals
@@ -183,7 +185,7 @@ Applies to:
 If you need to remove a previously added item, use the corresponding `remove_*` key.
 
 > Within each config file, removals are applied before additions.
- 
+
 If the same overlay removes and adds the same item, the added item remains. To remove something added by another overlay, place the removal in a later overlay file.
 
 Supported removal keys:
@@ -200,7 +202,7 @@ Supported removal keys:
 Remove patterns by name:
 
 ```toml
-remove_secret_patterns = ["Private Key", "JWT Token"]
+remove_secret_patterns = ["AWS Access Key ID", "JWT Token"]
 remove_exclude_patterns = ["MD5", "dummy"]
 ```
 
@@ -221,8 +223,6 @@ remove_ignore_files = ["package-lock.json"]
 remove_ignore_extensions = [".pdf", ".svg"]
 remove_ignore_dirs = ["dist"]
 ```
-
----
 
 ## Practical Examples
 
@@ -247,33 +247,33 @@ secrets-hunter . --config minimal.toml
 
 ### 2) Override an existing pattern by name
 
-**override_gh_token.toml**
+**override_stripe_live_only.toml**
 
 ```toml
 [[secret_patterns]]
-name = "GitHub Token" # same name => overrides packaged one
-pattern = '''\bghp_[A-Za-z0-9]{36}\b'''
+name = "Stripe API Key" # same name => overrides packaged one
+pattern = '''\bsk_live_[A-Za-z0-9]{24,}\b'''
 flags = ["ASCII"]
 ```
 
 Run:
 
 ```bash
-secrets-hunter . --config override_gh_token.toml
+secrets-hunter . --config override_stripe_live_only.toml
 ```
 
 ### 3) Remove a built-in pattern
 
-**remove_private_keys.toml**
+**remove_aws_access_key_id.toml**
 
 ```toml
-remove_secret_patterns = ["Private Key"]
+remove_secret_patterns = ["AWS Access Key ID"]
 ```
 
 Run:
 
 ```bash
-secrets-hunter . --config remove_private_keys.toml
+secrets-hunter . --config remove_aws_access_key_id.toml
 ```
 
 ### 4) Team baseline overlay
@@ -312,6 +312,7 @@ extensions = [
   ".map",
 ]
 ```
+
 Run:
 
 ```bash
@@ -347,9 +348,3 @@ secrets-hunter . --config ci.toml --config local.toml
 ```
 
 Configs are layered in the order given: `ci.toml` first, then `local.toml`. Because `local.toml` removes the `test` exclude pattern, local scans will report matches that CI would suppress.
-
-## Keep Things Clean
-
-- Prefer **specific patterns** over broad ones (broad regex = noisy scans).
-- Keep `exclude_patterns` tight; avoid excluding generic words unless you really need it.
-- The name of your pattern will be shown in the report, so give it a clear `name`.
