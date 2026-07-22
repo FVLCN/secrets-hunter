@@ -1,20 +1,42 @@
-import logging
 import re
-import subprocess
 
 from pathlib import Path
 
-logger = logging.getLogger(__name__)
+from secrets_hunter.scanning.cancellation import (
+    ScanCancellation,
+    ScanCancelledError
+)
+from secrets_hunter.scanning.failures import OperationalScanError
+from secrets_hunter.scanning.read_result import (
+    SourceBytes,
+    SourceCancelled,
+    SourceReadFailure
+)
+from secrets_hunter.scan_modes.git_history.process import GitProcessRunner
 
-DIFF_HUNK_RE = re.compile(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
-COMMIT_SHA_RE = re.compile(r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
+
+_DIFF_HUNK_RE = re.compile(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+_COMMIT_SHA_RE = re.compile(r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 
 
 class GitHistoryReader:
     """Read commit-selected file blobs from a git repository."""
 
-    def __init__(self, target: Path):
+    CONTROL_OUTPUT_BYTES = 64 * 1024
+
+    def __init__(
+        self,
+        target: Path,
+        max_source_bytes: int,
+        source_timeout_seconds: float,
+        cancellation: ScanCancellation
+    ) -> None:
         self.target = Path(target).resolve()
+        self.max_source_bytes = max_source_bytes
+        self.process_runner = GitProcessRunner(
+            source_timeout_seconds,
+            cancellation
+        )
         self._repo_root = self._find_repo_root(self._git_cwd())
 
     @property
@@ -60,26 +82,49 @@ class GitHistoryReader:
             if path
         ]
 
-    def read_blob(self, commit_sha: str, repo_rel_path: str) -> bytes | None:
+    def read_blob(
+        self,
+        commit_sha: str,
+        repo_rel_path: str
+    ) -> SourceBytes | SourceCancelled | SourceReadFailure:
         self._validate_commit_sha(commit_sha)
+        object_spec = f"{commit_sha}:{repo_rel_path}"
 
-        result = subprocess.run(
-            ["git", "show", "--end-of-options", f"{commit_sha}:{repo_rel_path}"],
-            cwd=self.repo_root,
-            capture_output=True,
-            check=False
-        )
+        try:
+            blob_size = int(self._run_git_text([
+                "cat-file",
+                "-s",
+                object_spec
+            ], max_output_bytes=self.CONTROL_OUTPUT_BYTES))
+        except ScanCancelledError:
+            return SourceCancelled()
+        except (OperationalScanError, ValueError) as error:
+            return SourceReadFailure(f"Failed to inspect git blob: {error}")
 
-        if result.returncode == 0:
-            return result.stdout
+        if blob_size > self.max_source_bytes:
+            return SourceReadFailure(
+                f"Git blob is {blob_size} bytes; maximum is "
+                f"{self.max_source_bytes} bytes"
+            )
 
-        logger.debug(
-            "Unable to read git blob %s:%s: %s",
-            commit_sha,
-            repo_rel_path,
-            result.stderr.decode("utf-8", errors="replace").strip(),
-        )
-        return None
+        try:
+            body = self._run_git_bytes([
+                "show",
+                "--end-of-options",
+                object_spec
+            ])
+        except ScanCancelledError:
+            return SourceCancelled()
+        except OperationalScanError as error:
+            return SourceReadFailure(f"Failed to read git blob: {error}")
+
+        if len(body) > self.max_source_bytes:
+            return SourceReadFailure(
+                f"Git blob is {len(body)} bytes; maximum is "
+                f"{self.max_source_bytes} bytes"
+            )
+
+        return SourceBytes(body)
 
     def list_added_lines(self, commit_sha: str, repo_rel_path: str) -> set[int]:
         self._validate_commit_sha(commit_sha)
@@ -100,7 +145,7 @@ class GitHistoryReader:
         added_lines: set[int] = set()
 
         for line in diff.splitlines():
-            match = DIFF_HUNK_RE.match(line)
+            match = _DIFF_HUNK_RE.match(line)
 
             if not match:
                 continue
@@ -139,27 +184,38 @@ class GitHistoryReader:
         return self.target if self.target.is_dir() else self.target.parent
 
     def _find_repo_root(self, cwd: Path) -> Path:
-        output = self._run_git_text(["rev-parse", "--show-toplevel"], cwd=cwd)
+        output = self._run_git_text(
+            ["rev-parse", "--show-toplevel"],
+            cwd=cwd,
+            max_output_bytes=self.CONTROL_OUTPUT_BYTES
+        )
         return Path(output).resolve()
 
-    def _run_git_text(self, args: list[str], cwd: Path | None = None) -> str:
-        return self._run_git_bytes(args, cwd=cwd).decode("utf-8", errors="replace").strip()
+    def _run_git_text(
+        self,
+        args: list[str],
+        cwd: Path | None = None,
+        max_output_bytes: int | None = None
+    ) -> str:
+        return self._run_git_bytes(
+            args,
+            cwd=cwd,
+            max_output_bytes=max_output_bytes
+        ).decode("utf-8", errors="replace").strip()
 
-    def _run_git_bytes(self, args: list[str], cwd: Path | None = None) -> bytes:
-        result = subprocess.run(
-            ["git", *args],
-            cwd=cwd or self.repo_root,
-            capture_output=True,
-            check=False
+    def _run_git_bytes(
+        self,
+        args: list[str],
+        cwd: Path | None = None,
+        max_output_bytes: int | None = None
+    ) -> bytes:
+        return self.process_runner.run(
+            args,
+            cwd or self.repo_root,
+            max_output_bytes or self.max_source_bytes
         )
-
-        if result.returncode == 0:
-            return result.stdout
-
-        stderr = result.stderr.decode("utf-8", errors="replace").strip()
-        raise RuntimeError(f"git {' '.join(args)} failed: {stderr}")
 
     @staticmethod
     def _validate_commit_sha(commit_sha: str) -> None:
-        if not COMMIT_SHA_RE.fullmatch(commit_sha):
+        if not _COMMIT_SHA_RE.fullmatch(commit_sha):
             raise ValueError(f"invalid git commit sha: {commit_sha!r}")

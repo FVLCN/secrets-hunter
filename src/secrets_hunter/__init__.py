@@ -1,5 +1,35 @@
 from secrets_hunter._version import __version__
-from secrets_hunter.scanner import SecretsHunter
+from secrets_hunter.api import SecretsHunter
+from secrets_hunter.application import (
+    DomainSource,
+    FilesystemSource,
+    GitHistorySource,
+    ScanSource,
+    TextSource
+)
+from secrets_hunter.config import FindingOutputOptions, ScanOptions
+from secrets_hunter.models import FindingKind, ScanFailure, ScanFailureKind, ScanResult
+from secrets_hunter.runtime import ApplicationRuntime, load_application_runtime
+from secrets_hunter.scanning import ScanCancellation, ScanProgressObserver
 
 __author__ = 'FVLCN.dev'
-__all__ = ['SecretsHunter', '__version__', '__author__']
+__all__ = [
+    'ApplicationRuntime',
+    'DomainSource',
+    'FilesystemSource',
+    'FindingOutputOptions',
+    'FindingKind',
+    'GitHistorySource',
+    'ScanOptions',
+    'ScanCancellation',
+    'ScanFailure',
+    'ScanFailureKind',
+    'ScanProgressObserver',
+    'ScanResult',
+    'ScanSource',
+    'SecretsHunter',
+    'TextSource',
+    'load_application_runtime',
+    '__version__',
+    '__author__'
+]

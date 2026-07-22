@@ -1,21 +1,13 @@
-import logging
-
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
-from secrets_hunter.scan_modes.base.reader import SourceTextReader
-
-logger = logging.getLogger(__name__)
+from secrets_hunter.scanning.text_reader import SourceTextReader
 
 
 class FileReader:
-    @staticmethod
-    def read_file(filepath: Path) -> Iterator[str]:
-        try:
-            with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
-                for line in SourceTextReader.safe_lines(f):
-                    yield line
+    def __init__(self, source_text_reader: SourceTextReader) -> None:
+        self.source_text_reader = source_text_reader
 
-        except OSError as e:
-            print("\n")
-            logger.error(f"Error reading {filepath}: {e}")
+    def read_file(self, filepath: Path) -> Iterator[str]:
+        with open(filepath, 'r', encoding='utf-8', errors='replace') as f:
+            yield from self.source_text_reader.safe_lines(f)
