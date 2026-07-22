@@ -31,4 +31,7 @@ exclude = ["tests*"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-secrets_hunter = ["config/*.toml"]
+"secrets_hunter.config" = [
+    "**/*.toml",
+    "semantics/semantic_concept_model.json",
+]

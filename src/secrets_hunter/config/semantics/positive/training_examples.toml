@@ -1,0 +1,47 @@
+[[training_examples]]
+var_name = "OPENAI_API_KEY"
+value = "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"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = ".env.txt"
+concept_labels = ["product_service_target", "auth_system_target", "key_credential"]
+
+[[training_examples]]
+var_name = "JIRA_TOKEN"
+value = "ATATT3xbEBiiQNV98LQzPoudaBM2qiiGSzG1ZblIgJ67usInE4Es4xW_vKldgqLeDKyXeaxr9LSZKWnfwVhZSuzSzUpdczFs6X2a1qFnVj3ydzo6KHGLLXcExw0i4zl9vYaadUVWJgix-Vh8a7d0SKKk6uSj--vRurS7a-aYPbLgGkg_dUCkdmE=7FC53535"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "entrypoint.sh"
+concept_labels = ["product_service_target", "token_credential"]
+
+[[training_examples]]
+var_name = "ANTHROPIC_API_TOKEN"
+value = "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"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/agents/cli-runner/execute.ts"
+concept_labels = ["product_service_target", "auth_system_target", "token_credential"]
+
+[[training_examples]]
+var_name = "AUTHORIZATION"
+value = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGguaW50ZXJuYWwuZXhhbXBsZSIsInN1YiI6InVzZXJfN2YzYTljMmQiLCJhdWQiOiJhcGkiLCJpYXQiOjE3NjAwMDAwMDAsImV4cCI6MTc2MDAwMzYwMCwic2NvcGUiOiJyZWFkOnByb2plY3RzIHdyaXRlOmRlcGxveW1lbnRzIn0.yoQfGedKo1zBJHEsNLxFHTy_ojKs65rb1mS654_UIOc"
+detector = "pattern"
+finding_kind_id = "jwt_token"
+file_path = "docker-compose.yml"
+concept_labels = ["auth_system_target", "credential_generic", "token_credential"]
+
+[[training_examples]]
+var_name = "api_key"
+value = "036110f8f3076a085b44d1e460567368572b47c1"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/settings.py"
+concept_labels = ["auth_system_target", "key_credential"]
+
+[[training_examples]]
+var_name = "password"
+value = "eYSbqiRO8OBZr0wCkB4NBQinkKqxed2cZ2w="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "data/static/users.yml"
+concept_labels = ["password_credential"]

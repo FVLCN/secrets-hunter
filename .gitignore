@@ -26,5 +26,8 @@ ENV/
 # Results
 *.json
 
+# Preserve the model
+!src/secrets_hunter/config/semantics/semantic_concept_model.json
+
 # Misc
 .DS_Store
