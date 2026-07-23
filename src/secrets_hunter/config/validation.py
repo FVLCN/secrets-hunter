@@ -9,7 +9,8 @@ from .settings import (
     DEFAULT_SCAN_OPTIONS,
     HEX_ENTROPY_MAX,
     MAX_WORKERS_MULTIPLIER,
-    FindingOutputOptions,
+    FindingPresentationOptions,
+    FindingSelectionOptions,
     ScanOptions
 )
 from .specs import RejectionPatternSpec
@@ -184,12 +185,12 @@ class ScanOptionsValidator:
             raise ValueError("source_timeout_seconds must be finite and greater than zero")
 
 
-class FindingOutputOptionsValidator:
+class FindingSelectionOptionsValidator:
     @staticmethod
-    def validate(options: FindingOutputOptions) -> None:
-        if not isinstance(options, FindingOutputOptions):
+    def validate(options: FindingSelectionOptions) -> None:
+        if not isinstance(options, FindingSelectionOptions):
             raise TypeError(
-                "output_options must be a FindingOutputOptions instance"
+                "selection_options must be a FindingSelectionOptions instance"
             )
 
         if isinstance(options.min_confidence, bool) or not isinstance(
@@ -200,6 +201,16 @@ class FindingOutputOptionsValidator:
 
         if not 0 <= options.min_confidence <= 100:
             raise ValueError("min_confidence must be between 0 and 100")
+
+
+class FindingPresentationOptionsValidator:
+    @staticmethod
+    def validate(options: FindingPresentationOptions) -> None:
+        if not isinstance(options, FindingPresentationOptions):
+            raise TypeError(
+                "presentation_options must be a "
+                "FindingPresentationOptions instance"
+            )
 
         if not isinstance(options.reveal_findings, bool):
             raise TypeError("reveal_findings must be a boolean")

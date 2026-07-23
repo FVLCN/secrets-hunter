@@ -1,7 +1,8 @@
 import argparse
 
 from secrets_hunter.config import (
-    DEFAULT_FINDING_OUTPUT_OPTIONS,
+    DEFAULT_FINDING_PRESENTATION_OPTIONS,
+    DEFAULT_FINDING_SELECTION_OPTIONS,
     DEFAULT_SCAN_OPTIONS
 )
 
@@ -22,10 +23,10 @@ def add_scan_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--reveal-findings",
         action="store_true",
-        default=DEFAULT_FINDING_OUTPUT_OPTIONS.reveal_findings,
+        default=DEFAULT_FINDING_PRESENTATION_OPTIONS.reveal_findings,
         help=(
             "reveal findings in output "
-            f"(default: {DEFAULT_FINDING_OUTPUT_OPTIONS.reveal_findings})"
+            f"(default: {DEFAULT_FINDING_PRESENTATION_OPTIONS.reveal_findings})"
         )
     )
     add_config_option(parser)
@@ -105,10 +106,10 @@ def add_scan_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--min-confidence",
         type=int,
-        default=DEFAULT_FINDING_OUTPUT_OPTIONS.min_confidence,
+        default=DEFAULT_FINDING_SELECTION_OPTIONS.min_confidence,
         help=(
-            "minimum confidence of findings to display "
-            f"(default: {DEFAULT_FINDING_OUTPUT_OPTIONS.min_confidence})"
+            "minimum confidence required for a finding to be reported"
+            f"(default: {DEFAULT_FINDING_SELECTION_OPTIONS.min_confidence})"
         ),
     )
     parser.add_argument(
@@ -121,6 +122,6 @@ def add_scan_options(parser: argparse.ArgumentParser) -> None:
         "--truncate-long-matches",
         action="store_true",
         dest="truncate_long_matches",
-        default=DEFAULT_FINDING_OUTPUT_OPTIONS.truncate_long_matches,
+        default=DEFAULT_FINDING_PRESENTATION_OPTIONS.truncate_long_matches,
         help="truncate long finding matches in output",
     )

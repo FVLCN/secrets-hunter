@@ -7,7 +7,11 @@ from secrets_hunter.application import (
     ScanSource,
     TextSource
 )
-from secrets_hunter.config import FindingOutputOptions, ScanOptions
+from secrets_hunter.config import (
+    FindingPresentationOptions,
+    FindingSelectionOptions,
+    ScanOptions
+)
 from secrets_hunter.models import FindingKind, ScanFailure, ScanFailureKind, ScanResult
 from secrets_hunter.runtime import ApplicationRuntime, load_application_runtime
 from secrets_hunter.scanning import ScanCancellation, ScanProgressObserver
@@ -17,7 +21,8 @@ __all__ = [
     'ApplicationRuntime',
     'DomainSource',
     'FilesystemSource',
-    'FindingOutputOptions',
+    'FindingPresentationOptions',
+    'FindingSelectionOptions',
     'FindingKind',
     'GitHistorySource',
     'ScanOptions',

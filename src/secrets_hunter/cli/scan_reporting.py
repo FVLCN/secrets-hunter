@@ -2,7 +2,7 @@ import logging
 
 from collections import Counter
 
-from secrets_hunter.config import FindingOutputOptions
+from secrets_hunter.config import FindingSelectionOptions
 from secrets_hunter.models import ScanResult, Severity
 from secrets_hunter.reporters.finding_view import FindingView
 
@@ -36,13 +36,20 @@ def log_scan_result(result: ScanResult, elapsed: float) -> None:
 
 def log_findings_summary(
     findings: list[FindingView],
-    output_options: FindingOutputOptions
+    selection_options: FindingSelectionOptions,
+    *,
+    total_detected_findings: int
 ) -> None:
     severity_counts = Counter(finding.severity for finding in findings)
     total_findings = len(findings)
 
     if total_findings == 0:
-        logger.info("No secrets found")
+        if total_detected_findings:
+            logger.info(
+                "No findings met the minimum confidence threshold"
+            )
+        else:
+            logger.info("No secrets found")
     elif total_findings == 1:
         finding = findings[0]
         logger.info(f"1 {finding.severity.lower()} severity secret was found")
@@ -54,7 +61,7 @@ def log_findings_summary(
         ).removesuffix(",")
         logger.info(f"Found {total_findings} secrets: {severity_summary}")
 
-    if total_findings > 0 and not output_options.min_confidence:
+    if total_findings > 0 and not selection_options.min_confidence:
         logger.info(
             "Showing all findings, including rejected ones. "
             "Use the --min-confidence flag to exclude them from the report."

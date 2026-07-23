@@ -10,14 +10,20 @@ from secrets_hunter.cli.scan_reporting import (
     log_scan_result
 )
 from secrets_hunter.cli.source_adapters import SCAN_SOURCE_ADAPTERS
-from secrets_hunter.config import FindingOutputOptions, ScanOptions
+from secrets_hunter.config import (
+    FindingPresentationOptions,
+    FindingSelectionOptions,
+    ScanOptions
+)
 from secrets_hunter.config.validation import (
-    FindingOutputOptionsValidator,
+    FindingPresentationOptionsValidator,
+    FindingSelectionOptionsValidator,
     ScanOptionsValidator
 )
 from secrets_hunter.models import Disposition
 from secrets_hunter.reporters.console_reporter import ConsoleReporter
-from secrets_hunter.reporters.findings_output_processor import FindingsOutputProcessor
+from secrets_hunter.reporters.finding_presentation import present_findings
+from secrets_hunter.reporters.finding_selection import select_for_reporting
 from secrets_hunter.reporters.json_reporter import JSONReporter
 from secrets_hunter.reporters.sarif_reporter import SARIFReporter
 from secrets_hunter.runtime import load_application_runtime
@@ -60,8 +66,11 @@ def validate(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
 
     try:
         ScanOptionsValidator.validate(create_scan_options(args))
-        FindingOutputOptionsValidator.validate(
-            create_finding_output_options(args)
+        FindingSelectionOptionsValidator.validate(
+            create_finding_selection_options(args)
+        )
+        FindingPresentationOptionsValidator.validate(
+            create_finding_presentation_options(args)
         )
         ScanSourceValidator.validate(args.source_factory(args))
     except (TypeError, ValueError) as error:
@@ -81,11 +90,18 @@ def create_scan_options(args: argparse.Namespace) -> ScanOptions:
     )
 
 
-def create_finding_output_options(
+def create_finding_selection_options(
     args: argparse.Namespace
-) -> FindingOutputOptions:
-    return FindingOutputOptions(
-        min_confidence=args.min_confidence,
+) -> FindingSelectionOptions:
+    return FindingSelectionOptions(
+        min_confidence=args.min_confidence
+    )
+
+
+def create_finding_presentation_options(
+    args: argparse.Namespace
+) -> FindingPresentationOptions:
+    return FindingPresentationOptions(
         reveal_findings=args.reveal_findings,
         truncate_long_matches=args.truncate_long_matches
     )
@@ -93,7 +109,8 @@ def create_finding_output_options(
 
 def run(args: argparse.Namespace) -> int:
     scan_options = create_scan_options(args)
-    output_options = create_finding_output_options(args)
+    selection_options = create_finding_selection_options(args)
+    presentation_options = create_finding_presentation_options(args)
     runtime = load_application_runtime(args.config)
 
     logging.basicConfig(
@@ -119,26 +136,35 @@ def run(args: argparse.Namespace) -> int:
     if result.aborted:
         return 1
 
-    findings = FindingsOutputProcessor.prepare(
-        list(result.findings),
-        output_options
+    selected_findings = select_for_reporting(
+        result.findings,
+        selection_options
+    )
+    finding_views = present_findings(
+        selected_findings,
+        presentation_options
     )
 
-    if result.complete or findings:
-        log_findings_summary(findings, output_options)
+    if result.complete or finding_views:
+        log_findings_summary(
+            finding_views,
+            selection_options,
+            total_detected_findings=len(result.findings)
+        )
 
     if args.json_output:
-        JSONReporter.export(findings, args.json_output)
+        JSONReporter.export(finding_views, args.json_output)
     elif args.sarif_output:
-        SARIFReporter.export(findings, args.sarif_output)
+        SARIFReporter.export(finding_views, args.sarif_output)
     else:
-        ConsoleReporter.format_report(findings)
+        ConsoleReporter.format_report(finding_views)
 
     if not result.complete:
         return 1
 
     if args.fail_on_findings and any(
-        finding.disposition is not Disposition.SUPPRESS for finding in findings
+        finding.disposition is not Disposition.SUPPRESS
+        for finding in selected_findings
     ):
         return 2
 

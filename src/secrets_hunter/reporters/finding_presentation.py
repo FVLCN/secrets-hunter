@@ -1,5 +1,7 @@
-from secrets_hunter.config import FindingOutputOptions
-from secrets_hunter.config.validation import FindingOutputOptionsValidator
+from collections.abc import Iterable
+
+from secrets_hunter.config import FindingPresentationOptions
+from secrets_hunter.config.validation import FindingPresentationOptionsValidator
 from secrets_hunter.detection.pem import PEM_BEGIN_RE, PEM_END_RE
 from secrets_hunter.models import Finding
 from secrets_hunter.reporters.finding_view import FindingView
@@ -69,35 +71,29 @@ def truncate_match(match_text: str) -> str:
     return truncate_generic_match(match_text)
 
 
-class FindingsOutputProcessor:
-    @staticmethod
-    def prepare(
-        findings: list[Finding],
-        options: FindingOutputOptions
-    ) -> list[FindingView]:
-        """Prepare findings for output by filtering, truncating, masking, and sorting."""
-        FindingOutputOptionsValidator.validate(options)
-        output_findings: list[FindingView] = []
+def present_findings(
+    findings: Iterable[Finding],
+    options: FindingPresentationOptions
+) -> list[FindingView]:
+    """Create output views without changing which findings were selected."""
+    FindingPresentationOptionsValidator.validate(options)
+    finding_views: list[FindingView] = []
 
-        for finding in findings:
-            if finding.confidence < options.min_confidence:
-                continue
+    for finding in findings:
+        match = finding.match
+        context = finding.context
 
-            match = finding.match
-            context = finding.context
+        if options.truncate_long_matches:
+            match = truncate_match(match)
 
-            if options.truncate_long_matches:
-                match = truncate_match(match)
+        if not options.reveal_findings:
+            match = MASKED_VALUE
+            context = MASKED_VALUE
 
-            if not options.reveal_findings:
-                match = MASKED_VALUE
-                context = MASKED_VALUE
+        finding_views.append(FindingView.from_finding(
+            finding,
+            match=match,
+            context=context
+        ))
 
-            output_findings.append(FindingView.from_finding(
-                finding,
-                match=match,
-                context=context
-            ))
-
-        output_findings.sort(key=lambda view: view.confidence, reverse=True)
-        return output_findings
+    return finding_views

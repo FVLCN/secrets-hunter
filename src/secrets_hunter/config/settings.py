@@ -17,11 +17,16 @@ class ScanOptions:
 
 
 @dataclass(frozen=True)
-class FindingOutputOptions:
+class FindingSelectionOptions:
     min_confidence: int = 0
+
+
+@dataclass(frozen=True)
+class FindingPresentationOptions:
     reveal_findings: bool = False
     truncate_long_matches: bool = False
 
 
 DEFAULT_SCAN_OPTIONS = ScanOptions()
-DEFAULT_FINDING_OUTPUT_OPTIONS = FindingOutputOptions()
+DEFAULT_FINDING_SELECTION_OPTIONS = FindingSelectionOptions()
+DEFAULT_FINDING_PRESENTATION_OPTIONS = FindingPresentationOptions()
