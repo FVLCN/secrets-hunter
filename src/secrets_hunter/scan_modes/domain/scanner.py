@@ -1,49 +1,69 @@
 import logging
 import urllib.parse
 
-from secrets_hunter.config import CLIArgs, DOMAIN_SCAN_PATHS
-from secrets_hunter.models import Finding, ScanWorkItem
-from secrets_hunter.models.config import RuntimeConfig
-from secrets_hunter.scan_modes.base import BaseScanner
+from typing import assert_never, override
+
+from secrets_hunter.config import DOMAIN_SCAN_PATHS
+from secrets_hunter.models import (
+    ScanFailure,
+    ScanResult
+)
+from secrets_hunter.scanning.content_validator import TextContentValidator
+from secrets_hunter.scanning.read_result import (
+    SourceBytes,
+    SourceCancelled,
+    SourceMissing,
+    SourceReadFailure
+)
+from secrets_hunter.scanning.scanner import BaseScanner
+from secrets_hunter.scanning.session import ScanSession
+from secrets_hunter.scanning.source_identity import SourcePathResolver
+from secrets_hunter.scanning.text_reader import SourceTextReader
+from secrets_hunter.scanning.work import ScanWorkItem, ScanWorkPlan
 from secrets_hunter.scan_modes.domain.client import DomainClient
-from secrets_hunter.validators import TextContentValidator
 
 logger = logging.getLogger(__name__)
 
 
 class DomainScanner(BaseScanner):
-    def __init__(self, runtime_cfg: RuntimeConfig, cli_args: CLIArgs | None, domain: str):
-        super().__init__(runtime_cfg, cli_args)
+    def __init__(
+        self,
+        session: ScanSession,
+        content_validator: TextContentValidator,
+        source_text_reader: SourceTextReader,
+        domain: str,
+        *,
+        skip_tls_verify: bool = False
+    ) -> None:
+        super().__init__(session)
+        self.content_validator = content_validator
+        self.source_text_reader = source_text_reader
         self.domain = domain
+        self.skip_tls_verify = skip_tls_verify
+        self.source_path_resolver = SourcePathResolver()
 
-    def found_message(self, total_items: int) -> str:
-        return f"Got {total_items} URL(s) to scan"
-
-    @property
-    def empty_message(self) -> str:
-        return "No URLs to scan"
-
-    @property
-    def finished_message(self) -> str:
-        return "Domain scan finished"
-
-    @property
-    def failed_unit_label(self) -> str:
-        return "URL"
-
-    def collect_work_items(self) -> list[ScanWorkItem]:
+    @override
+    def create_work_plan(self) -> ScanWorkPlan:
         domain_client = DomainClient(
             self.domain,
-            skip_tls_verify=self.cli_args.skip_tls_verify
+            self.session.options.max_source_bytes,
+            self.session.options.source_timeout_seconds,
+            self.session.control.cancellation,
+            skip_tls_verify=self.skip_tls_verify
         )
         logger.info(f"Collecting likely sensitive URLs from {domain_client.base_url}...")
-        return [
-            ScanWorkItem(
-                label=url,
-                run=lambda url=url: self.scan_url_response(domain_client, url)
-            )
-            for url in self.collect_urls_to_scan(domain_client)
-        ]
+        urls = self.collect_urls_to_scan(domain_client)
+        return ScanWorkPlan(
+            label=domain_client.base_url,
+            events=tuple(
+                ScanWorkItem(
+                    label=url,
+                    run=lambda url=url: self.scan_url_response(domain_client, url)
+                )
+                for url in urls
+            ),
+            total_items=len(urls)
+        )
 
     @staticmethod
     def collect_urls_to_scan(domain_client: DomainClient) -> list[str]:
@@ -56,21 +76,69 @@ class DomainScanner(BaseScanner):
         self,
         domain_client: DomainClient,
         url: str
-    ) -> tuple[list[Finding], bool]:
-        response_body, fetch_success = domain_client.read_url(url)
+    ) -> ScanResult:
+        if self.session.control.cancellation.cancelled:
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                aborted=True
+            )
 
-        if response_body is None:
-            return [], fetch_success
+        read_result = domain_client.read_url(url)
 
-        if not TextContentValidator.is_text_content(response_body):
-            return [], True
+        if self.session.control.cancellation.cancelled:
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                aborted=True
+            )
 
-        findings, scan_success = self.scan_lines(
+        if isinstance(read_result, SourceReadFailure):
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                failures=(
+                    ScanFailure(
+                        label=url,
+                        message=read_result.message
+                    ),
+                )
+            )
+
+        if isinstance(read_result, SourceCancelled):
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                aborted=True
+            )
+
+        if isinstance(read_result, SourceMissing):
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                successful_items=1
+            )
+
+        if not isinstance(read_result, SourceBytes):
+            assert_never(read_result)
+
+        response_body = read_result.content
+        if not self.content_validator.is_text_content(response_body):
+            return ScanResult(
+                total_items=1,
+                attempted_items=1,
+                successful_items=1
+            )
+
+        result = self.session.source_scanner.scan(
             self.source_text_reader.bytes_to_lines(response_body),
-            domain_client.display_path(url),
+            self.source_path_resolver.identify(url)
         )
 
-        if not scan_success:
-            return findings, scan_success
+        if not result.complete:
+            return result
 
-        return [finding.with_vulnerable_url(url) for finding in findings], True
+        return result.with_findings(
+            finding.with_vulnerable_url(url)
+            for finding in result.findings
+        )

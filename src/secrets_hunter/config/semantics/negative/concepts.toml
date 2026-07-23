@@ -1,0 +1,39 @@
+[[concepts]]
+id = "test_fixture"
+category = "hard_reject"
+policy = "hard_reject"
+
+[[concepts]]
+id = "hash_artifact"
+category = "non_secret_artifact"
+policy = "reject_evidence"
+
+[[concepts]]
+id = "public_crypto_artifact"
+category = "non_secret_artifact"
+policy = "reject_evidence"
+
+[[concepts]]
+id = "identifier_context"
+category = "weak_negative"
+policy = "context_reject_evidence"
+
+[[concepts]]
+id = "generic_assignment_name"
+category = "neutral"
+policy = "neutral"
+
+[[concepts]]
+id = "ordinary_identifier_words"
+category = "weak_negative"
+policy = "neutral_reject_evidence"
+
+[[concepts]]
+id = "version_or_reference_artifact"
+category = "non_secret_artifact"
+policy = "reject_evidence"
+
+[[concepts]]
+id = "placeholder_value"
+category = "rejection_pattern"
+policy = "value_reject"

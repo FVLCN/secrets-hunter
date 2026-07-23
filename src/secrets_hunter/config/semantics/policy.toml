@@ -1,0 +1,37 @@
+[reporting]
+concept_probability_threshold = 0.10
+concept_limit = 5
+
+[decision_thresholds]
+reject = 0.80
+context_reject = 0.80
+neutral_reject = 0.80
+credential = 0.70
+target = 0.70
+neutral = 0.60
+strong_credential = 0.85
+
+[confidence]
+value_rejected_blocking = 0.02
+artifact_reject = 0.05
+value_rejected = 0.02
+no_assignment_entropy_with_secret_evidence = 0.30
+no_assignment_entropy = 0.05
+strong_secret_pattern = 0.99
+strong_secret_context = 0.95
+strong_secret_context_with_fixture = 0.75
+known_pattern = 0.95
+context_reject_with_credential = 0.30
+context_reject_with_target = 0.20
+context_reject = 0.05
+neutral_bare_credential = 0.25
+neutral_high_entropy_identifier = 0.25
+unknown_high_entropy_identifier = 0.55
+high_entropy_assigned = 0.45
+strong_credential = 0.90
+credential_with_neutral = 0.25
+credential_with_value_signal = 0.75
+credential_with_hash_shaped_value = 0.85
+credential_only = 0.55
+target_only = 0.30
+default = 0.10

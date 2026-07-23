@@ -1,5 +1,12 @@
-from abc import ABC
 from dataclasses import dataclass
+from typing import override
+
+from secrets_hunter.detection.finding_kinds import (
+    DB_CONNECTION_KIND,
+    PEM_KEY_KIND
+)
+from secrets_hunter.detection.pem import PemAnalysis
+from secrets_hunter.models import FindingKind
 
 
 @dataclass(frozen=True)
@@ -11,12 +18,12 @@ class SourceFragment:
 
 
 @dataclass(frozen=True)
-class LineFragment(ABC):
+class LineFragment:
     # Extracted candidate derived from a SourceFragment.
     content: str
 
     @property
-    def special_finding_type(self) -> str | None:
+    def special_finding_kind(self) -> FindingKind | None:
         return None
 
 
@@ -28,18 +35,19 @@ class GenericStringFragment(LineFragment):
 @dataclass(frozen=True)
 class DBConnectionFragment(LineFragment):
     @property
-    def special_finding_type(self) -> str | None:
-        return "DB Connection String"
+    @override
+    def special_finding_kind(self) -> FindingKind | None:
+        return DB_CONNECTION_KIND
 
 
 @dataclass(frozen=True)
 class PEMKeyFragment(LineFragment):
     # Parsed PEM structure kept with the raw matched content.
-    header: str | None
     body: str | None
     footer: str | None
-    inline: bool = False
+    pem_analysis: PemAnalysis
 
     @property
-    def special_finding_type(self) -> str | None:
-        return "PEM Key"
+    @override
+    def special_finding_kind(self) -> FindingKind | None:
+        return PEM_KEY_KIND

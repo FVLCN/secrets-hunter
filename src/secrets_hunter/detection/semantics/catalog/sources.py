@@ -1,0 +1,7 @@
+POSITIVE_CONCEPTS_RESOURCE = "semantics/positive/concepts.toml"
+POSITIVE_EVIDENCE_RESOURCE = "semantics/positive/evidences.toml"
+NEGATIVE_CONCEPTS_RESOURCE = "semantics/negative/concepts.toml"
+NEGATIVE_EVIDENCE_RESOURCE = "semantics/negative/evidences.toml"
+PROVIDERS_RESOURCE = "providers/providers.toml"
+PROVIDER_PATTERNS_RESOURCE = "providers/provider_patterns.toml"
+POLICY_RESOURCE = "semantics/policy.toml"

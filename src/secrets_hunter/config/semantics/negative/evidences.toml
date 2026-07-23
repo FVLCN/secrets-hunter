@@ -1,0 +1,95 @@
+[[evidence]]
+concept = "test_fixture"
+sources = ["var_name", "path"]
+terms = [
+    "test",
+    "mock",
+    "fake",
+    "dummy",
+    "example",
+    "placeholder",
+    "template",
+    "sample",
+    "demo"
+]
+
+[[evidence]]
+concept = "hash_artifact"
+sources = ["var_name", "path", "rejection_pattern", "value_shape"]
+terms = [
+    "idempotency",
+    "idempotence",
+    "idempotent",
+    "checksum",
+    "hash",
+    "hashed",
+    "hashing",
+    "sha",
+    "sha1",
+    "sha256",
+    "sha512",
+    "md2",
+    "md4",
+    "md5",
+    "integrity",
+    "digest",
+    "sum"
+]
+
+[[evidence]]
+concept = "public_crypto_artifact"
+sources = ["var_name", "path", "value_shape"]
+terms = [
+    "public",
+    "certificate",
+    "cert",
+    "pubkey"
+]
+
+[[evidence]]
+concept = "identifier_context"
+sources = ["var_name"]
+terms = [
+    "identifier",
+    "uuid",
+    "guid"
+]
+
+[[evidence]]
+concept = "identifier_context"
+sources = ["name_role"]
+terms = ["exact_identifier_name"]
+
+[[evidence]]
+concept = "generic_assignment_name"
+sources = ["var_name"]
+terms = [
+    "value",
+    "variable",
+    "var",
+    "local",
+    "dev"
+]
+
+[[evidence]]
+concept = "version_or_reference_artifact"
+sources = ["var_name", "path"]
+terms = [
+    "version",
+    "reference",
+    "path",
+    "timestamp",
+    "build",
+    "block",
+    "object",
+    "rootobject",
+    "created",
+    "revision",
+    "revises",
+    "cache"
+]
+
+[[evidence]]
+concept = "placeholder_value"
+sources = ["rejection_pattern"]
+terms = ["placeholder"]

@@ -1,0 +1,56 @@
+[compact_aliases]
+
+[[concepts]]
+id = "product_service_target"
+category = "secret_target"
+policy = "evidence"
+
+[[concepts]]
+id = "cloud_provider_target"
+category = "secret_target"
+policy = "evidence"
+
+[[concepts]]
+id = "infrastructure_target"
+category = "secret_target"
+policy = "evidence"
+
+[[concepts]]
+id = "auth_system_target"
+category = "secret_target"
+policy = "evidence"
+
+[[concepts]]
+id = "key_credential"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "token_credential"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "secret_credential"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "connection_credential"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "password_credential"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "credential_generic"
+category = "credential"
+policy = "evidence"
+
+[[concepts]]
+id = "webhook_credential"
+category = "credential"
+policy = "evidence"

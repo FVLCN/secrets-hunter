@@ -2,22 +2,24 @@ import json
 import logging
 
 from secrets_hunter import __version__
-from secrets_hunter.models import Finding
+from secrets_hunter.reporters.finding_view import FindingView
 
 logger = logging.getLogger(__name__)
 
 
 class SARIFReporter:
     @staticmethod
-    def export(findings: list[Finding], output_file: str) -> None:
+    def export(findings: list[FindingView], output_file: str) -> None:
         logger.info(f"Exporting results to {output_file}...")
 
         results = []
         for finding in findings:
             result = {
-                "ruleId": finding.type,
+                "ruleId": finding.kind.id,
                 "message": {
-                    "text": f"{finding.type} found in {finding.file}"
+                    "text": (
+                        f"{finding.kind.display_name} found in {finding.file}"
+                    )
                 },
                 "locations": [{
                     "physicalLocation": {
@@ -34,14 +36,23 @@ class SARIFReporter:
                 }],
                 "properties": {
                     "title": finding.title,
+                    "finding_kind": {
+                        "id": finding.kind.id,
+                        "display_name": finding.kind.display_name
+                    },
                     "match": finding.match,
                     "detection_method": finding.detection_method,
                     "confidence": finding.confidence,
+                    "disposition": finding.disposition.value,
                     "context_var": finding.context_var,
                     "commit": finding.commit,
                     "vulnerable_url": finding.vulnerable_url,
                     "severity": finding.severity,
-                    "confidence_reasoning": finding.confidence_reasoning
+                    "confidence_reasoning": finding.confidence_reasoning,
+                    "decision_trace": [
+                        activation.to_dict()
+                        for activation in finding.decision_trace
+                    ],
                 }
             }
             results.append(result)

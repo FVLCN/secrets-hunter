@@ -1,0 +1,29 @@
+[[provider_patterns]]
+id = "aws_access_key_id"
+provider = "aws"
+name = "AWS Access Key ID"
+regex = '''\bAKIA[0-9A-Z]{16}\b'''
+
+[[provider_patterns]]
+id = "gitlab_personal_access_token"
+provider = "gitlab"
+name = "GitLab Personal Access Token"
+regex = '''\bglpat-[A-Za-z0-9_-]{20}\b'''
+
+[[provider_patterns]]
+id = "stripe_api_key"
+provider = "stripe"
+name = "Stripe API Key"
+regex = '''\bsk_(?:live|test)_[A-Za-z0-9]{24,}\b'''
+
+[[provider_patterns]]
+id = "twilio_sid"
+provider = "twilio"
+name = "Twilio SID"
+regex = '''\bSK[A-Z0-9]{32}\b'''
+
+[[provider_patterns]]
+id = "telegram_bot_token"
+provider = "telegram"
+name = "Telegram Bot Token"
+regex = '''\b\d{9,10}:[A-Za-z0-9_-]{35,}\b'''

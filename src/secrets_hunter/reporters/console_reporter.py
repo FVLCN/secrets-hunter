@@ -1,19 +1,43 @@
-from typing import Optional
-
 from secrets_hunter.reporters.console_base import BaseConsoleReporter
-from secrets_hunter.models import Finding
+from secrets_hunter.reporters.finding_view import FindingView
+from secrets_hunter.reporters.semantic_analysis_view import (
+    SemanticConceptView,
+    SemanticKeywordView,
+)
 
 
 class ConsoleReporter(BaseConsoleReporter):
     @staticmethod
-    def _truncate(s: Optional[str], max_len: int) -> str:
+    def _truncate(s: str | None, max_len: int) -> str:
         if not s:
             return ""
         s = s.replace("\n", "\\n")
         return s if len(s) <= max_len else s[: max_len - 3] + "..."
 
     @staticmethod
-    def format_report(findings: list[Finding]) -> None:
+    def _format_keyword(keyword: SemanticKeywordView) -> str:
+        return keyword.display_term or keyword.term
+
+    @staticmethod
+    def _format_concept(concept: SemanticConceptView) -> str:
+        name = concept.name
+        probability_percent = round(concept.probability * 100)
+
+        keywords = [
+            formatted
+            for keyword in concept.strongest_keywords
+            for formatted in [ConsoleReporter._format_keyword(keyword)]
+            if formatted
+        ]
+        keyword_suffix = f" [{', '.join(keywords)}]" if keywords else ""
+
+        if concept.kind == "fact":
+            return f"{name}{keyword_suffix}"
+
+        return f"{name} {probability_percent}%{keyword_suffix}"
+
+    @staticmethod
+    def format_report(findings: list[FindingView]) -> None:
         if not findings:
             return
 
@@ -24,15 +48,43 @@ class ConsoleReporter(BaseConsoleReporter):
 
         for i, f in enumerate(findings, 1):
             lines.append(f"[{i}] {f.title}")
-            lines.append(f"    Severity:   {f.severity} (confidence: {f.confidence}%, reasoning: {f.confidence_reasoning})")
+            severity_detail = f"Confidence: {f.confidence}%"
 
-            if getattr(f, "commit", None):
+            if f.confidence_reasoning:
+                severity_detail += f", {f.confidence_reasoning}"
+
+            lines.append(f"    Severity:   {f.severity} ({severity_detail})")
+
+            semantic_analysis = f.semantic_analysis
+
+            if semantic_analysis:
+                facts = semantic_analysis.facts
+                signals = [
+                    ConsoleReporter._format_concept(concept)
+                    for concept in semantic_analysis.concepts
+                ]
+
+                if facts:
+                    lines.append(f"    Facts:      {', '.join(facts)}")
+
+                if signals:
+                    lines.append(f"    Signals:    {', '.join(signals)}")
+
+            shadowed_rules = f.shadowed_rule_ids
+            decision_summary = f.selected_rule_id
+
+            if shadowed_rules:
+                decision_summary += f" (shadowed: {', '.join(shadowed_rules)})"
+
+            lines.append(f"    Decision:   {decision_summary}")
+
+            if f.commit:
                 lines.append(f"    Commit:     {f.commit}")
 
-            if getattr(f, "vulnerable_url", None):
+            if f.vulnerable_url:
                 lines.append(f"    URL:        {f.vulnerable_url}")
 
-            if getattr(f, "context_var", None):
+            if f.context_var:
                 lines.append(f"    Variable:   {f.context_var}")
 
             match_str = ConsoleReporter._truncate(f.match, 120)
