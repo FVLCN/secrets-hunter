@@ -3,6 +3,10 @@ import logging
 
 from secrets_hunter import __version__
 from secrets_hunter.reporters.finding_view import FindingView
+from secrets_hunter.reporters.source_location import (
+    source_location_kind,
+    source_location_to_dict
+)
 
 logger = logging.getLogger(__name__)
 
@@ -14,20 +18,23 @@ class SARIFReporter:
 
         results = []
         for finding in findings:
+            location = finding.location
+            serialized_location = source_location_to_dict(location)
             result = {
                 "ruleId": finding.kind.id,
                 "message": {
                     "text": (
-                        f"{finding.kind.display_name} found in {finding.file}"
+                        f"{finding.kind.display_name} found in "
+                        f"{location.locator}"
                     )
                 },
                 "locations": [{
                     "physicalLocation": {
                         "artifactLocation": {
-                            "uri": finding.file
+                            "uri": location.locator
                         },
                         "region": {
-                            "startLine": finding.line,
+                            "startLine": location.line,
                             "snippet": {
                                 "text": finding.context
                             }
@@ -45,8 +52,10 @@ class SARIFReporter:
                     "confidence": finding.confidence,
                     "disposition": finding.disposition.value,
                     "context_var": finding.context_var,
-                    "commit": finding.commit,
-                    "vulnerable_url": finding.vulnerable_url,
+                    "location": {
+                        "kind": source_location_kind(location),
+                        **serialized_location
+                    },
                     "severity": finding.severity,
                     "confidence_reasoning": finding.confidence_reasoning,
                     "decision_trace": [

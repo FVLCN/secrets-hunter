@@ -53,7 +53,7 @@ class SourceScanner:
                 findings.extend(
                     self.detection_engine.scan_fragment(
                         source_fragment,
-                        source.finding_path
+                        source.location
                     )
                 )
                 self.control.progress.source_progress(

@@ -10,17 +10,19 @@ from secrets_hunter.models import (
 )
 from secrets_hunter.scanning.content_validator import TextContentValidator
 from secrets_hunter.scanning.read_result import (
-    SourceBytes,
     SourceCancelled,
     SourceMissing,
     SourceReadFailure
 )
 from secrets_hunter.scanning.scanner import BaseScanner
 from secrets_hunter.scanning.session import ScanSession
-from secrets_hunter.scanning.source_identity import SourcePathResolver
+from secrets_hunter.scanning.source_identity import SourceIdentity
 from secrets_hunter.scanning.text_reader import SourceTextReader
 from secrets_hunter.scanning.work import ScanWorkItem, ScanWorkPlan
-from secrets_hunter.scan_modes.domain.client import DomainClient
+from secrets_hunter.scanning.modes.domain.client import (
+    DomainClient,
+    FetchedHttpResponse
+)
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,6 @@ class DomainScanner(BaseScanner):
         self.source_text_reader = source_text_reader
         self.domain = domain
         self.skip_tls_verify = skip_tls_verify
-        self.source_path_resolver = SourcePathResolver()
 
     @override
     def create_work_plan(self) -> ScanWorkPlan:
@@ -119,7 +120,7 @@ class DomainScanner(BaseScanner):
                 successful_items=1
             )
 
-        if not isinstance(read_result, SourceBytes):
+        if not isinstance(read_result, FetchedHttpResponse):
             assert_never(read_result)
 
         response_body = read_result.content
@@ -130,15 +131,10 @@ class DomainScanner(BaseScanner):
                 successful_items=1
             )
 
-        result = self.session.source_scanner.scan(
+        return self.session.source_scanner.scan(
             self.source_text_reader.bytes_to_lines(response_body),
-            self.source_path_resolver.identify(url)
-        )
-
-        if not result.complete:
-            return result
-
-        return result.with_findings(
-            finding.with_vulnerable_url(url)
-            for finding in result.findings
+            SourceIdentity.for_http_response(
+                requested_url=url,
+                effective_url=read_result.effective_url
+            )
         )

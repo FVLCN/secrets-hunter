@@ -1,12 +1,14 @@
 import argparse
 
 from secrets_hunter.application import DomainSource
+from secrets_hunter.scanning.modes.domain.mode import DOMAIN_MODE
 
 from ..defaults import DEFAULT_SKIP_TLS_VERIFY
 from ..protocols import SubparserRegistry
 
 
 NAME = "domain"
+SCAN_MODE = DOMAIN_MODE
 
 
 def register(

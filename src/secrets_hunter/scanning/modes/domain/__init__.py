@@ -1,0 +1,1 @@
+"""Domain scan mode."""

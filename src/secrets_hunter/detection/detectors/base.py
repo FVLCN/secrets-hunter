@@ -1,6 +1,7 @@
 from typing import Protocol
 
 from secrets_hunter.detection.fragmenter.models import LineFragment
+from secrets_hunter.models import SourceLocation
 
 from .models import DetectionCandidate
 
@@ -10,7 +11,7 @@ class Detector(Protocol):
         self,
         line: str,
         line_num: int,
-        filepath: str,
+        source_location: SourceLocation,
         fragments: list[LineFragment]
     ) -> list[DetectionCandidate]:
         ...

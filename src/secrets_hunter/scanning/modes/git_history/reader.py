@@ -12,7 +12,7 @@ from secrets_hunter.scanning.read_result import (
     SourceCancelled,
     SourceReadFailure
 )
-from secrets_hunter.scan_modes.git_history.process import GitProcessRunner
+from secrets_hunter.scanning.modes.git_history.process import GitProcessRunner
 
 
 _DIFF_HUNK_RE = re.compile(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")

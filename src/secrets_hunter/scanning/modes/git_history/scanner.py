@@ -27,7 +27,7 @@ from secrets_hunter.scanning.work import (
     ScanWorkItem,
     ScanWorkPlan
 )
-from secrets_hunter.scan_modes.git_history.reader import GitHistoryReader
+from secrets_hunter.scanning.modes.git_history.reader import GitHistoryReader
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +168,10 @@ class GitHistoryScanner(BaseScanner):
         display_path = git_reader.repo_root / repo_rel_path
         result = self.session.source_scanner.scan(
             self.source_text_reader.bytes_to_lines(blob),
-            source_path_resolver.identify(display_path)
+            source_path_resolver.identify_git_blob(
+                display_path,
+                commit_sha
+            )
         )
 
         if not result.complete:
@@ -199,9 +202,9 @@ class GitHistoryScanner(BaseScanner):
             return result.with_findings(())
 
         introduced_findings = [
-            finding.with_commit(commit_sha)
+            finding
             for finding in result.findings
-            if finding.line in added_lines
+            if finding.location.line in added_lines
         ]
 
         return result.with_findings(introduced_findings)

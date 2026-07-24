@@ -4,13 +4,12 @@ from dataclasses import dataclass
 
 from secrets_hunter.detection.entropy_classification import EntropyClassification
 from secrets_hunter.detection.fragmenter.models import LineFragment
-from secrets_hunter.models import DetectionMethod, FindingKind
+from secrets_hunter.models import DetectionMethod, FindingKind, SourceLocation
 
 
 @dataclass(frozen=True)
 class DetectionCandidate:
-    file: str
-    line: int
+    location: SourceLocation
     finding_kind: FindingKind
     match: str
     context: str

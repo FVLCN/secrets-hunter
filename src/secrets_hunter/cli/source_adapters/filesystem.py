@@ -1,11 +1,14 @@
 import argparse
 
 from secrets_hunter.application import FilesystemSource
+from secrets_hunter.scanning.modes.filesystem.mode import FILESYSTEM_MODE
 
+from ..defaults import DEFAULT_CLI_SCAN_MODE
 from ..protocols import SubparserRegistry
 
 
-NAME = "files"
+NAME = DEFAULT_CLI_SCAN_MODE
+SCAN_MODE = FILESYSTEM_MODE
 
 
 def register(

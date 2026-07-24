@@ -7,16 +7,20 @@ from secrets_hunter.models import (
     Finding,
     FindingKind,
     Severity,
+    SourceLocation
 )
 from secrets_hunter.reporters.rule_activation_view import RuleActivationView
 from secrets_hunter.reporters.semantic_analysis_view import SemanticAnalysisView
+from secrets_hunter.reporters.source_location import (
+    format_source_location,
+    source_location_to_dict
+)
 
 
 @dataclass(frozen=True)
 class FindingView:
     title: str
-    file: str
-    line: int
+    location: SourceLocation
     kind: FindingKind
     match: str
     context: str
@@ -27,8 +31,6 @@ class FindingView:
     disposition: Disposition
     decision_trace: tuple[RuleActivationView, ...]
     context_var: str | None = None
-    commit: str | None = None
-    vulnerable_url: str | None = None
     semantic_analysis: SemanticAnalysisView | None = None
 
     @classmethod
@@ -45,9 +47,11 @@ class FindingView:
             else finding.kind.display_name
         )
         return cls(
-            title=f"Hardcoded {title_subject} at {finding.file}:{finding.line}",
-            file=finding.file,
-            line=finding.line,
+            title=(
+                f"Hardcoded {title_subject} at "
+                f"{format_source_location(finding.location)}"
+            ),
+            location=finding.location,
             kind=finding.kind,
             match=match,
             context=context,
@@ -61,13 +65,11 @@ class FindingView:
                 for activation in finding.decision_trace
             ),
             context_var=finding.context_var,
-            commit=finding.commit,
-            vulnerable_url=finding.vulnerable_url,
             semantic_analysis=(
                 SemanticAnalysisView.from_result(finding.semantic_analysis)
                 if finding.semantic_analysis is not None
                 else None
-            ),
+            )
         )
 
     @property
@@ -89,8 +91,7 @@ class FindingView:
     def to_dict(self) -> dict[str, object]:
         data: dict[str, object] = {
             "title": self.title,
-            "file": self.file,
-            "line": self.line,
+            "location": source_location_to_dict(self.location),
             "finding_kind": {
                 "id": self.kind.id,
                 "display_name": self.kind.display_name
@@ -99,8 +100,6 @@ class FindingView:
             "context": self.context,
             "detection_method": self.detection_method,
             "context_var": self.context_var,
-            "commit": self.commit,
-            "vulnerable_url": self.vulnerable_url,
             "severity": self.severity,
             "confidence_reasoning": self.confidence_reasoning,
             "confidence": self.confidence,

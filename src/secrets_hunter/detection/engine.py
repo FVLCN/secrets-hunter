@@ -4,7 +4,7 @@ from secrets_hunter.detection.detectors.base import Detector
 from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter.fragmenter import SourceFragmenter
 from secrets_hunter.detection.fragmenter.models import LineFragment, SourceFragment
-from secrets_hunter.models import Finding
+from secrets_hunter.models import Finding, SourceLocation
 
 
 class DetectionEngine:
@@ -27,18 +27,18 @@ class DetectionEngine:
         fragments: list[LineFragment],
         source: str,
         line: int,
-        source_path: str
+        source_location: SourceLocation
     ) -> list[DetectionCandidate]:
         entropy_candidates = self.entropy_detector.detect(
             source,
             line,
-            source_path,
+            source_location,
             fragments
         )
         pattern_candidates = self.pattern_detector.detect(
             source,
             line,
-            source_path,
+            source_location,
             fragments
         )
         pattern_matches = {
@@ -58,7 +58,7 @@ class DetectionEngine:
     def scan_fragment(
         self,
         source_fragment: SourceFragment,
-        source_path: str
+        source_location: SourceLocation
     ) -> list[Finding]:
         fragments = self.source_fragmenter.extract(source_fragment)
 
@@ -69,7 +69,7 @@ class DetectionEngine:
             fragments,
             source_fragment.content,
             source_fragment.start_line,
-            source_path
+            source_location
         )
 
         if not candidates:

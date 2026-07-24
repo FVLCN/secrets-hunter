@@ -3,13 +3,15 @@ import logging
 import time
 
 from secrets_hunter.application import ScanApplication
-from secrets_hunter.application.source_validation import ScanSourceValidator
 from secrets_hunter.cli.scan_progress import TerminalScanProgressObserver
 from secrets_hunter.cli.scan_reporting import (
     log_findings_summary,
     log_scan_result
 )
-from secrets_hunter.cli.source_adapters import SCAN_SOURCE_ADAPTERS
+from secrets_hunter.cli.source_adapters import (
+    CLI_SCAN_MODE_REGISTRY,
+    SCAN_SOURCE_ADAPTERS
+)
 from secrets_hunter.config import (
     FindingPresentationOptions,
     FindingSelectionOptions,
@@ -72,7 +74,9 @@ def validate(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
         FindingPresentationOptionsValidator.validate(
             create_finding_presentation_options(args)
         )
-        ScanSourceValidator.validate(args.source_factory(args))
+        source = args.source_factory(args)
+        CLI_SCAN_MODE_REGISTRY.bind(source).validate()
+        args.scan_source = source
     except (TypeError, ValueError) as error:
         parser.error(str(error))
 
@@ -120,21 +124,23 @@ def run(args: argparse.Namespace) -> int:
     )
 
     progress_observer = TerminalScanProgressObserver()
-    source = args.source_factory(args)
-    application = ScanApplication(runtime, scan_options)
+    source = args.scan_source
+    application = ScanApplication(
+        runtime,
+        scan_options,
+        scan_modes=CLI_SCAN_MODE_REGISTRY
+    )
+    prepared_scan = application.prepare(source)
     started = time.monotonic()
     try:
-        result = application.scan(
-            source,
+        result = prepared_scan.run(
             progress_observer=progress_observer
         )
     finally:
         progress_observer.finish_progress_line()
 
-    log_scan_result(result, time.monotonic() - started)
-
-    if result.aborted:
-        return 1
+    elapsed_seconds = time.monotonic() - started
+    log_scan_result(result, elapsed_seconds)
 
     selected_findings = select_for_reporting(
         result.findings,
@@ -153,7 +159,15 @@ def run(args: argparse.Namespace) -> int:
         )
 
     if args.json_output:
-        JSONReporter.export(finding_views, args.json_output)
+        JSONReporter.export(
+            prepared_scan.source_description,
+            result,
+            finding_views,
+            args.json_output,
+            elapsed_seconds=elapsed_seconds,
+            selection_options=selection_options,
+            presentation_options=presentation_options
+        )
     elif args.sarif_output:
         SARIFReporter.export(finding_views, args.sarif_output)
     else:

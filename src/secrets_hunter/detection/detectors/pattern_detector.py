@@ -4,7 +4,7 @@ from secrets_hunter.detection.detectors.models import (
 )
 from secrets_hunter.detection.fragmenter import LineFragment
 from secrets_hunter.detection.pattern_plan import PatternDetectionPlan
-from secrets_hunter.models import DetectionMethod, FindingKind
+from secrets_hunter.models import DetectionMethod, FindingKind, SourceLocation
 
 
 class PatternDetector:
@@ -22,12 +22,11 @@ class PatternDetector:
         fragment: LineFragment,
         line: str,
         line_num: int,
-        filepath: str,
+        source_location: SourceLocation,
         pattern: DetectionPattern | None = None
     ) -> DetectionCandidate:
         return DetectionCandidate(
-            file=filepath,
-            line=line_num,
+            location=source_location.at_line(line_num),
             finding_kind=finding_kind,
             match=fragment.content,
             context=line.strip()[:100],
@@ -40,7 +39,7 @@ class PatternDetector:
         self,
         line: str,
         line_num: int,
-        filepath: str,
+        source_location: SourceLocation,
         fragments: list[LineFragment]
     ) -> list[DetectionCandidate]:
         candidates: list[DetectionCandidate] = []
@@ -52,7 +51,7 @@ class PatternDetector:
                     fragment,
                     line,
                     line_num,
-                    filepath
+                    source_location
                 )
                 candidates.append(candidate)
                 continue
@@ -70,7 +69,7 @@ class PatternDetector:
                         fragment,
                         line,
                         line_num,
-                        filepath,
+                        source_location,
                         pattern
                     )
                     candidates.append(candidate)

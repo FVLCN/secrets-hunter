@@ -18,7 +18,7 @@ from secrets_hunter.scanning.read_result import (
     SourceReadFailure,
     SourceReadResult
 )
-from secrets_hunter.scan_modes.domain.url import is_http_url, normalize_domain
+from secrets_hunter.scanning.modes.domain.url import is_http_url, normalize_domain
 
 
 class _BinaryResponse(Protocol):
@@ -34,6 +34,18 @@ class _Redirect:
     location: str
 
 
+@dataclass(frozen=True)
+class FetchedHttpResponse:
+    content: bytes
+    effective_url: str
+
+
+type DomainReadResult = (
+    FetchedHttpResponse
+    | SourceMissing
+    | SourceCancelled
+    | SourceReadFailure
+)
 type _RequestResult = SourceReadResult | _Redirect
 
 
@@ -70,7 +82,7 @@ class DomainClient:
         self.cancellation = cancellation
         self.opener = self._build_opener(skip_tls_verify)
 
-    def read_url(self, url: str) -> SourceReadResult:
+    def read_url(self, url: str) -> DomainReadResult:
         if self.cancellation.cancelled:
             return SourceCancelled()
 
@@ -94,6 +106,12 @@ class DomainClient:
 
             visited_urls.add(current_url)
             result = self._request_once(current_url, deadline)
+
+            if isinstance(result, SourceBytes):
+                return FetchedHttpResponse(
+                    content=result.content,
+                    effective_url=current_url
+                )
 
             if not isinstance(result, _Redirect):
                 return result

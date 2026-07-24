@@ -8,8 +8,8 @@ from secrets_hunter.models import (
     ScanFailure,
     ScanResult
 )
-from secrets_hunter.scan_modes.filesystem.collector import FilesystemCollector
-from secrets_hunter.scan_modes.filesystem.reader import FileReader
+from secrets_hunter.scanning.modes.filesystem.collector import FilesystemCollector
+from secrets_hunter.scanning.modes.filesystem.reader import FileReader
 from secrets_hunter.scanning.scanner import BaseScanner
 from secrets_hunter.scanning.session import ScanSession
 from secrets_hunter.scanning.source_identity import SourcePathResolver
@@ -69,5 +69,5 @@ class FilesystemScanner(BaseScanner):
         lines = self.file_reader.read_file(filepath)
         return self.session.source_scanner.scan(
             lines,
-            self.source_path_resolver.identify_resolved(filepath)
+            self.source_path_resolver.identify_resolved_file(filepath)
         )

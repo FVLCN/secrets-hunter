@@ -9,6 +9,13 @@ from .scan_result import ScanFailure, ScanFailureKind, ScanResult, ScanStatus
 from .decision import Decision, Disposition, RuleActivation
 from .rejection import RejectionKind, RejectionPattern, RejectionReason
 from .semantic_analysis import SemanticAnalysisResult
+from .source_location import (
+    FileLocation,
+    GitLocation,
+    HttpLocation,
+    SourceLocation,
+    TextLocation
+)
 from .value_kind import ValueKind
 
 __all__ = [
@@ -16,6 +23,9 @@ __all__ = [
     'Disposition',
     'Finding',
     'FindingKind',
+    'FileLocation',
+    'GitLocation',
+    'HttpLocation',
     'DetectionMethod',
     'Severity',
     'severity_for_confidence',
@@ -28,5 +38,7 @@ __all__ = [
     'ScanResult',
     'ScanStatus',
     'SemanticAnalysisResult',
+    'SourceLocation',
+    'TextLocation',
     'ValueKind'
 ]

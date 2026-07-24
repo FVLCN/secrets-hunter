@@ -11,8 +11,13 @@ from secrets_hunter.detection.rejection_analyzer import CandidateRejectionAnalyz
 from secrets_hunter.detection.value_analysis import ValueAnalyzer
 from secrets_hunter.runtime import ApplicationRuntime
 from secrets_hunter.scanning.cancellation import ScanCancellation
+from secrets_hunter.scanning.content_safety import (
+    DEFAULT_CONTENT_SAFETY_POLICY
+)
+from secrets_hunter.scanning.content_validator import TextContentValidator
 from secrets_hunter.scanning.control import ScanControl
 from secrets_hunter.scanning.executor import ScanExecutor
+from secrets_hunter.scanning.modes import ScannerContext
 from secrets_hunter.scanning.path_filter import PathFilter
 from secrets_hunter.scanning.progress import (
     IsolatedScanProgressObserver,
@@ -21,6 +26,7 @@ from secrets_hunter.scanning.progress import (
 )
 from secrets_hunter.scanning.session import ScanSession
 from secrets_hunter.scanning.source_scanner import SourceScanner
+from secrets_hunter.scanning.text_reader import SourceTextReader
 
 
 def compose_scan_session(
@@ -92,4 +98,25 @@ def compose_path_filter(runtime: ApplicationRuntime) -> PathFilter:
         set(runtime_config.ignore_files),
         set(runtime_config.ignore_extensions),
         set(runtime_config.ignore_dirs)
+    )
+
+
+def compose_scanner_context(
+    runtime: ApplicationRuntime,
+    options: ScanOptions,
+    *,
+    cancellation: ScanCancellation | None = None,
+    progress: ScanProgressObserver | None = None
+) -> ScannerContext:
+    content_safety = DEFAULT_CONTENT_SAFETY_POLICY
+    return ScannerContext(
+        session=compose_scan_session(
+            runtime,
+            options,
+            cancellation=cancellation,
+            progress=progress
+        ),
+        content_validator=TextContentValidator(content_safety),
+        source_text_reader=SourceTextReader(content_safety),
+        path_filter=compose_path_filter(runtime)
     )

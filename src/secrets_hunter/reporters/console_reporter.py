@@ -1,3 +1,4 @@
+from secrets_hunter.models import GitLocation, HttpLocation
 from secrets_hunter.reporters.console_base import BaseConsoleReporter
 from secrets_hunter.reporters.finding_view import FindingView
 from secrets_hunter.reporters.semantic_analysis_view import (
@@ -78,11 +79,16 @@ class ConsoleReporter(BaseConsoleReporter):
 
             lines.append(f"    Decision:   {decision_summary}")
 
-            if f.commit:
-                lines.append(f"    Commit:     {f.commit}")
+            location = f.location
+            if isinstance(location, GitLocation):
+                lines.append(f"    Commit:     {location.commit_sha}")
 
-            if f.vulnerable_url:
-                lines.append(f"    URL:        {f.vulnerable_url}")
+            if isinstance(location, HttpLocation):
+                lines.append(f"    URL:        {location.effective_url}")
+                if location.requested_url != location.effective_url:
+                    lines.append(
+                        f"    Requested:  {location.requested_url}"
+                    )
 
             if f.context_var:
                 lines.append(f"    Variable:   {f.context_var}")

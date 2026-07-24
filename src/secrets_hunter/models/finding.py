@@ -1,10 +1,10 @@
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from enum import StrEnum
-from typing import Self
 
 from .decision import Decision, Disposition, RuleActivation
 from .finding_kind import FindingKind
 from .semantic_analysis import SemanticAnalysisResult
+from .source_location import SourceLocation
 
 
 class Severity(StrEnum):
@@ -46,16 +46,13 @@ class DetectionMethod(StrEnum):
 
 @dataclass(frozen=True)
 class Finding:
-    file: str
-    line: int
+    location: SourceLocation
     kind: FindingKind
     match: str
     context: str
     detection_method: DetectionMethod
     decision: Decision
     context_var: str | None = None
-    commit: str | None = None
-    vulnerable_url: str | None = None
     semantic_analysis: SemanticAnalysisResult | None = None
 
     @property
@@ -77,9 +74,3 @@ class Finding:
     @property
     def severity(self) -> Severity:
         return severity_for_confidence(self.confidence)
-
-    def with_commit(self, commit: str) -> Self:
-        return replace(self, commit=commit)
-
-    def with_vulnerable_url(self, vulnerable_url: str) -> Self:
-        return replace(self, vulnerable_url=vulnerable_url)

@@ -34,7 +34,7 @@ class CandidateAssessor:
             name=variable_name or "",
             detection_method=candidate.detection_method,
             finding_kind=candidate.finding_kind,
-            file_path=candidate.file,
+            file_path=candidate.location.locator,
             value_analysis=value_analysis,
             lexical_subject=lexical_subject,
             pem_analysis=(
@@ -115,8 +115,7 @@ class CandidateAssessor:
         )
 
         return Finding(
-            file=candidate.file,
-            line=candidate.line,
+            location=candidate.location,
             kind=candidate.finding_kind,
             match=candidate.match,
             context=candidate.context,

@@ -1,6 +1,6 @@
 from secrets_hunter.detection.entropy_classification import EntropyClassifier
 from secrets_hunter.detection.fragmenter import LineFragment
-from secrets_hunter.models import DetectionMethod
+from secrets_hunter.models import DetectionMethod, SourceLocation
 
 from .models import DetectionCandidate
 
@@ -15,7 +15,7 @@ class EntropyDetector:
         self,
         line: str,
         line_num: int,
-        filepath: str,
+        source_location: SourceLocation,
         fragments: list[LineFragment]
     ) -> list[DetectionCandidate]:
         candidates: list[DetectionCandidate] = []
@@ -27,8 +27,7 @@ class EntropyDetector:
                 continue
 
             candidates.append(DetectionCandidate(
-                file=filepath,
-                line=line_num,
+                location=source_location.at_line(line_num),
                 finding_kind=classification.finding_kind,
                 match=fragment.content,
                 context=line.strip()[:100],

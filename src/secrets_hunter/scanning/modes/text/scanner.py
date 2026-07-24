@@ -3,7 +3,7 @@ from typing import override
 from secrets_hunter.models import ScanResult
 from secrets_hunter.scanning.scanner import BaseScanner
 from secrets_hunter.scanning.session import ScanSession
-from secrets_hunter.scanning.source_identity import SourcePathResolver
+from secrets_hunter.scanning.source_identity import SourceIdentity
 from secrets_hunter.scanning.text_reader import SourceTextReader
 from secrets_hunter.scanning.work import ScanWorkItem, ScanWorkPlan
 
@@ -20,7 +20,6 @@ class TextScanner(BaseScanner):
         self.source_text_reader = source_text_reader
         self.content = content
         self.source_name = source_name
-        self.source_path_resolver = SourcePathResolver.for_target(".")
 
     @override
     def create_work_plan(self) -> ScanWorkPlan:
@@ -38,5 +37,5 @@ class TextScanner(BaseScanner):
     def scan_text(self) -> ScanResult:
         return self.session.source_scanner.scan(
             self.source_text_reader.text_to_lines(self.content),
-            self.source_path_resolver.identify(self.source_name)
+            SourceIdentity.for_text(self.source_name)
         )

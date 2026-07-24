@@ -1,11 +1,13 @@
 import argparse
 
 from secrets_hunter.application import GitHistorySource
+from secrets_hunter.scanning.modes.git_history.mode import GIT_HISTORY_MODE
 
 from ..protocols import SubparserRegistry
 
 
 NAME = "git"
+SCAN_MODE = GIT_HISTORY_MODE
 
 
 def register(
