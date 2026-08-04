@@ -81,7 +81,7 @@ class DetectionEngine:
         return [
             self.candidate_assessor.assess(
                 candidate,
-                assignment_context.variables_for(
+                assignment_context.associated_names_for(
                     match=candidate.match,
                     candidate_context=candidate.context
                 )

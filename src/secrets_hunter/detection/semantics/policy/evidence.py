@@ -133,10 +133,10 @@ class EvidenceCollector:
         }
 
         for provider_match in provider_matches:
-            target_concept = provider_match.target_concept
-            evidence_by_concept[target_concept] = self._rank_evidence(
+            target_concept_id = provider_match.target_concept_id
+            evidence_by_concept[target_concept_id] = self._rank_evidence(
                 (
-                    *evidence_by_concept.get(target_concept, ()),
+                    *evidence_by_concept.get(target_concept_id, ()),
                     *provider_match.strongest_keywords,
                 ),
                 3

@@ -36,14 +36,13 @@ def build_semantic_analysis_result(
     return SemanticAnalysisResult(
         concepts=tuple(
             SemanticConceptResult(
-                name=concept.name.value,
+                concept_id=concept.concept_id.value,
                 probability=concept.probability,
                 strongest_keywords=tuple(
                     _keyword_result(keyword)
                     for keyword in concept.strongest_keywords
                 ),
-                kind=concept.kind,
-                display_name=concept.display_name,
+                display_name=concept.display_name
             )
             for concept in concepts
         ),
@@ -52,7 +51,7 @@ def build_semantic_analysis_result(
                 id=provider.id,
                 name=provider.name,
                 kind=provider.kind,
-                target_concept=provider.target_concept.value,
+                target_concept_id=provider.target_concept_id.value,
                 strongest_keywords=tuple(
                     _keyword_result(keyword)
                     for keyword in provider.strongest_keywords

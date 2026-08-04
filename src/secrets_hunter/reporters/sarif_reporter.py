@@ -51,7 +51,7 @@ class SARIFReporter:
                     "detection_method": finding.detection_method,
                     "confidence": finding.confidence,
                     "disposition": finding.disposition.value,
-                    "context_var": finding.context_var,
+                    "associated_name": finding.associated_name,
                     "location": {
                         "kind": source_location_kind(location),
                         **serialized_location

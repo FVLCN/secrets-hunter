@@ -177,7 +177,7 @@ def run(args: argparse.Namespace) -> int:
         return 1
 
     if args.fail_on_findings and any(
-        finding.disposition is not Disposition.SUPPRESS
+        finding.disposition is not Disposition.REJECT
         for finding in selected_findings
     ):
         return 2

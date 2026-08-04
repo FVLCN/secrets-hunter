@@ -53,7 +53,7 @@ MODEL_TRAINING_RESOURCES = (
 
 @dataclass(frozen=True)
 class SemanticExample:
-    name: str
+    associated_name: str
     value: str
     lexical_subject: str | None
     detection_method: DetectionMethod
@@ -146,7 +146,7 @@ def _load_example(
     raw_lexical_subject = example_data.get("lexical_subject")
 
     return SemanticExample(
-        name=require_string_or_empty(var_name, "var_name", source),
+        associated_name=require_string_or_empty(var_name, "var_name", source),
         value=require_string(example_data.get("value"), "value", source),
         lexical_subject=(
             require_string_or_empty(

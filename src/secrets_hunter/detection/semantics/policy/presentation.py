@@ -37,7 +37,7 @@ class PolicyPresentation:
 
         return tuple(
             ConceptProbability(
-                name=concept_id,
+                concept_id=concept_id,
                 probability=probability,
                 strongest_keywords=self._display_evidence(
                     concept_id,

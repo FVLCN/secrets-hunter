@@ -5,7 +5,7 @@ from enum import StrEnum
 class Disposition(StrEnum):
     REPORT = "report"
     REVIEW = "review"
-    SUPPRESS = "suppress"
+    REJECT = "reject"
 
 
 @dataclass(frozen=True)

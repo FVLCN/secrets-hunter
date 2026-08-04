@@ -26,7 +26,7 @@ def unassigned_high_entropy_with_secret_classification(
 
 @rules.when(
     priority=1990,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.no_assignment_entropy,
     reasoning="unassigned high-entropy value",
 )

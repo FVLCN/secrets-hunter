@@ -35,22 +35,22 @@ def _validate_evidence_references(
 def _validate_provider_references(providers: tuple[Provider, ...], concepts: tuple[SemanticConcept, ...], source: str) -> None:
     concept_ids = {concept.id for concept in concepts}
     unknown = sorted({
-        provider.target_concept
+        provider.target_concept_id
         for provider in providers
-        if provider.target_concept not in concept_ids
+        if provider.target_concept_id not in concept_ids
     })
 
     if unknown:
         raise ValueError(f"Providers in {source} reference unknown target concepts: {', '.join(unknown)}")
 
 
-def _validate_provider_kind_targets(
-    provider_kind_targets: dict[str, ConceptId],
+def _validate_provider_kind_target_ids(
+    provider_kind_target_ids: dict[str, ConceptId],
     concepts: tuple[SemanticConcept, ...],
     source: str
 ) -> None:
     concept_ids = {concept.id for concept in concepts}
-    unknown = sorted(set(provider_kind_targets.values()) - concept_ids)
+    unknown = sorted(set(provider_kind_target_ids.values()) - concept_ids)
 
     if unknown:
         raise ValueError(f"Provider kind targets in {source} reference unknown concepts: {', '.join(unknown)}")

@@ -48,7 +48,7 @@ def _semantic_input_from_example(
     value_analyzer: ValueAnalyzer
 ) -> SemanticInput:
     return SemanticInput(
-        name=example.name,
+        associated_name=example.associated_name,
         detection_method=example.detection_method,
         finding_kind=example.finding_kind,
         file_path=example.file_path,
@@ -67,7 +67,7 @@ def _validated_training_labels(
 
     if unknown:
         raise ValueError(
-            f"Example {example.name!r} references unknown concepts: "
+            f"Example {example.associated_name!r} references unknown concepts: "
             f"{', '.join(sorted(unknown))}"
         )
 
@@ -95,7 +95,7 @@ def _training_rows_from_catalog(
         observation = observation_builder.build(item)
         feature_rows.append(concept_feature_names(observation))
         concept_label_rows.append(_validated_training_labels(catalog, example))
-        example_names.append(example.name)
+        example_names.append(example.associated_name)
 
     return feature_rows, concept_label_rows, example_names
 

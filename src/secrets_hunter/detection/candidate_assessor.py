@@ -24,14 +24,14 @@ class CandidateAssessor:
     def _semantic_result(
         self,
         candidate: DetectionCandidate,
-        variable_name: str | None,
+        associated_name: str | None,
         *,
         lexical_subject: str,
         rejection: RejectionReason | None,
         value_analysis: ValueAnalysis
     ) -> ConceptPolicyResult:
         item = SemanticInput(
-            name=variable_name or "",
+            associated_name=associated_name or "",
             detection_method=candidate.detection_method,
             finding_kind=candidate.finding_kind,
             file_path=candidate.location.locator,
@@ -43,20 +43,20 @@ class CandidateAssessor:
                 else None
             ),
             value_rejection=rejection,
-            provider_pattern_id=candidate.provider_pattern_id,
+            provider_pattern_id=candidate.provider_pattern_id
         )
         return self.semantic_runtime.analyze(item)
 
-    def _best_variable_result(
+    def _best_associated_name_result(
         self,
         candidate: DetectionCandidate,
-        variable_names: tuple[str, ...],
+        associated_names: tuple[str, ...],
         *,
         lexical_subject: str,
         rejection: RejectionReason | None,
         value_analysis: ValueAnalysis
     ) -> tuple[str | None, ConceptPolicyResult]:
-        names = sorted(variable_names)
+        names = sorted(associated_names)
 
         if not names:
             return None, self._semantic_result(
@@ -67,7 +67,7 @@ class CandidateAssessor:
                 value_analysis=value_analysis
             )
 
-        variable_results = [
+        associated_name_results = [
             (
                 name,
                 self._semantic_result(
@@ -76,23 +76,23 @@ class CandidateAssessor:
                     lexical_subject=lexical_subject,
                     rejection=rejection,
                     value_analysis=value_analysis
-                ),
+                )
             )
             for name in names
         ]
 
         return max(
-            variable_results,
-            key=lambda variable_result: (
-                variable_result[1].decision.confidence,
-                variable_result[0],
-            ),
+            associated_name_results,
+            key=lambda result: (
+                result[1].decision.confidence,
+                result[0]
+            )
         )
 
     def assess(
         self,
         candidate: DetectionCandidate,
-        variable_names: tuple[str, ...],
+        associated_names: tuple[str, ...]
     ) -> Finding:
         lexical_subject = self.rejection_analyzer.lexical_subject_for_candidate(
             candidate
@@ -106,9 +106,9 @@ class CandidateAssessor:
             lexical_subject,
             value_analysis.hash_classification
         )
-        best_variable, semantic_result = self._best_variable_result(
+        associated_name, semantic_result = self._best_associated_name_result(
             candidate,
-            variable_names,
+            associated_names,
             lexical_subject=lexical_subject,
             rejection=rejection,
             value_analysis=value_analysis
@@ -121,6 +121,6 @@ class CandidateAssessor:
             context=candidate.context,
             detection_method=candidate.detection_method,
             decision=semantic_result.decision,
-            context_var=best_variable,
-            semantic_analysis=semantic_result.analysis,
+            associated_name=associated_name,
+            semantic_analysis=semantic_result.analysis
         )

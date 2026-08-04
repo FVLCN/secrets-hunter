@@ -22,15 +22,30 @@ def log_scan_result(result: ScanResult, elapsed: float) -> None:
     logger.info(f"Scan duration: {duration}")
 
     if not result.complete and not result.aborted:
-        total_items = (
-            str(result.total_items)
-            if result.total_items is not None
-            else "unknown"
-        )
+        successful_items = result.successful_items
+        if result.total_items is None:
+            source_label = (
+                "source"
+                if successful_items == 1
+                else "sources"
+            )
+            success_summary = (
+                f"{successful_items} {source_label} scanned successfully"
+            )
+        else:
+            source_label = (
+                "source"
+                if result.total_items == 1
+                else "sources"
+            )
+            success_summary = (
+                f"{successful_items} of {result.total_items} "
+                f"{source_label} scanned successfully"
+            )
+
         logger.warning(
             f"Scan status: {result.status.value}. "
-            f"{result.successful_items}/{total_items} scan item(s) "
-            f"completed successfully; {len(result.failures)} failure(s)."
+            f"{success_summary}; {len(result.failures)} failed."
         )
 
 

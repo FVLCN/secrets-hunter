@@ -32,16 +32,15 @@ class ProviderMatch:
         return self.provider.kind
 
     @property
-    def target_concept(self) -> ConceptId:
-        return self.provider.target_concept
+    def target_concept_id(self) -> ConceptId:
+        return self.provider.target_concept_id
 
 
 @dataclass(frozen=True)
 class ConceptProbability:
-    name: ConceptId
+    concept_id: ConceptId
     probability: float
     strongest_keywords: tuple[ConceptKeywordEvidence, ...]
-    kind: str = "signal"
     display_name: str | None = None
 
 

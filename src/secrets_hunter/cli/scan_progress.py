@@ -4,11 +4,23 @@ import sys
 
 from typing import TextIO, override
 
-from secrets_hunter.models import ScanFailureKind, ScanResult
+from secrets_hunter.models import ScanFailureKind, ScanResult, ScanStatus
 from secrets_hunter.scanning.progress import ScanProgressObserver
 
 
 logger = logging.getLogger(__name__)
+
+_SCAN_STATUS_MESSAGES = {
+    ScanStatus.COMPLETE: "Scan completed.",
+    ScanStatus.PARTIAL: "Scan completed with errors.",
+    ScanStatus.FAILED: "Scan failed.",
+    ScanStatus.ABORTED: "Scan aborted."
+}
+
+
+def _count_label(count: int, singular: str) -> str:
+    label = singular if count == 1 else f"{singular}s"
+    return f"{count} {label}"
 
 
 class TerminalScanProgressObserver(ScanProgressObserver):
@@ -41,15 +53,17 @@ class TerminalScanProgressObserver(ScanProgressObserver):
         self.last_rendered_source_line = 0
 
         if total_items == 0:
-            logger.warning("No scan items to scan")
+            logger.warning("No sources found to scan.")
         elif total_items is None:
             logger.info(
-                f"Discovering scan items and scanning with "
-                f"{max_workers} workers...\n"
+                "Discovering and scanning sources with "
+                f"{_count_label(max_workers, 'worker')}...\n"
             )
         elif not single_source:
-            logger.info(f"Got {total_items} scan items to scan")
-            logger.info(f"Scanning with {max_workers} workers...\n")
+            logger.info(
+                f"Scanning {_count_label(total_items, 'source')} with "
+                f"{_count_label(max_workers, 'worker')}...\n"
+            )
 
     @override
     def source_started(self, label: str) -> None:
@@ -81,7 +95,7 @@ class TerminalScanProgressObserver(ScanProgressObserver):
 
         if total_items is None:
             self._write_progress(
-                f"\rCompleted {completed_items} scan item(s)..."
+                f"\rScanned {_count_label(completed_items, 'source')}..."
             )
             return
 
@@ -129,7 +143,7 @@ class TerminalScanProgressObserver(ScanProgressObserver):
                     f"Error scanning {failure.label}: {failure.message}"
                 )
 
-        logger.info(f"Scan {result.status.value}.")
+        logger.info(_SCAN_STATUS_MESSAGES[result.status])
 
     def finish_progress_line(self, *, add_spacing: bool = True) -> None:
         if not self.progress_line_open:
@@ -144,7 +158,7 @@ class TerminalScanProgressObserver(ScanProgressObserver):
     def _render_source_progress(self, current_line: int) -> None:
         self.last_rendered_source_line = current_line
         self._write_progress(
-            f"\rCurrent progress: scanning line #{current_line}..."
+            f"\rScanned through line {current_line}..."
         )
 
     def _write_progress(self, text: str) -> None:

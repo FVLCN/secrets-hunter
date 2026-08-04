@@ -21,7 +21,7 @@ class ConsoleReporter(BaseConsoleReporter):
 
     @staticmethod
     def _format_concept(concept: SemanticConceptView) -> str:
-        name = concept.name
+        display_name = concept.display_name
         probability_percent = round(concept.probability * 100)
 
         keywords = [
@@ -32,10 +32,7 @@ class ConsoleReporter(BaseConsoleReporter):
         ]
         keyword_suffix = f" [{', '.join(keywords)}]" if keywords else ""
 
-        if concept.kind == "fact":
-            return f"{name}{keyword_suffix}"
-
-        return f"{name} {probability_percent}%{keyword_suffix}"
+        return f"{display_name} {probability_percent}%{keyword_suffix}"
 
     @staticmethod
     def format_report(findings: list[FindingView]) -> None:
@@ -90,8 +87,8 @@ class ConsoleReporter(BaseConsoleReporter):
                         f"    Requested:  {location.requested_url}"
                     )
 
-            if f.context_var:
-                lines.append(f"    Variable:   {f.context_var}")
+            if f.associated_name:
+                lines.append(f"    Associated name: {f.associated_name}")
 
             match_str = ConsoleReporter._truncate(f.match, 120)
             if match_str:

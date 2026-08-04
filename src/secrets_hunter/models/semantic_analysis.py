@@ -13,10 +13,9 @@ class SemanticKeywordEvidenceResult:
 
 @dataclass(frozen=True)
 class SemanticConceptResult:
-    name: str
+    concept_id: str
     probability: float
     strongest_keywords: tuple[SemanticKeywordEvidenceResult, ...]
-    kind: str = "signal"
     display_name: str | None = None
 
 
@@ -25,7 +24,7 @@ class SemanticProviderMatchResult:
     id: str
     name: str
     kind: str
-    target_concept: str
+    target_concept_id: str
     strongest_keywords: tuple[SemanticKeywordEvidenceResult, ...]
     matched_pattern_id: str | None = None
 

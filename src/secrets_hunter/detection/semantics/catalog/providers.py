@@ -12,7 +12,7 @@ from .taxonomy import ConceptId, require_concept_id
 from .validation import require_unique_ids
 
 
-def _load_provider_kind_targets(
+def _load_provider_kind_target_ids(
     data: Mapping[str, object],
     source: str
 ) -> dict[str, ConceptId]:
@@ -24,11 +24,11 @@ def _load_provider_kind_targets(
         source
     )
 
-    provider_kind_targets: dict[str, ConceptId] = {}
+    provider_kind_target_ids: dict[str, ConceptId] = {}
 
     for raw_kind, raw_target in target_table.items():
         kind = normalize_token(raw_kind)
-        target = require_concept_id(
+        target_concept_id = require_concept_id(
             raw_target,
             f"provider_kind_targets.{raw_kind}",
             source
@@ -37,18 +37,18 @@ def _load_provider_kind_targets(
         if not kind:
             raise ValueError(f"Provider kind must not be empty in {source}")
 
-        provider_kind_targets[kind] = target
+        provider_kind_target_ids[kind] = target_concept_id
 
-    if not provider_kind_targets:
+    if not provider_kind_target_ids:
         raise ValueError(f"'provider_kind_targets' must not be empty in {source}")
 
-    return provider_kind_targets
+    return provider_kind_target_ids
 
 
 def _load_providers(
     data: Mapping[str, object],
     source: str,
-    provider_kind_targets: Mapping[str, ConceptId]
+    provider_kind_target_ids: Mapping[str, ConceptId]
 ) -> tuple[Provider, ...]:
     raw_providers = data.get("providers") or []
 
@@ -62,7 +62,7 @@ def _load_providers(
 
         provider_id = normalize_token(require_string(provider_data.get("id"), "id", source))
         kind = normalize_token(require_string(provider_data.get("kind"), "kind", source))
-        target_concept = provider_kind_targets.get(kind)
+        target_concept_id = provider_kind_target_ids.get(kind)
         terms = tuple(dict.fromkeys(
             normalize_token(term)
             for term in require_string_list(provider_data, "terms", source)
@@ -77,7 +77,7 @@ def _load_providers(
                 "use provider_kind_targets instead"
             )
 
-        if not target_concept:
+        if not target_concept_id:
             raise ValueError(
                 f"Provider {provider_id!r} in {source} uses unmapped provider kind {kind!r}"
             )
@@ -87,7 +87,7 @@ def _load_providers(
                 id=provider_id,
                 name=require_string(provider_data.get("name"), "name", source),
                 kind=kind,
-                target_concept=target_concept,
+                target_concept_id=target_concept_id,
                 terms=terms
             )
         )

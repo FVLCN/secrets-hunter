@@ -23,7 +23,7 @@ def _rejection_reasoning(context: DecisionContext) -> str:
 
 @rules.when(
     priority=200,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.value_rejected_blocking,
     reasoning=_rejection_reasoning,
 )
@@ -37,7 +37,7 @@ def exact_value_rejection(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=100,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.artifact_reject,
     reasoning="public cryptographic artifact",
 )

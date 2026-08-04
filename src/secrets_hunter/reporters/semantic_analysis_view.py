@@ -51,10 +51,9 @@ class SemanticKeywordView:
 
 @dataclass(frozen=True)
 class SemanticConceptView:
-    name: str
+    display_name: str
     concept_id: str
     probability: float
-    kind: str
     strongest_keywords: tuple[SemanticKeywordView, ...]
 
     @classmethod
@@ -63,26 +62,24 @@ class SemanticConceptView:
         concept: SemanticConceptResult,
     ) -> Self:
         return cls(
-            name=concept.display_name or concept.name,
-            concept_id=concept.name,
+            display_name=concept.display_name or concept.concept_id,
+            concept_id=concept.concept_id,
             probability=concept.probability,
-            kind=concept.kind,
             strongest_keywords=tuple(
                 SemanticKeywordView.from_result(keyword)
                 for keyword in concept.strongest_keywords
-            ),
+            )
         )
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "name": self.name,
+            "display_name": self.display_name,
             "concept_id": self.concept_id,
             "probability": round(self.probability, 4),
-            "kind": self.kind,
             "strongest_keywords": [
                 keyword.to_dict()
                 for keyword in self.strongest_keywords
-            ],
+            ]
         }
 
 
@@ -91,7 +88,7 @@ class SemanticProviderView:
     id: str
     name: str
     kind: str
-    target_concept: str
+    target_concept_id: str
     strongest_keywords: tuple[SemanticKeywordView, ...]
     matched_pattern_id: str | None = None
 
@@ -104,7 +101,7 @@ class SemanticProviderView:
             id=provider.id,
             name=provider.name,
             kind=provider.kind,
-            target_concept=provider.target_concept,
+            target_concept_id=provider.target_concept_id,
             strongest_keywords=tuple(
                 SemanticKeywordView.from_result(keyword)
                 for keyword in provider.strongest_keywords
@@ -117,7 +114,7 @@ class SemanticProviderView:
             "id": self.id,
             "name": self.name,
             "kind": self.kind,
-            "target_concept": self.target_concept,
+            "target_concept_id": self.target_concept_id,
             "strongest_keywords": [
                 keyword.to_dict()
                 for keyword in self.strongest_keywords

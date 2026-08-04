@@ -18,7 +18,7 @@ from .facts import FactId
 
 @dataclass(frozen=True)
 class SemanticInput:
-    name: str
+    associated_name: str
     detection_method: DetectionMethod
     finding_kind: FindingKind
     file_path: str

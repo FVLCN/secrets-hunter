@@ -25,7 +25,7 @@ class SemanticObservationBuilder:
         self.lexical_analyzer = lexical_analyzer or LexicalAnalyzer()
 
     def build(self, item: SemanticInput) -> SemanticObservation:
-        name = item.name or ""
+        associated_name = item.associated_name or ""
         value_analysis = item.value_analysis
         value = value_analysis.value
         detection_method = item.detection_method
@@ -48,16 +48,20 @@ class SemanticObservationBuilder:
         pem_analysis = item.pem_analysis
         catalog = self.catalog
 
-        name_tokens = catalog.tokens_for_name(name) if name else ()
-        name_roles = name_role_tokens(name_tokens) if name else ()
+        name_tokens = (
+            catalog.tokens_for_name(associated_name)
+            if associated_name
+            else ()
+        )
+        name_roles = name_role_tokens(name_tokens) if associated_name else ()
         neutral_tokens = (
             neutral_identifier_tokens(name_tokens, catalog.vocabulary)
-            if name
+            if associated_name
             else ()
         )
         unknown_tokens = (
             unknown_identifier_tokens(name_tokens, catalog.vocabulary)
-            if name
+            if associated_name
             else ()
         )
         path = PurePath(file_path)
@@ -103,7 +107,7 @@ class SemanticObservationBuilder:
         value_entropy = value_analysis.entropy
         facts: set[FactId] = set()
 
-        if not name:
+        if not associated_name:
             facts.add(FactId.NO_ASSIGNMENT_CONTEXT)
 
         if detection_method is DetectionMethod.ENTROPY:

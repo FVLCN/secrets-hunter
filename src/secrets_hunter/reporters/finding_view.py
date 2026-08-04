@@ -30,7 +30,7 @@ class FindingView:
     confidence_reasoning: str
     disposition: Disposition
     decision_trace: tuple[RuleActivationView, ...]
-    context_var: str | None = None
+    associated_name: str | None = None
     semantic_analysis: SemanticAnalysisView | None = None
 
     @classmethod
@@ -42,8 +42,8 @@ class FindingView:
         context: str
     ) -> Self:
         title_subject = (
-            finding.context_var.replace("_", " ")
-            if finding.context_var
+            finding.associated_name.replace("_", " ")
+            if finding.associated_name
             else finding.kind.display_name
         )
         return cls(
@@ -64,7 +64,7 @@ class FindingView:
                 RuleActivationView.from_activation(activation)
                 for activation in finding.decision_trace
             ),
-            context_var=finding.context_var,
+            associated_name=finding.associated_name,
             semantic_analysis=(
                 SemanticAnalysisView.from_result(finding.semantic_analysis)
                 if finding.semantic_analysis is not None
@@ -99,7 +99,7 @@ class FindingView:
             "match": self.match,
             "context": self.context,
             "detection_method": self.detection_method,
-            "context_var": self.context_var,
+            "associated_name": self.associated_name,
             "severity": self.severity,
             "confidence_reasoning": self.confidence_reasoning,
             "confidence": self.confidence,

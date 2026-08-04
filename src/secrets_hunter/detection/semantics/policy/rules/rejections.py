@@ -25,7 +25,7 @@ def credential_with_hash_shape(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=2300,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.artifact_reject,
     reasoning="non-secret artifact classification",
 )
@@ -35,7 +35,7 @@ def artifact_classification(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=2200,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.value_rejected,
     reasoning="value matched a rejection pattern",
 )
@@ -53,7 +53,7 @@ def value_rejection(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=2100,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.artifact_reject,
     reasoning="matched value is ordinary text",
 )
@@ -93,7 +93,7 @@ def context_reject_with_target(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=1780,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     reasoning="non-secret identifier context",
 )
 def context_reject(context: DecisionContext) -> bool:

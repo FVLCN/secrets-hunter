@@ -49,7 +49,7 @@ def fixture_with_target(context: DecisionContext) -> bool:
 
 @rules.when(
     priority=2470,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     confidence=lambda values: values.context_reject,
     reasoning="fixture-like context without supporting secret classification",
 )

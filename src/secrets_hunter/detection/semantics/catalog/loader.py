@@ -11,9 +11,9 @@ from .concepts import (
 from .models import SemanticCatalog
 from .policy import _load_policy_config
 from .providers import (
-    _load_provider_kind_targets,
+    _load_provider_kind_target_ids,
     _load_provider_patterns,
-    _load_providers,
+    _load_providers
 )
 from .sources import (
     NEGATIVE_CONCEPTS_RESOURCE,
@@ -26,10 +26,10 @@ from .sources import (
 )
 from .validation import (
     _validate_evidence_references,
-    _validate_provider_kind_targets,
+    _validate_provider_kind_target_ids,
     _validate_provider_pattern_references,
     _validate_provider_references,
-    require_unique_ids,
+    require_unique_ids
 )
 
 
@@ -82,8 +82,15 @@ def load_semantic_catalog(
     provider_patterns_data = provider_patterns_document.data
     provider_patterns_source = provider_patterns_document.source
     policy_data, policy_source = policy_document.data, policy_document.source
-    provider_kind_targets = _load_provider_kind_targets(providers_data, providers_source)
-    providers = _load_providers(providers_data, providers_source, provider_kind_targets)
+    provider_kind_target_ids = _load_provider_kind_target_ids(
+        providers_data,
+        providers_source
+    )
+    providers = _load_providers(
+        providers_data,
+        providers_source,
+        provider_kind_target_ids
+    )
     provider_patterns = _load_provider_patterns(provider_patterns_data, provider_patterns_source)
     secret_evidence = _load_evidence_by_concept(secret_evidence_data, secret_evidence_source)
     false_positive_evidence = _load_evidence_by_concept(
@@ -101,7 +108,11 @@ def load_semantic_catalog(
         false_positive_source,
         false_positive_evidence
     )
-    _validate_provider_kind_targets(provider_kind_targets, secret_concepts, providers_source)
+    _validate_provider_kind_target_ids(
+        provider_kind_target_ids,
+        secret_concepts,
+        providers_source
+    )
     _validate_provider_references(providers, secret_concepts, providers_source)
     _validate_provider_pattern_references(provider_patterns, providers, provider_patterns_source)
     _validate_evidence_references(

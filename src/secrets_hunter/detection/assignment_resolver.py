@@ -27,32 +27,32 @@ DEFAULT_ASSIGNMENT_PATTERN_SOURCES = (
 
 @dataclass(frozen=True)
 class AssignmentContext:
-    variables_by_value: Mapping[str, tuple[str, ...]]
+    associated_names_by_value: Mapping[str, tuple[str, ...]]
 
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
-            "variables_by_value",
+            "associated_names_by_value",
             frozen_mapping({
-                value: tuple(variable_names)
-                for value, variable_names in self.variables_by_value.items()
+                value: tuple(associated_names)
+                for value, associated_names in self.associated_names_by_value.items()
             })
         )
 
-    def variables_for(
+    def associated_names_for(
         self,
         *,
         match: str,
-        candidate_context: str,
+        candidate_context: str
     ) -> tuple[str, ...]:
         normalized_match = match.strip().strip(VALUE_BOUNDARY_CHARS)
-        variable_names = (
-            self.variables_by_value.get(match)
-            or self.variables_by_value.get(normalized_match)
+        associated_names = (
+            self.associated_names_by_value.get(match)
+            or self.associated_names_by_value.get(normalized_match)
         )
 
-        if variable_names:
-            return variable_names
+        if associated_names:
+            return associated_names
 
         if not match or not candidate_context:
             return ()
@@ -63,17 +63,17 @@ class AssignmentContext:
         if match_index < 0:
             return ()
 
-        for assigned_value, assigned_variables in self.variables_by_value.items():
+        for assigned_value, associated_names in self.associated_names_by_value.items():
             if not assigned_value or len(assigned_value) < 4:
                 continue
 
             if match_probe in assigned_value or match in assigned_value:
-                return assigned_variables
+                return associated_names
 
             assigned_index = candidate_context.find(assigned_value)
 
             if 0 <= assigned_index <= match_index:
-                return assigned_variables
+                return associated_names
 
         return ()
 
@@ -86,13 +86,15 @@ class AssignmentResolver:
         self.compiled_patterns = tuple(compiled_patterns)
 
     def build(self, source: str) -> AssignmentContext:
-        variables_by_value: dict[str, set[str]] = {}
+        associated_names_by_value: dict[str, set[str]] = {}
 
         for pattern in self.compiled_patterns:
             for match in pattern.finditer(source):
-                variable_name = match.group(1)
+                associated_name = match.group(1)
                 value = match.group(2).strip().strip(VALUE_BOUNDARY_CHARS)
-                variables_by_value.setdefault(value, set()).add(variable_name)
+                associated_names_by_value.setdefault(value, set()).add(
+                    associated_name
+                )
 
                 for separator in ("=", ":"):
                     if separator not in value:
@@ -105,16 +107,16 @@ class AssignmentResolver:
                     )
 
                     if right_hand_side and right_hand_side != value:
-                        variables_by_value.setdefault(
+                        associated_names_by_value.setdefault(
                             right_hand_side,
-                            set(),
-                        ).add(variable_name)
+                            set()
+                        ).add(associated_name)
 
                     break
 
         return AssignmentContext(
-            variables_by_value={
-                value: tuple(sorted(variable_names))
-                for value, variable_names in variables_by_value.items()
+            associated_names_by_value={
+                value: tuple(sorted(associated_names))
+                for value, associated_names in associated_names_by_value.items()
             }
         )

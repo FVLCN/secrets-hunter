@@ -9,7 +9,7 @@ rules = RuleSet(DecisionPhase.FALLBACK)
 
 @rules.when(
     priority=0,
-    disposition=Disposition.SUPPRESS,
+    disposition=Disposition.REJECT,
     reasoning="no actionable secret classification",
 )
 def default(context: DecisionContext) -> bool:

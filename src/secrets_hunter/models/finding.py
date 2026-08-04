@@ -52,7 +52,7 @@ class Finding:
     context: str
     detection_method: DetectionMethod
     decision: Decision
-    context_var: str | None = None
+    associated_name: str | None = None
     semantic_analysis: SemanticAnalysisResult | None = None
 
     @property

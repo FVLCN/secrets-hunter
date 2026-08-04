@@ -29,7 +29,7 @@ class Provider:
     id: str
     name: str
     kind: str
-    target_concept: ConceptId
+    target_concept_id: ConceptId
     terms: tuple[str, ...]
 
 
