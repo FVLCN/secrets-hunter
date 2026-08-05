@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 
-from secrets_hunter.detection.semantics.catalog import SemanticCatalog
+from secrets_hunter.detection.semantics.catalog import ConceptId, SemanticCatalog
 from secrets_hunter.detection.semantics.observation import SemanticObservation
 from secrets_hunter.models import Decision, RuleActivation
 
 from .concept_groups import PolicyConceptGroups
+from .models import ConceptKeywordEvidence
 from .rules import (
     DEFAULT_REGISTRY,
     DecisionContext,
@@ -40,11 +41,19 @@ class SecretDecisionPolicy:
         self,
         observation: SemanticObservation,
         groups: PolicyConceptGroups,
+        evidence_by_concept: dict[
+            ConceptId,
+            tuple[ConceptKeywordEvidence, ...]
+        ]
     ) -> Decision:
         if groups.policy != self.policy:
             raise ValueError("Decision groups use a different semantic policy")
 
-        context = DecisionContext.build(observation, groups)
+        context = DecisionContext.build(
+            observation,
+            groups,
+            evidence_by_concept
+        )
         matches: list[_RuleMatch] = []
         fallback: DecisionRule | None = None
 

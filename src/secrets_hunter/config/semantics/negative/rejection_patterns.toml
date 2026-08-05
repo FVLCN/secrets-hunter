@@ -100,12 +100,6 @@ category = "placeholder"
 name = "abcde"
 pattern = 'abcde'
 
-[[rejection_patterns]]
-kind = "placeholder"
-category = "placeholder"
-name = "5+ repeating characters"
-pattern = '''(.)\1{4,}'''
-
 # AI/model artifacts
 
 [[rejection_patterns]]

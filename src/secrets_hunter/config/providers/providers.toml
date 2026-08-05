@@ -106,6 +106,12 @@ kind = "product_service"
 terms = ["google"]
 
 [[providers]]
+id = "posthog"
+name = "PostHog"
+kind = "product_service"
+terms = ["posthog"]
+
+[[providers]]
 id = "aws"
 name = "AWS"
 kind = "cloud_provider"
@@ -170,3 +176,9 @@ id = "kafka"
 name = "Kafka"
 kind = "infrastructure"
 terms = ["kafka"]
+
+[[providers]]
+id = "azure_devops"
+name = "Azure DevOps"
+kind = "product_service"
+terms = ["azdo", "azuredevops"]

@@ -65,6 +65,12 @@ class SemanticObservationBuilder:
             else ()
         )
         path = PurePath(file_path)
+        file_extension = path.suffix.lower()
+        file_extension_tokens = (
+            (file_extension.removeprefix("."),)
+            if file_extension
+            else ()
+        )
         english_words_in_value_tokens = (
             lexical_analysis.corpus_tokens
             if lexical_analysis.is_english_text
@@ -119,6 +125,9 @@ class SemanticObservationBuilder:
         if public_crypto_shape_tokens:
             facts.add(FactId.PUBLIC_CRYPTO_ARTIFACT)
 
+        if has_terminal_identifier_suffix(name_tokens):
+            facts.add(FactId.TERMINAL_IDENTIFIER_SUFFIX)
+
         if unknown_tokens:
             facts.add(FactId.UNKNOWN_IDENTIFIER_CONTEXT)
 
@@ -132,7 +141,8 @@ class SemanticObservationBuilder:
             name_role_tokens=name_roles,
             neutral_identifier_tokens=neutral_tokens,
             unknown_identifier_tokens=unknown_tokens,
-            file_extension=path.suffix.lower() or "<none>",
+            file_extension=file_extension,
+            file_extension_tokens=file_extension_tokens,
             path_tokens=path_tokens(file_path, catalog),
             finding_kind_tokens=finding_kind_tokens,
             rejection_pattern_tokens=rejection_tokens,
@@ -150,7 +160,14 @@ def name_role_tokens(name_tokens: tuple[str, ...]) -> tuple[str, ...]:
     if name_tokens == ("id",):
         return ("exact_identifier_name",)
 
+    if has_terminal_identifier_suffix(name_tokens):
+        return ("terminal_identifier_suffix",)
+
     return ()
+
+
+def has_terminal_identifier_suffix(name_tokens: tuple[str, ...]) -> bool:
+    return len(name_tokens) > 1 and name_tokens[-1] == "id"
 
 
 def bucket_number(value: float, boundaries: tuple[float, ...]) -> str:

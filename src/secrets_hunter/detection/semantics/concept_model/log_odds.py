@@ -33,6 +33,91 @@ from secrets_hunter.immutability import frozen_mapping
 MODEL_RESOURCE = "semantics/semantic_concept_model.json"
 MODEL_TYPE = "semantic_concept_log_odds_v1"
 DEFAULT_CONCEPT_SMOOTHING = 0.1
+CONCEPT_FEATURE_SUPPORT_SHRINKAGE = 2.0
+MAX_CONCEPT_FEATURE_WEIGHT = 2.0
+_NAME_FEATURES = frozenset({
+    "name_present",
+    "neutral_identifier_present"
+})
+_NAME_FEATURE_PREFIXES = (
+    "name_token=",
+    "name_bigram=",
+    "name_trigram=",
+    "neutral_identifier_token="
+)
+_PATH_FEATURE_PREFIXES = (
+    "file_extension=",
+    "path_token="
+)
+_REJECTION_FEATURES = frozenset({"fact=value_rejected"})
+_REJECTION_FEATURE_PREFIXES = (
+    "value_rejection_name=",
+    "value_rejection_category="
+)
+_NAME_ONLY_CONCEPTS = frozenset({
+    ConceptId.CREDENTIAL_GENERIC,
+    ConceptId.KEY_CREDENTIAL,
+    ConceptId.ORDINARY_IDENTIFIER_WORDS,
+    ConceptId.PASSWORD_CREDENTIAL,
+    ConceptId.SECRET_CREDENTIAL,
+    ConceptId.TOKEN_CREDENTIAL,
+    ConceptId.WEBHOOK_CREDENTIAL
+})
+_NAME_AND_PATH_CONCEPTS = frozenset({
+    ConceptId.CLOUD_PROVIDER_TARGET,
+    ConceptId.TEST_FIXTURE,
+    ConceptId.VERSION_OR_REFERENCE_ARTIFACT
+})
+
+
+def _is_name_feature(feature: str) -> bool:
+    return (
+        feature in _NAME_FEATURES
+        or feature.startswith(_NAME_FEATURE_PREFIXES)
+    )
+
+
+def _is_path_feature(feature: str) -> bool:
+    return feature.startswith(_PATH_FEATURE_PREFIXES)
+
+
+def _is_rejection_feature(feature: str) -> bool:
+    return (
+        feature in _REJECTION_FEATURES
+        or feature.startswith(_REJECTION_FEATURE_PREFIXES)
+    )
+
+
+def _features_for_concept(
+    concept_id: ConceptId,
+    features: tuple[str, ...]
+) -> set[str]:
+    feature_set = set(features)
+
+    if concept_id in _NAME_ONLY_CONCEPTS:
+        return {
+            feature
+            for feature in feature_set
+            if _is_name_feature(feature)
+        }
+
+    if concept_id in _NAME_AND_PATH_CONCEPTS:
+        return {
+            feature
+            for feature in feature_set
+            if _is_name_feature(feature) or _is_path_feature(feature)
+        }
+
+    if concept_id is ConceptId.HASH_ARTIFACT:
+        return {
+            feature
+            for feature in feature_set
+            if _is_name_feature(feature)
+            or _is_path_feature(feature)
+            or _is_rejection_feature(feature)
+        }
+
+    return feature_set
 
 
 @dataclass(frozen=True)
@@ -267,6 +352,10 @@ def train_concept_model(
     metadata: Mapping[str, object] | None = None
 ) -> SemanticConceptLogOddsModel:
     classifiers: dict[str, ConceptLogOddsClassifier] = {}
+    feature_support: Counter[str] = Counter()
+
+    for features in feature_rows:
+        feature_support.update(set(features))
 
     for concept_id in concept_ids:
         positive_indices = [index for index, labels in enumerate(label_rows) if concept_id in labels]
@@ -282,7 +371,7 @@ def train_concept_model(
             all_features: set[str] = set()
 
             for index, features in enumerate(feature_rows):
-                feature_set = set(features)
+                feature_set = _features_for_concept(concept_id, features)
                 all_features.update(feature_set)
 
                 if index in positive_indices:
@@ -300,7 +389,18 @@ def train_concept_model(
                 negative_probability = (
                     negative_feature_counts.get(feature, 0) + smoothing
                 ) / negative_denominator
-                feature_weights[feature] = math.log(positive_probability / negative_probability)
+                raw_feature_weight = math.log(
+                    positive_probability / negative_probability
+                )
+                support = feature_support[feature]
+                support_factor = support / (
+                    support + CONCEPT_FEATURE_SUPPORT_SHRINKAGE
+                )
+                feature_weight = raw_feature_weight * support_factor
+                feature_weights[feature] = max(
+                    -MAX_CONCEPT_FEATURE_WEIGHT,
+                    min(MAX_CONCEPT_FEATURE_WEIGHT, feature_weight)
+                )
 
         classifiers[concept_id.value] = ConceptLogOddsClassifier(
             prior_weight=prior_weight,

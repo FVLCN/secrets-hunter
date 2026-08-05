@@ -4,7 +4,7 @@ value = "nA861W3S7bE2oqzIVdBWtehx"
 detector = "entropy"
 finding_kind_id = "high_entropy_base64"
 file_path = "config/settings.py"
-concept_labels = ["test_fixture", "key_credential"]
+concept_labels = ["test_fixture"]
 
 [[training_examples]]
 var_name = "test_token"
@@ -12,7 +12,7 @@ value = "eMHFQU5lBdtS3iky2UhuYVjah"
 detector = "entropy"
 finding_kind_id = "high_entropy_base64"
 file_path = "test/api/auth.ts"
-concept_labels = ["test_fixture", "token_credential"]
+concept_labels = ["test_fixture"]
 
 [[training_examples]]
 var_name = "integrity"
@@ -60,7 +60,7 @@ value = "79ffdc174191ed0f2d01d465c10c80c8c9542cb"
 detector = "entropy"
 finding_kind_id = "high_entropy_hex"
 file_path = "src/ui/animation.ts"
-concept_labels = ["ordinary_identifier_words", "key_credential"]
+concept_labels = ["ordinary_identifier_words"]
 
 [[training_examples]]
 var_name = "render_key"
@@ -68,7 +68,7 @@ value = "31ea5df94d64f1a13f1e7f01f1ff7fd291cda2cb"
 detector = "entropy"
 finding_kind_id = "high_entropy_hex"
 file_path = "src/ui/rendering.ts"
-concept_labels = ["ordinary_identifier_words", "key_credential"]
+concept_labels = ["ordinary_identifier_words"]
 
 [[training_examples]]
 var_name = "cardNum"
@@ -81,3 +81,51 @@ rejection_kind = "placeholder"
 rejection_category = "placeholder"
 rejection_pattern = "12345"
 concept_labels = ["placeholder_value", "test_fixture"]
+
+[[training_examples]]
+var_name = "idempotency_key"
+value = "7b3e2c59b5c79e7bf3fd359a32dae32adbc2b346"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/payments/request.py"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "client_id"
+value = "wt8shMqZBumrYjSCVDFJMKhsLoQUgiB-kc0QpbL9"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/oauth-development-guide.md"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "commit_id"
+value = "6ff08d511cd729f04031155dc9135bdab3b766d4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/releases/manifest.json"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+concept_labels = ["hash_artifact", "version_or_reference_artifact"]
+
+[[training_examples]]
+var_name = "clientId"
+value = "Mz66IExNZyqOd_rGkgxdCZF75-ETr0jpDeWIWYpF"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "frontend/src/lib/oauth/oauthClient.ts"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "value"
+value = "18446744073709551615"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "funnel-udf/src/parsing.rs"
+concept_labels = ["generic_assignment_name"]

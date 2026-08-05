@@ -38,6 +38,7 @@ class SemanticObservation:
     neutral_identifier_tokens: tuple[str, ...]
     unknown_identifier_tokens: tuple[str, ...]
     file_extension: str
+    file_extension_tokens: tuple[str, ...]
     path_tokens: tuple[str, ...]
     finding_kind_tokens: tuple[str, ...]
     rejection_pattern_tokens: tuple[str, ...]

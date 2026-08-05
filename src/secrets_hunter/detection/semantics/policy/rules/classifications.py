@@ -29,6 +29,7 @@ def neutral_credential_context(context: DecisionContext) -> bool:
         context.neutral_reject_probability >= thresholds.neutral_reject
         and context.credential_probability >= thresholds.credential
         and context.target_probability < thresholds.target
+        and not context.has_fact(FactId.HIGH_ENTROPY)
     )
 
 
@@ -56,9 +57,11 @@ def _subordinate_credential_context(context: DecisionContext) -> bool:
 
 def _credential_entropy_condition(context: DecisionContext) -> bool:
     return (
-        _subordinate_credential_context(context)
-        and context.has_fact(FactId.HIGH_ENTROPY)
-        and context.target_probability < context.policy.decision_thresholds.target
+        context.has_fact(FactId.HIGH_ENTROPY)
+        and (
+            _subordinate_credential_context(context)
+            or context.has_strong_direct_credential_evidence
+        )
     )
 
 

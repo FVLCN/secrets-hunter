@@ -26,6 +26,7 @@ context_reject_with_target = 0.20
 context_reject = 0.05
 neutral_bare_credential = 0.25
 neutral_high_entropy_identifier = 0.25
+contextual_high_entropy_identifier = 0.30
 unknown_high_entropy_identifier = 0.55
 high_entropy_assigned = 0.45
 strong_credential = 0.90

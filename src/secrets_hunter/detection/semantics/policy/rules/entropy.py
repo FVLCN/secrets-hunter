@@ -4,6 +4,10 @@ from secrets_hunter.models import Disposition
 from .context import DecisionContext
 from .models import DecisionPhase
 from .rule_set import RuleSet
+from ..signals import (
+    has_direct_ordinary_identifier_evidence,
+    has_direct_reference_artifact_evidence
+)
 
 rules = RuleSet(DecisionPhase.SEMANTIC)
 
@@ -48,6 +52,25 @@ def neutral_high_entropy_identifier(context: DecisionContext) -> bool:
     return (
         context.has_fact(FactId.HIGH_ENTROPY)
         and context.neutral_reject_probability >= thresholds.neutral_reject
+    )
+
+
+@rules.when(
+    priority=1550,
+    disposition=Disposition.REVIEW,
+    confidence=lambda values: values.contextual_high_entropy_identifier,
+    reasoning="high-entropy value in contextual non-secret identifier"
+)
+def contextual_high_entropy_identifier(context: DecisionContext) -> bool:
+    evidence_by_concept = context.evidence_by_concept
+
+    return (
+        context.has_fact(FactId.HIGH_ENTROPY)
+        and not context.has_strong_direct_credential_evidence
+        and (
+            has_direct_ordinary_identifier_evidence(evidence_by_concept)
+            or has_direct_reference_artifact_evidence(evidence_by_concept)
+        )
     )
 
 

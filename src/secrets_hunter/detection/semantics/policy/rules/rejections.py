@@ -1,10 +1,14 @@
-from secrets_hunter.detection.semantics.catalog import ConceptId
 from secrets_hunter.detection.semantics.observation import FactId
-from secrets_hunter.models import Disposition, RejectionKind
+from secrets_hunter.models import Disposition, RejectionKind, ValueKind
 
 from .context import DecisionContext
 from .models import DecisionPhase
 from .rule_set import RuleSet
+from ..signals import (
+    has_direct_fixture_evidence,
+    has_direct_hash_artifact_evidence,
+    has_direct_identifier_evidence
+)
 
 rules = RuleSet(DecisionPhase.SEMANTIC)
 
@@ -16,10 +20,19 @@ rules = RuleSet(DecisionPhase.SEMANTIC)
     reasoning="credential classification with hash-shaped value",
 )
 def credential_with_hash_shape(context: DecisionContext) -> bool:
-    thresholds = context.policy.decision_thresholds
+    rejection = context.observation.value_rejection
+    has_hash_shape = (
+        rejection is not None
+        and rejection.kind is RejectionKind.HASH
+    ) or (
+        context.observation.value_kind is ValueKind.HEX
+        and context.has_fact(FactId.HIGH_ENTROPY)
+    )
+
     return (
-        ConceptId.HASH_ARTIFACT in context.reject_evidence
-        and context.credential_probability >= thresholds.credential
+        has_hash_shape
+        and context.has_strong_direct_credential_evidence
+        and not has_direct_fixture_evidence(context.evidence_by_concept)
     )
 
 
@@ -30,7 +43,16 @@ def credential_with_hash_shape(context: DecisionContext) -> bool:
     reasoning="non-secret artifact classification",
 )
 def artifact_classification(context: DecisionContext) -> bool:
-    return bool(context.reject_evidence) and not context.strong_secret_context
+    return (
+        (
+            bool(context.reject_evidence)
+            or has_direct_hash_artifact_evidence(
+                context.evidence_by_concept
+            )
+        )
+        and not context.strong_secret_context
+        and not context.has_strong_direct_credential_evidence
+    )
 
 
 @rules.when(
@@ -71,9 +93,18 @@ def english_text_value(context: DecisionContext) -> bool:
 )
 def context_reject_with_credential(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
-    return (
+    has_identifier_context = (
         context.context_reject_probability >= thresholds.context_reject
-        and context.credential_probability >= thresholds.credential
+        or has_direct_identifier_evidence(context.evidence_by_concept)
+    )
+    has_credential_context = (
+        context.credential_probability >= thresholds.credential
+        or context.has_strong_direct_credential_evidence
+    )
+
+    return (
+        has_identifier_context
+        and has_credential_context
     )
 
 
@@ -84,9 +115,18 @@ def context_reject_with_credential(context: DecisionContext) -> bool:
 )
 def context_reject_with_target(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
-    return (
+    has_identifier_context = (
         context.context_reject_probability >= thresholds.context_reject
-        and context.credential_probability < thresholds.credential
+        or has_direct_identifier_evidence(context.evidence_by_concept)
+    )
+    has_credential_context = (
+        context.credential_probability >= thresholds.credential
+        or context.has_strong_direct_credential_evidence
+    )
+
+    return (
+        has_identifier_context
+        and not has_credential_context
         and context.target_probability >= thresholds.target
     )
 
@@ -98,9 +138,18 @@ def context_reject_with_target(context: DecisionContext) -> bool:
 )
 def context_reject(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
-    return (
+    has_identifier_context = (
         context.context_reject_probability >= thresholds.context_reject
-        and context.credential_probability < thresholds.credential
+        or has_direct_identifier_evidence(context.evidence_by_concept)
+    )
+    has_credential_context = (
+        context.credential_probability >= thresholds.credential
+        or context.has_strong_direct_credential_evidence
+    )
+
+    return (
+        has_identifier_context
+        and not has_credential_context
         and context.target_probability < thresholds.target
     )
 

@@ -60,7 +60,11 @@ class ConceptSecretPolicy:
             self.indexes,
             self.policy,
         )
-        decision = self.decision.decide(observation, groups)
+        decision = self.decision.decide(
+            observation,
+            groups,
+            evidence_by_concept
+        )
 
         return ConceptPolicyResult(
             analysis=build_semantic_analysis_result(

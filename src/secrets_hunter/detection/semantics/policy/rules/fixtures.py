@@ -14,7 +14,7 @@ rules = RuleSet(DecisionPhase.SEMANTIC)
     reasoning="strong secret context despite fixture-like naming",
 )
 def fixture_with_strong_secret_context(context: DecisionContext) -> bool:
-    return bool(context.hard_rejects) and context.strong_secret_context
+    return context.has_fixture_context and context.strong_secret_context
 
 
 @rules.when(
@@ -26,9 +26,12 @@ def fixture_with_strong_secret_context(context: DecisionContext) -> bool:
 def fixture_with_credential(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
     return (
-        bool(context.hard_rejects)
+        context.has_fixture_context
         and not context.strong_secret_context
-        and context.credential_probability >= thresholds.credential
+        and (
+            context.credential_probability >= thresholds.credential
+            or context.has_strong_direct_credential_evidence
+        )
     )
 
 
@@ -41,8 +44,9 @@ def fixture_with_credential(context: DecisionContext) -> bool:
 def fixture_with_target(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
     return (
-        bool(context.hard_rejects)
+        context.has_fixture_context
         and context.credential_probability < thresholds.credential
+        and not context.has_strong_direct_credential_evidence
         and context.target_probability >= thresholds.target
     )
 
@@ -56,8 +60,10 @@ def fixture_with_target(context: DecisionContext) -> bool:
 def fixture_context(context: DecisionContext) -> bool:
     thresholds = context.policy.decision_thresholds
     return (
-        bool(context.hard_rejects)
+        context.has_fixture_context
+        and context.observation.value_rejection is None
         and context.credential_probability < thresholds.credential
+        and not context.has_strong_direct_credential_evidence
         and context.target_probability < thresholds.target
     )
 

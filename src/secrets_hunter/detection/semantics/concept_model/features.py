@@ -35,7 +35,8 @@ def concept_feature_names(
         for token in observation.neutral_identifier_tokens:
             features.append(f"neutral_identifier_token={token}")
 
-    features.append(f"file_extension={observation.file_extension}")
+    if observation.file_extension:
+        features.append(f"file_extension={observation.file_extension}")
 
     for token in observation.path_tokens:
         features.append(f"path_token={token}")

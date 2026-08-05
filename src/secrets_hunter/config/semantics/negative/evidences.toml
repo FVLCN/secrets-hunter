@@ -3,7 +3,11 @@ concept = "test_fixture"
 sources = ["var_name", "path"]
 terms = [
     "test",
+    "tests",
     "mock",
+    "mocks",
+    "fixture",
+    "fixtures",
     "fake",
     "dummy",
     "example",
@@ -12,6 +16,11 @@ terms = [
     "sample",
     "demo"
 ]
+
+[[evidence]]
+concept = "test_fixture"
+sources = ["file_extension"]
+terms = ["example"]
 
 [[evidence]]
 concept = "hash_artifact"
@@ -58,7 +67,10 @@ terms = [
 [[evidence]]
 concept = "identifier_context"
 sources = ["name_role"]
-terms = ["exact_identifier_name"]
+terms = [
+    "exact_identifier_name",
+    "terminal_identifier_suffix"
+]
 
 [[evidence]]
 concept = "generic_assignment_name"

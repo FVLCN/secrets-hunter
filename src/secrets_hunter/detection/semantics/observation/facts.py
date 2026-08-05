@@ -7,4 +7,5 @@ class FactId(StrEnum):
     KNOWN_PATTERN_MATCH = "known_pattern_match"
     NO_ASSIGNMENT_CONTEXT = "no_assignment_context"
     PUBLIC_CRYPTO_ARTIFACT = "public_crypto_artifact"
+    TERMINAL_IDENTIFIER_SUFFIX = "terminal_identifier_suffix"
     UNKNOWN_IDENTIFIER_CONTEXT = "unknown_identifier_context"

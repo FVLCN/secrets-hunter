@@ -37,6 +37,7 @@ class ConfidencePolicy:
     context_reject: float
     neutral_bare_credential: float
     neutral_high_entropy_identifier: float
+    contextual_high_entropy_identifier: float
     unknown_high_entropy_identifier: float
     high_entropy_assigned: float
     strong_credential: float
