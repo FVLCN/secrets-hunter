@@ -1,38 +1,17 @@
-from abc import ABC, abstractmethod
-from pathlib import Path
-from urllib.parse import urlparse
+from typing import Protocol
 
-from secrets_hunter.models import Finding
+from secrets_hunter.detection.fragmenter.models import LineFragment
+from secrets_hunter.models import SourceLocation
+
+from .models import DetectionCandidate
 
 
-class BaseDetector(ABC):
-    def __init__(self):
-        self.base_path: Path | None = None
-
-    @abstractmethod
-    def detect(self, line: str, line_num: int, filepath: str, strings: list[str]) -> list[Finding]:
-        pass
-
-    def set_base_path(self, target: str) -> None:
-        target_path = Path(target).resolve()
-        self.base_path = target_path if target_path.is_dir() else target_path.parent
-
-    def format_filepath(self, filepath: str) -> str:
-        parsed = urlparse(filepath)
-
-        if parsed.scheme in {"http", "https"}:
-            return filepath
-
-        fpath = Path(filepath)
-
-        if not fpath.is_absolute():
-            fpath = Path.cwd() / fpath
-
-        fpath = fpath.resolve()
-
-        base = self.base_path
-
-        if base and fpath.is_relative_to(base):
-            return str(fpath.relative_to(base))
-
-        return str(fpath)
+class Detector(Protocol):
+    def detect(
+        self,
+        line: str,
+        line_num: int,
+        source_location: SourceLocation,
+        fragments: list[LineFragment]
+    ) -> list[DetectionCandidate]:
+        ...

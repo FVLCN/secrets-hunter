@@ -1,0 +1,146 @@
+[[evidence]]
+concept = "infrastructure_target"
+sources = ["var_name", "finding_kind"]
+terms = [
+    "db",
+    "database",
+    "connection"
+]
+
+[[evidence]]
+concept = "infrastructure_target"
+sources = ["var_name"]
+terms = [
+    "admin",
+    "root",
+    "backend",
+    "service",
+    "worker"
+]
+
+[[evidence]]
+concept = "cloud_provider_target"
+sources = ["var_name"]
+terms = ["cloud"]
+
+[[evidence]]
+concept = "auth_system_target"
+sources = ["var_name"]
+terms = [
+    "api",
+    "auth",
+    "oauth",
+    "oidc",
+    "saml",
+    "session",
+    "consumer",
+    "client"
+]
+
+[[evidence]]
+concept = "auth_system_target"
+sources = ["var_name", "finding_kind"]
+terms = [
+    "jwt",
+    "bearer"
+]
+
+[[evidence]]
+concept = "key_credential"
+sources = ["var_name", "finding_kind"]
+terms = ["key"]
+
+[[evidence]]
+concept = "key_credential"
+sources = ["var_name"]
+terms = ["pat"]
+phrases = [
+    "access_key",
+    "access_key_id",
+    "api_key",
+    "auth_key",
+    "encryption_key",
+    "private_key",
+    "secret_access_key",
+    "secret_key",
+    "ssh_key"
+]
+
+[[evidence]]
+concept = "token_credential"
+sources = ["var_name", "finding_kind"]
+terms = [
+    "token",
+    "bearer",
+    "jwt"
+]
+
+[[evidence]]
+concept = "token_credential"
+sources = ["var_name"]
+phrases = [
+    "access_token",
+    "api_token",
+    "auth_token",
+    "bearer_token",
+    "session_token"
+]
+
+[[evidence]]
+concept = "secret_credential"
+sources = ["var_name"]
+terms = ["secret"]
+phrases = [
+    "client_secret",
+    "secret_key"
+]
+
+[[evidence]]
+concept = "secret_credential"
+sources = ["var_name", "finding_kind"]
+phrases = ["connection_string"]
+
+[[evidence]]
+concept = "connection_credential"
+sources = ["var_name"]
+terms = [
+    "url",
+    "uri",
+    "dsn"
+]
+phrases = [
+    "database_url",
+    "database_uri"
+]
+
+[[evidence]]
+concept = "connection_credential"
+sources = ["var_name", "finding_kind"]
+phrases = ["connection_string"]
+
+[[evidence]]
+concept = "password_credential"
+sources = ["var_name"]
+terms = [
+    "password",
+    "passwd",
+    "pass",
+    "pwd"
+]
+
+[[evidence]]
+concept = "credential_generic"
+sources = ["var_name"]
+terms = [
+    "credential",
+    "credentials",
+    "auth",
+    "authorization",
+    "private",
+    "cookie"
+]
+
+[[evidence]]
+concept = "webhook_credential"
+sources = ["var_name"]
+terms = ["webhook"]

@@ -7,7 +7,7 @@ name = "secrets-hunter"
 version = "0.8.1"
 description = "The Secrets Scanner that respects your time"
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = "MIT"
 license-files = ["LICENSE"]
 keywords = ["security", "secrets", "scanner", "git", "ci"]
@@ -31,4 +31,7 @@ exclude = ["tests*"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-secrets_hunter = ["config/*.toml"]
+"secrets_hunter.config" = [
+    "**/*.toml",
+    "semantics/semantic_concept_model.json",
+]
