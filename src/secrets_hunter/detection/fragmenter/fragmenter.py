@@ -1,9 +1,27 @@
 import re
 
-from secrets_hunter.config import STRIP, PEM_BEGIN_RE, DB_URI_RE
+from collections.abc import Callable
+
+from secrets_hunter.detection.pem import PEM_BEGIN_RE, analyze_pem_header
+from secrets_hunter.detection.value_patterns import (
+    CREDENTIAL_URI_RE,
+    VALUE_BOUNDARY_CHARS
+)
 from secrets_hunter.detection.fragmenter.models import (
     LineFragment, GenericStringFragment, DBConnectionFragment, PEMKeyFragment, SourceFragment
 )
+
+
+_IDENTIFIER_RE = re.compile(
+    r"^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$"
+)
+_QUOTED_STRING_RE = re.compile(
+    r'"((?:\\.|[^"\\]){5,})"|\'((?:\\.|[^\'\\]){5,})\'|`((?:\\.|[^`\\]){5,})`'
+)
+
+
+def _chunk_re(min_token_length: int) -> re.Pattern[str]:
+    return re.compile(rf"\S{{{min_token_length},}}")
 
 
 class SourceFragmenter:
@@ -11,49 +29,24 @@ class SourceFragmenter:
     Splits source text into candidate values for secret detection.
     """
 
-    def __init__(self, assignment_patterns, min_token_length, entropy_detector):
-        self.assignment_patterns = assignment_patterns
+    def __init__(
+        self,
+        min_token_length: int,
+        is_high_entropy: Callable[[str], bool]
+    ) -> None:
         self.min_token_length = min_token_length
         self.max_identifier_len = 40
-        self.entropy_detector = entropy_detector
-
-        # snake_case, SCREAMING_SNAKE, camelCase
-        self._identifier_re = re.compile(
-            r'^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$'
-        )
-
-        # quoted strings (handles escapes)
-        self._quoted_re = re.compile(r'"((?:\\.|[^"\\]){5,})"|\'((?:\\.|[^\'\\]){5,})\'|`((?:\\.|[^`\\]){5,})`')
-
-        # any non-whitespace chunk with length >= min_token_length
-        self._chunk_re = re.compile(rf'\S{{{min_token_length},}}')
-
-    def assignment_map(self, line: str) -> dict[str, set[str]]:
-        out: dict[str, set[str]] = {}
-
-        for pattern in self.assignment_patterns:
-            for match in pattern.finditer(line):
-                var = match.group(1).lower()
-                val = match.group(2).strip().strip(STRIP)
-                out.setdefault(val, set()).add(var)
-
-                for sep in ("=", ":"):
-                    if sep in val:
-                        rhs = val.split(sep, 1)[1].strip(STRIP).lstrip("=")
-                        if rhs != val and len(rhs) > 0:
-                            out.setdefault(rhs, set()).add(var)
-                        break
-
-        return out
+        self.is_high_entropy = is_high_entropy
+        self._chunk_re = _chunk_re(min_token_length)
 
     @staticmethod
-    def _extract_and_blank(
+    def _extract_and_blank[_FragmentT: LineFragment](
         line: str,
-        pattern,
-        fragment_factory
-    ) -> tuple[str, list[LineFragment]]:
+        pattern: re.Pattern[str],
+        fragment_factory: Callable[[str], _FragmentT]
+    ) -> tuple[str, list[_FragmentT]]:
         """Match all occurrences of pattern, collect as LineFragments, blank them out."""
-        fragments = []
+        fragments: list[_FragmentT] = []
 
         for m in pattern.finditer(line):
             fragments.append(fragment_factory(m.group(0)))
@@ -69,8 +62,12 @@ class SourceFragmenter:
         header_match = PEM_BEGIN_RE.search(content)
 
         while header_match is not None:
-            pem_type = header_match.group(1)
-            expected_footer = f"-----END {pem_type}-----"
+            pem_analysis = analyze_pem_header(header_match.group(0))
+
+            if pem_analysis is None:
+                raise ValueError(f"Unsupported PEM header: {header_match.group(0)!r}")
+
+            expected_footer = pem_analysis.pem_type.footer_marker
             footer_start = content.find(expected_footer, header_match.end())
 
             if footer_start != -1:
@@ -87,10 +84,9 @@ class SourceFragmenter:
 
             fragments.append(PEMKeyFragment(
                 content=fragment_content,
-                header=header_match.group(0),
                 body=body,
                 footer=footer,
-                inline=source_fragment.start_line == source_fragment.end_line,
+                pem_analysis=pem_analysis
             ))
 
             content = (
@@ -104,24 +100,21 @@ class SourceFragmenter:
         return content, fragments
 
     def _looks_like_identifier(self, s: str) -> bool:
-        if not self._identifier_re.match(s):
+        if not _IDENTIFIER_RE.match(s):
             return False
 
         if len(s) > self.max_identifier_len:
             return False
 
-        # high entropy - likely not an identifier but a token chunk
-        findings = self.entropy_detector.detect("", 0, "", [GenericStringFragment(s)])
-
-        return len(findings) == 0
+        return not self.is_high_entropy(s)
 
     def _split_assignment(self, s: str) -> str | None:
         """If it's key=value or key:value, keep only RHS (value) when it's long enough"""
         for sep in ("=", ":"):
             if sep in s:
                 lhs, rhs = s.split(sep, 1)
-                lhs = lhs.strip(STRIP).lstrip("-")
-                rhs = rhs.strip(STRIP).lstrip("=")
+                lhs = lhs.strip(VALUE_BOUNDARY_CHARS).lstrip("-")
+                rhs = rhs.strip(VALUE_BOUNDARY_CHARS).lstrip("=")
 
                 if self._looks_like_identifier(lhs):
                     return rhs if len(rhs) >= self.min_token_length else ""
@@ -129,17 +122,21 @@ class SourceFragmenter:
         return None
 
     def extract(self, source_fragment: SourceFragment) -> list[LineFragment]:
-        fragments = []
+        fragments: list[LineFragment] = []
 
         # PEM headers, DB URIs
         line, pem = self._extract_pem_and_blank(source_fragment)
         fragments.extend(pem)
-        line, db_conn = self._extract_and_blank(line, DB_URI_RE, DBConnectionFragment)
+        line, db_conn = self._extract_and_blank(
+            line,
+            CREDENTIAL_URI_RE,
+            DBConnectionFragment
+        )
         fragments.extend(db_conn)
 
         # 1) collect quoted strings + blank them out
         line_wo_quotes = line
-        for m in self._quoted_re.finditer(line):
+        for m in _QUOTED_STRING_RE.finditer(line):
             s = m.group(1) or m.group(2) or m.group(3)
 
             if s:
@@ -156,7 +153,7 @@ class SourceFragmenter:
 
         # 2) collect other long chunks (unquoted)
         for chunk in self._chunk_re.findall(line_wo_quotes):
-            cleaned = chunk.strip(STRIP)
+            cleaned = chunk.strip(VALUE_BOUNDARY_CHARS)
 
             result = self._split_assignment(cleaned)
 
@@ -165,8 +162,8 @@ class SourceFragmenter:
             elif result is None and len(cleaned) >= self.min_token_length:
                 fragments.append(GenericStringFragment(cleaned))
 
-        seen = set()
-        unique_strings = []
+        seen: set[str] = set()
+        unique_strings: list[LineFragment] = []
 
         for f in fragments:
             if f.content not in seen:

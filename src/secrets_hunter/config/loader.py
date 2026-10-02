@@ -1,86 +1,79 @@
-import re
-import tomllib
-
-from hashlib import sha256
-from importlib.resources import files as res_files
+from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
 
-from secrets_hunter.models.config import ExcludePattern, RuntimeConfig
+from secrets_hunter.config.specs import RejectionPatternSpec
+from secrets_hunter.config.validation import RejectionPatternSpecValidator
+from secrets_hunter.detection.assignment_resolver import (
+    DEFAULT_ASSIGNMENT_PATTERN_SOURCES
+)
+from secrets_hunter.detection.regex import compile_regex
+from secrets_hunter.immutability import frozen_mapping
+from secrets_hunter.models import RejectionPattern, RejectionReason
+from secrets_hunter.models.config import RuntimeConfig
+from secrets_hunter.resources import LoadedToml, TomlTable, load_toml
 
-FLAG_MAP: dict[str, int] = {
-    "IGNORECASE": re.IGNORECASE,
-    "MULTILINE": re.MULTILINE,
-    "DOTALL": re.DOTALL,
-    "VERBOSE": re.VERBOSE,
-    "ASCII": re.ASCII,
-}
+
+REJECTION_PATTERNS_RESOURCE = "semantics/negative/rejection_patterns.toml"
+SUPPORTED_USER_CONFIG_KEYS = frozenset({
+    "ignore",
+    "remove_ignore_files",
+    "remove_ignore_extensions",
+    "remove_ignore_dirs"
+})
 
 
-def require_table(value: Any, key: str, file: Path) -> dict[str, Any]:
+def require_table(
+    value: object,
+    key: str,
+    file: str | Path
+) -> TomlTable:
     if value is None:
         return {}
 
     if not isinstance(value, dict):
         raise ValueError(f"'{key}' must be a table in {file}")
 
-    return value
+    table: dict[str, object] = {}
+    for table_key, item in value.items():
+        if not isinstance(table_key, str):
+            raise ValueError(f"'{key}' keys must be strings in {file}")
+        table[table_key] = item
+
+    return frozen_mapping(table)
 
 
-def require_list(data: dict[str, Any], key: str, file: Path) -> list[Any]:
+def require_list(
+    data: Mapping[str, object],
+    key: str,
+    file: str | Path
+) -> list[object]:
     v = data.get(key) or []
 
     if not isinstance(v, list):
         raise ValueError(f"'{key}' must be a list in {file}")
 
-    return v
+    return list(v)
 
 
-def require_string_list(data: dict[str, Any], key: str, file: Path) -> list[str]:
+def require_string_list(
+    data: Mapping[str, object],
+    key: str,
+    file: str | Path
+) -> list[str]:
     v = require_list(data, key, file)
+    strings: list[str] = []
 
     for i, item in enumerate(v):
         if not isinstance(item, str):
             raise ValueError(f"'{key}[{i}]' must be a string in {file}, got {type(item).__name__}")
+        strings.append(item)
 
-    return v
-
-
-def require_pattern_item(item: Any, key: str, required_fields: set[str], file: Path) -> dict[str, Any]:
-    if not isinstance(item, dict):
-        raise ValueError(f"'{key}' items must be tables in {file}: {item!r}")
-
-    missing = required_fields - item.keys()
-
-    if missing:
-        raise ValueError(f"'{key}' item in {file} missing fields {missing}: {item!r}")
-
-    flags = item.get("flags") or []
-
-    if not isinstance(flags, list) or any(not isinstance(x, str) for x in flags):
-        raise ValueError(f"'{key}' item in {file} 'flags' must be a list of strings: {item!r}")
-
-    item["flags"] = flags
-    return item
+    return strings
 
 
 def remove_from_list(lst: list[str], names: list[str]) -> list[str]:
     names_set = set(names)
     return [x for x in lst if x not in names_set]
-
-
-def read_toml(path: Path) -> dict[str, Any]:
-    try:
-        text = path.read_text(encoding="utf-8")
-    except FileNotFoundError as e:
-        raise FileNotFoundError(f"Config file not found: {path}") from e
-    except OSError as e:
-        raise type(e)(f"Cannot read {path}: {e}") from e
-
-    try:
-        return tomllib.loads(text)
-    except tomllib.TOMLDecodeError as e:
-        raise ValueError(f"Invalid TOML in {path}: {e}") from e
 
 
 def deduplicate_keep_order(items: list[str]) -> list[str]:
@@ -95,158 +88,107 @@ def deduplicate_keep_order(items: list[str]) -> list[str]:
     return out
 
 
-def re_compile(pattern: str, flags: list[str] | None = None, *, source: str = "") -> re.Pattern:
-    f = 0
+def reject_unsupported_user_config(
+    data: Mapping[str, object],
+    file: str | Path
+) -> None:
+    unsupported = sorted(set(data) - SUPPORTED_USER_CONFIG_KEYS)
 
-    for name in (flags or []):
-        if name not in FLAG_MAP:
-            where = f" in {source}" if source else ""
-            raise ValueError(f"Unknown regex flag '{name}'{where}")
-
-        f |= FLAG_MAP[name]
-
-    try:
-        return re.compile(pattern, f)
-    except re.error as e:
-        where = f" in {source}" if source else ""
-        raise ValueError(f"Invalid regex pattern{where}: {e}") from e
+    if unsupported:
+        keys = ", ".join(unsupported)
+        raise ValueError(
+            f"Unsupported config keys in {file}: {keys}. "
+            "User config currently supports only ignore settings."
+        )
 
 
 def load_runtime_config(user_configs: list[str | Path] | None = None) -> RuntimeConfig:
     """
-    Loads packaged TOML config and applies user overlays.
-    Overlays are applied in the order provided.
+    Loads packaged detection resources and ignore settings.
+    User overlays are applied only to ignore settings, in the order provided.
     """
-    base_dir = res_files("secrets_hunter.config")
-    base_files = [
-        Path(str(base_dir / "patterns.toml")),
-        Path(str(base_dir / "ignore.toml")),
-    ]
-
-    for bf in base_files:
-        if not bf.exists():
-            raise FileNotFoundError(f"Missing packaged config file: {bf}")
-
     overlay_files = [Path(p).expanduser().resolve() for p in (user_configs or [])]
-    files = base_files + overlay_files
 
     # aggregated (raw)
-    secret_patterns_by_name: dict[str, dict[str, Any]] = {}
-    exclude_patterns_by_name: dict[str, dict[str, Any]] = {}
-    exclude_keywords: list[str] = []
-    secret_keywords: list[str] = []
-    assignment_patterns: list[str] = []
+    rejection_specs_by_name: dict[str, RejectionPatternSpec] = {}
+    assignment_pattern_sources = list(DEFAULT_ASSIGNMENT_PATTERN_SOURCES)
     ignore_files: list[str] = []
     ignore_ext: list[str] = []
     ignore_dirs: list[str] = []
 
-    for f in files:
-        data = read_toml(f)
+    rejection_document = load_toml(fallback_resource=REJECTION_PATTERNS_RESOURCE)
+    rejection_data = rejection_document.data
+    rejection_source = rejection_document.source
 
-        # removals
-        for name in require_string_list(data, "remove_secret_patterns", f):
-            secret_patterns_by_name.pop(name, None)
+    for item in require_list(rejection_data, "rejection_patterns", rejection_source):
+        spec = RejectionPatternSpecValidator.parse(
+            item,
+            rejection_source
+        )
+        rejection_specs_by_name[spec.name] = spec
 
-        for name in require_string_list(data, "remove_exclude_patterns", f):
-            exclude_patterns_by_name.pop(name, None)
+    ignore_documents: list[tuple[LoadedToml, bool]] = [
+        (load_toml(fallback_resource="ignore.toml"), False)
+    ]
+    ignore_documents.extend(
+        (load_toml(path), True)
+        for path in overlay_files
+    )
+
+    for document, is_overlay in ignore_documents:
+        data = document.data
+        source = document.source
+
+        if is_overlay:
+            reject_unsupported_user_config(data, source)
 
         ignore_files = remove_from_list(
-            ignore_files, require_string_list(data, "remove_ignore_files", f)
+            ignore_files, require_string_list(data, "remove_ignore_files", source)
         )
         ignore_ext = remove_from_list(
-            ignore_ext, require_string_list(data, "remove_ignore_extensions", f)
+            ignore_ext, require_string_list(data, "remove_ignore_extensions", source)
         )
         ignore_dirs = remove_from_list(
-            ignore_dirs, require_string_list(data, "remove_ignore_dirs", f)
+            ignore_dirs, require_string_list(data, "remove_ignore_dirs", source)
         )
-        exclude_keywords = remove_from_list(
-            exclude_keywords, require_string_list(data, "remove_exclude_keywords", f)
-        )
-        secret_keywords = remove_from_list(
-            secret_keywords, require_string_list(data, "remove_secret_keywords", f)
-        )
-        assignment_patterns = remove_from_list(
-            assignment_patterns, require_string_list(data, "remove_assignment_patterns", f)
-        )
-
-        # patterns
-        for item in require_list(data, "secret_patterns", f):
-            item = require_pattern_item(item, "secret_patterns", {"name", "pattern"}, f)
-            secret_patterns_by_name[item["name"]] = {"pattern": item["pattern"], "flags": item["flags"]}
-
-        for item in require_list(data, "exclude_patterns", f):
-            item = require_pattern_item(item, "exclude_patterns", {"name", "pattern", "category"}, f)
-            exclude_patterns_by_name[item["name"]] = item
-
-        # lists
-        exclude_keywords.extend(require_string_list(data, "exclude_keywords", f))
-        secret_keywords.extend(require_string_list(data, "secret_keywords", f))
-        assignment_patterns.extend(require_string_list(data, "assignment_patterns", f))
 
         # ignore
-        ig = require_table(data.get("ignore"), "ignore", f)
-        ignore_files.extend(require_string_list(ig, "files", f))
-        ignore_ext.extend(require_string_list(ig, "extensions", f))
-        ignore_dirs.extend(require_string_list(ig, "dirs", f))
+        ig = require_table(data.get("ignore"), "ignore", source)
+        ignore_files.extend(require_string_list(ig, "files", source))
+        ignore_ext.extend(require_string_list(ig, "extensions", source))
+        ignore_dirs.extend(require_string_list(ig, "dirs", source))
 
     # deduplication
-    exclude_keywords = deduplicate_keep_order(exclude_keywords)
-    secret_keywords = deduplicate_keep_order(secret_keywords)
-    assignment_patterns = deduplicate_keep_order(assignment_patterns)
     ignore_files = deduplicate_keep_order(ignore_files)
     ignore_ext = deduplicate_keep_order(ignore_ext)
     ignore_dirs = deduplicate_keep_order(ignore_dirs)
 
     # compile
-    compiled_secret_patterns = {
-        name: re_compile(v["pattern"], v.get("flags"), source=f"secret_patterns[{name}]")
-        for name, v in secret_patterns_by_name.items()
-    }
-
-    compiled_exclude_patterns = [
-        ExcludePattern(
-            pattern=re_compile(ep["pattern"], ep.get("flags"), source=f"exclude_patterns[{ep['name']}]"),
-            name=ep["name"],
-            category=ep["category"]
+    compiled_rejection_patterns = tuple(
+        RejectionPattern(
+            pattern=compile_regex(
+                spec.pattern,
+                spec.flags,
+                source=f"rejection_patterns[{spec.name}]"
+            ),
+            reason=RejectionReason(
+                kind=spec.kind,
+                name=spec.name,
+                category=spec.category
+            )
         )
-        for ep in exclude_patterns_by_name.values()
-    ]
-
-    compiled_assignment = [
-        re_compile(p, source=f"assignment_patterns[{i}]")
-        for i, p in enumerate(assignment_patterns)
-    ]
-
-    return RuntimeConfig(
-        secret_patterns=compiled_secret_patterns,
-        exclude_patterns=compiled_exclude_patterns,
-        exclude_keywords=exclude_keywords,
-        secret_keywords=secret_keywords,
-        assignment_patterns=compiled_assignment,
-        ignore_files=tuple(ignore_files),
-        ignore_extensions=tuple(ignore_ext),
-        ignore_dirs=tuple(ignore_dirs),
+        for spec in rejection_specs_by_name.values()
     )
 
+    compiled_assignment_patterns = tuple(
+        compile_regex(p, source=f"hardcoded_assignment_pattern[{i}]")
+        for i, p in enumerate(assignment_pattern_sources)
+    )
 
-CONFIG_CACHE: dict[str, RuntimeConfig] = {}
-
-
-def _config_key(user_configs: list[str | Path] | None) -> str:
-    if not user_configs:
-        return ""
-
-    paths = [str(Path(p).expanduser().resolve()) for p in user_configs]  # normalize
-    return sha256("\n".join(paths).encode("utf-8")).hexdigest()
-
-
-def get_runtime_config(user_configs: list[str | Path] | None = None, *, reload: bool = False) -> RuntimeConfig:
-    """
-    Cached accessor. Pass reload=True to force reloading.
-    """
-    key = _config_key(user_configs)
-
-    if key not in CONFIG_CACHE or reload:
-        CONFIG_CACHE[key] = load_runtime_config(user_configs=user_configs)
-
-    return CONFIG_CACHE[key]
+    return RuntimeConfig(
+        rejection_patterns=compiled_rejection_patterns,
+        compiled_assignment_patterns=compiled_assignment_patterns,
+        ignore_files=tuple(ignore_files),
+        ignore_extensions=tuple(ignore_ext),
+        ignore_dirs=tuple(ignore_dirs)
+    )

@@ -1,0 +1,151 @@
+[[training_examples]]
+var_name = "OPENAI_API_KEY"
+value = "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"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = ".env.txt"
+concept_labels = ["product_service_target", "auth_system_target", "key_credential"]
+
+[[training_examples]]
+var_name = "JIRA_TOKEN"
+value = "ATATT3xbEBiiQNV98LQzPoudaBM2qiiGSzG1ZblIgJ67usInE4Es4xW_vKldgqLeDKyXeaxr9LSZKWnfwVhZSuzSzUpdczFs6X2a1qFnVj3ydzo6KHGLLXcExw0i4zl9vYaadUVWJgix-Vh8a7d0SKKk6uSj--vRurS7a-aYPbLgGkg_dUCkdmE=7FC53535"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "entrypoint.sh"
+concept_labels = ["product_service_target", "token_credential"]
+
+[[training_examples]]
+var_name = "ANTHROPIC_API_TOKEN"
+value = "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"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/agents/cli-runner/execute.ts"
+concept_labels = ["product_service_target", "auth_system_target", "token_credential"]
+
+[[training_examples]]
+var_name = "AUTHORIZATION"
+value = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2F1dGguaW50ZXJuYWwuZXhhbXBsZSIsInN1YiI6InVzZXJfN2YzYTljMmQiLCJhdWQiOiJhcGkiLCJpYXQiOjE3NjAwMDAwMDAsImV4cCI6MTc2MDAwMzYwMCwic2NvcGUiOiJyZWFkOnByb2plY3RzIHdyaXRlOmRlcGxveW1lbnRzIn0.yoQfGedKo1zBJHEsNLxFHTy_ojKs65rb1mS654_UIOc"
+detector = "pattern"
+finding_kind_id = "jwt_token"
+file_path = "docker-compose.yml"
+concept_labels = ["auth_system_target", "credential_generic", "token_credential"]
+
+[[training_examples]]
+var_name = "api_key"
+value = "036110f8f3076a085b44d1e460567368572b47c1"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/settings.py"
+concept_labels = ["auth_system_target", "key_credential"]
+
+[[training_examples]]
+var_name = "password"
+value = "eYSbqiRO8OBZr0wCkB4NBQinkKqxed2cZ2w="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "data/static/users.yml"
+concept_labels = ["password_credential"]
+
+[[training_examples]]
+var_name = "DATABASE_URL"
+value = "postgres://svc_app_9808dccf:4DvcdLR6SWFT_mMcg95HCmcmuRtkpGIg@postgres.service.consul:5432/app"
+detector = "pattern"
+finding_kind_id = "db_connection_string"
+file_path = ".env.production"
+concept_labels = ["infrastructure_target", "secret_credential", "connection_credential"]
+
+[[training_examples]]
+var_name = "client_secret"
+value = "0-zKyXGjJTMrdNqmlsc7ZvFFJZkRYgYKjDyAezrKnJOCe4yAkUTblw0dEt3yyghxK724DYBP3aNPuJYj16qGk4YiUUOm0f08HJWo9li8-qAex6X2iVCTAAQloaEKUnbt"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/auth/oauth-client.js"
+concept_labels = ["auth_system_target", "secret_credential"]
+
+[[training_examples]]
+var_name = "totpSecret"
+value = "RHDLXT25NSQWGK5ZQNRJ6CAVSYUMQ4NI"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "data/static/users.yml"
+concept_labels = ["auth_system_target", "secret_credential"]
+
+[[training_examples]]
+var_name = "encryption_key"
+value = "5ebf61dc5d2e9b028625b0bd4c126c67"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/crypto/encryption.js"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "MD5"
+concept_labels = ["key_credential"]
+
+[[training_examples]]
+var_name = "SECRET_KEY"
+value = "6b01eee4f945ca25045b5aab440b953461faf08693a9abbf1166dc7c6b9772da"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ci-backend.yml"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+concept_labels = ["key_credential", "secret_credential"]
+
+[[training_examples]]
+var_name = "secret_api_token"
+value = "phs_JVRb8fNi0XyIKGgUCyi29ZJUOXEr6NF2dKBy5Ws8XVeF11C"
+detector = "pattern"
+finding_kind_id = "posthog_secret_api_token"
+file_path = "api/test/test_authentication.py"
+concept_labels = ["product_service_target", "auth_system_target", "token_credential", "secret_credential", "test_fixture"]
+
+[[training_examples]]
+var_name = "STRIPE_WEBHOOK_SECRET"
+value = "whsec_NKDuyiZZmYk0TGVZoOqMM0LIknCLaYpa"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/server/config/payments.ts"
+concept_labels = ["product_service_target", "secret_credential", "webhook_credential"]
+
+[[training_examples]]
+var_name = "AWS_SECRET_ACCESS_KEY"
+value = "MCoUsYkFfYvRTCGxDwjiuFXR2AGI3Zav5Z4a5qKE"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "deploy/production/app.env"
+concept_labels = ["cloud_provider_target", "key_credential", "secret_credential"]
+
+[[training_examples]]
+var_name = "AZURE_DEVOPS_PAT"
+value = "c2LsvawvwNqE7kbz46kpZPK27rZVOc9xmNdNc01fpLv8nH5bKrTshONmRlxDACAAAAAAAAAAAAASAZDO15zD"
+detector = "pattern"
+finding_kind_id = "azure_devops_pat"
+file_path = "scripts/release/publish.ps1"
+concept_labels = ["product_service_target", "token_credential", "secret_credential"]
+
+[[training_examples]]
+var_name = "AZURE_CLIENT_SECRET"
+value = "myWVgKxCNQGSOmO50n6l1m2KNlXk3G5TsxsaLEOP"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "deploy/azure/production.env"
+concept_labels = ["cloud_provider_target", "auth_system_target", "secret_credential"]
+
+[[training_examples]]
+var_name = "GOOGLE_API_KEY"
+value = "AIza0Blai23k4IJ7Xfn6pao6yl89PWUw_YlaoMz"
+detector = "pattern"
+finding_kind_id = "gcp_api_key"
+file_path = "src/integrations/google/maps.ts"
+concept_labels = ["cloud_provider_target", "key_credential", "secret_credential"]
+
+[[training_examples]]
+var_name = "GITHUB_WEBHOOK_SECRET"
+value = "mFA5VJBubsDD8gWq2aRQAIilkURoL5J2fiGgBe0FwbNgxag9"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/integrations/github/webhooks.ts"
+concept_labels = ["product_service_target", "secret_credential", "webhook_credential"]

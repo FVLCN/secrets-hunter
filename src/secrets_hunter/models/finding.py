@@ -1,12 +1,13 @@
-from dataclasses import dataclass, replace, asdict
-from enum import Enum, IntEnum
+from dataclasses import dataclass
+from enum import StrEnum
 
-from secrets_hunter.detection.fragmenter import LineFragment
+from .decision import Decision, Disposition, RuleActivation
+from .finding_kind import FindingKind
+from .semantic_analysis import SemanticAnalysisResult
+from .source_location import SourceLocation
 
-REPORT_EXCLUDED_FIELDS = {"fragment"}
 
-
-class Severity(str, Enum):
+class Severity(StrEnum):
     CRITICAL = "CRITICAL"
     HIGH     = "HIGH"
     MEDIUM   = "MEDIUM"
@@ -17,82 +18,59 @@ class Severity(str, Enum):
         return self.name
 
 
-class DetectionMethod(str, Enum):
+def severity_for_confidence(confidence: int) -> Severity:
+    confidence = int(confidence)
+
+    if confidence < 0 or confidence > 100:
+        raise ValueError(f"confidence must be between 0 and 100, got {confidence}")
+
+    if confidence <= 10:
+        return Severity.INFO
+
+    if confidence <= 35:
+        return Severity.LOW
+
+    if confidence <= 69:
+        return Severity.MEDIUM
+
+    if confidence <= 89:
+        return Severity.HIGH
+
+    return Severity.CRITICAL
+
+
+class DetectionMethod(StrEnum):
     PATTERN = "pattern"
     ENTROPY = "entropy"
 
 
-class Confidence(IntEnum):
-    REJECTED                           = 0
-    HIGH_ENTROPY_NO_ASSIGNMENT_CONTEXT = 5
-    HIGH_ENTROPY_WITH_ASSIGNMENT       = 75
-    VERIFIED                           = 100
-
-
 @dataclass(frozen=True)
 class Finding:
-    title: str
-    file: str
-    line: int
-    type: str
+    location: SourceLocation
+    kind: FindingKind
     match: str
     context: str
-    severity: Severity
-    confidence_reasoning: str
     detection_method: DetectionMethod
-    confidence: Confidence
-    fragment: LineFragment
-    context_var: str | None = None
-    commit: str | None = None
-    vulnerable_url: str | None = None
+    decision: Decision
+    associated_name: str | None = None
+    semantic_analysis: SemanticAnalysisResult | None = None
 
-    def to_display(self) -> dict[str, object]:
-        data = asdict(self)
+    @property
+    def confidence(self) -> int:
+        return round(self.decision.confidence * 100)
 
-        for field in REPORT_EXCLUDED_FIELDS:
-            data.pop(field, None)
+    @property
+    def confidence_reasoning(self) -> str:
+        return self.decision.reasoning
 
-        return data
+    @property
+    def disposition(self) -> Disposition:
+        return self.decision.disposition
 
-    def reject(self, confidence_reasoning: str) -> 'Finding':
-        return replace(
-            self,
-            severity=Severity.INFO,
-            confidence=Confidence.REJECTED,
-            confidence_reasoning=confidence_reasoning
-        )
+    @property
+    def decision_trace(self) -> tuple[RuleActivation, ...]:
+        return self.decision.trace
 
-    def mask(self) -> 'Finding':
-        return replace(
-            self,
-            match="***MASKED***",
-            context="***MASKED***"
-        )
-
-    def with_match(self, match: str) -> 'Finding':
-        return replace(self, match=match)
-
-    def with_commit(self, commit: str) -> 'Finding':
-        return replace(self, commit=commit)
-
-    def with_vulnerable_url(self, vulnerable_url: str) -> 'Finding':
-        return replace(self, vulnerable_url=vulnerable_url)
-
-    def with_context(
-        self,
-        var: str,
-        severity: Severity,
-        confidence: Confidence,
-        reasoning: str | None = None
-    ) -> 'Finding':
-        kwargs = {
-            'context_var': var,
-            'severity': severity,
-            'confidence': confidence,
-            'title': f'Hardcoded {var.replace("_", " ")} at {self.file}:{self.line}'
-        }
-
-        if reasoning:
-            kwargs['confidence_reasoning'] = reasoning
-
-        return replace(self, **kwargs)
+    @property
+    def severity(self) -> Severity:
+        return severity_for_confidence(self.confidence)

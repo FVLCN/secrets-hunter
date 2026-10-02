@@ -1,0 +1,184 @@
+[provider_kind_targets]
+product_service = "product_service_target"
+cloud_provider = "cloud_provider_target"
+infrastructure = "infrastructure_target"
+
+[[providers]]
+id = "jira"
+name = "Jira"
+kind = "product_service"
+terms = ["jira"]
+
+[[providers]]
+id = "github"
+name = "GitHub"
+kind = "product_service"
+terms = ["github"]
+
+[[providers]]
+id = "gitlab"
+name = "GitLab"
+kind = "product_service"
+terms = ["gitlab"]
+
+[[providers]]
+id = "stripe"
+name = "Stripe"
+kind = "product_service"
+terms = ["stripe"]
+
+[[providers]]
+id = "slack"
+name = "Slack"
+kind = "product_service"
+terms = ["slack"]
+
+[[providers]]
+id = "datadog"
+name = "Datadog"
+kind = "product_service"
+terms = ["datadog"]
+
+[[providers]]
+id = "sentry"
+name = "Sentry"
+kind = "product_service"
+terms = ["sentry"]
+
+[[providers]]
+id = "twilio"
+name = "Twilio"
+kind = "product_service"
+terms = ["twilio"]
+
+[[providers]]
+id = "mailgun"
+name = "Mailgun"
+kind = "product_service"
+terms = ["mailgun"]
+
+[[providers]]
+id = "sendgrid"
+name = "SendGrid"
+kind = "product_service"
+terms = ["sendgrid"]
+
+[[providers]]
+id = "openai"
+name = "OpenAI"
+kind = "product_service"
+terms = ["openai"]
+
+[[providers]]
+id = "anthropic"
+name = "Anthropic"
+kind = "product_service"
+terms = ["anthropic"]
+
+[[providers]]
+id = "pagerduty"
+name = "PagerDuty"
+kind = "product_service"
+terms = ["pagerduty"]
+
+[[providers]]
+id = "okta"
+name = "Okta"
+kind = "product_service"
+terms = ["okta"]
+
+[[providers]]
+id = "auth0"
+name = "Auth0"
+kind = "product_service"
+terms = ["auth0"]
+
+[[providers]]
+id = "telegram"
+name = "Telegram"
+kind = "product_service"
+terms = ["telegram"]
+
+[[providers]]
+id = "google"
+name = "Google"
+kind = "product_service"
+terms = ["google"]
+
+[[providers]]
+id = "posthog"
+name = "PostHog"
+kind = "product_service"
+terms = ["posthog"]
+
+[[providers]]
+id = "aws"
+name = "AWS"
+kind = "cloud_provider"
+terms = ["aws"]
+
+[[providers]]
+id = "gcp"
+name = "Google Cloud"
+kind = "cloud_provider"
+terms = ["gcp", "googlecloud"]
+
+[[providers]]
+id = "azure"
+name = "Azure"
+kind = "cloud_provider"
+terms = ["azure"]
+
+[[providers]]
+id = "digitalocean"
+name = "DigitalOcean"
+kind = "cloud_provider"
+terms = ["digitalocean"]
+
+[[providers]]
+id = "cloudflare"
+name = "Cloudflare"
+kind = "cloud_provider"
+terms = ["cloudflare"]
+
+[[providers]]
+id = "postgres"
+name = "PostgreSQL"
+kind = "infrastructure"
+terms = ["postgres", "postgresql"]
+
+[[providers]]
+id = "mysql"
+name = "MySQL"
+kind = "infrastructure"
+terms = ["mysql"]
+
+[[providers]]
+id = "mariadb"
+name = "MariaDB"
+kind = "infrastructure"
+terms = ["mariadb"]
+
+[[providers]]
+id = "mongodb"
+name = "MongoDB"
+kind = "infrastructure"
+terms = ["mongodb", "mongo"]
+
+[[providers]]
+id = "redis"
+name = "Redis"
+kind = "infrastructure"
+terms = ["redis"]
+
+[[providers]]
+id = "kafka"
+name = "Kafka"
+kind = "infrastructure"
+terms = ["kafka"]
+
+[[providers]]
+id = "azure_devops"
+name = "Azure DevOps"
+kind = "product_service"
+terms = ["azdo", "azuredevops"]

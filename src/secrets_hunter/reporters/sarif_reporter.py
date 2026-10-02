@@ -2,30 +2,39 @@ import json
 import logging
 
 from secrets_hunter import __version__
-from secrets_hunter.models import Finding
+from secrets_hunter.reporters.finding_view import FindingView
+from secrets_hunter.reporters.source_location import (
+    source_location_kind,
+    source_location_to_dict
+)
 
 logger = logging.getLogger(__name__)
 
 
 class SARIFReporter:
     @staticmethod
-    def export(findings: list[Finding], output_file: str) -> None:
+    def export(findings: list[FindingView], output_file: str) -> None:
         logger.info(f"Exporting results to {output_file}...")
 
         results = []
         for finding in findings:
+            location = finding.location
+            serialized_location = source_location_to_dict(location)
             result = {
-                "ruleId": finding.type,
+                "ruleId": finding.kind.id,
                 "message": {
-                    "text": f"{finding.type} found in {finding.file}"
+                    "text": (
+                        f"{finding.kind.display_name} found in "
+                        f"{location.locator}"
+                    )
                 },
                 "locations": [{
                     "physicalLocation": {
                         "artifactLocation": {
-                            "uri": finding.file
+                            "uri": location.locator
                         },
                         "region": {
-                            "startLine": finding.line,
+                            "startLine": location.line,
                             "snippet": {
                                 "text": finding.context
                             }
@@ -34,14 +43,25 @@ class SARIFReporter:
                 }],
                 "properties": {
                     "title": finding.title,
+                    "finding_kind": {
+                        "id": finding.kind.id,
+                        "display_name": finding.kind.display_name
+                    },
                     "match": finding.match,
                     "detection_method": finding.detection_method,
                     "confidence": finding.confidence,
-                    "context_var": finding.context_var,
-                    "commit": finding.commit,
-                    "vulnerable_url": finding.vulnerable_url,
+                    "disposition": finding.disposition.value,
+                    "associated_name": finding.associated_name,
+                    "location": {
+                        "kind": source_location_kind(location),
+                        **serialized_location
+                    },
                     "severity": finding.severity,
-                    "confidence_reasoning": finding.confidence_reasoning
+                    "confidence_reasoning": finding.confidence_reasoning,
+                    "decision_trace": [
+                        activation.to_dict()
+                        for activation in finding.decision_trace
+                    ],
                 }
             }
             results.append(result)

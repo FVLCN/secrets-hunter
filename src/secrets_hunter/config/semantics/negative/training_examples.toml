@@ -1,0 +1,131 @@
+[[training_examples]]
+var_name = "fake_key"
+value = "nA861W3S7bE2oqzIVdBWtehx"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "config/settings.py"
+concept_labels = ["test_fixture"]
+
+[[training_examples]]
+var_name = "test_token"
+value = "eMHFQU5lBdtS3iky2UhuYVjah"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "test/api/auth.ts"
+concept_labels = ["test_fixture"]
+
+[[training_examples]]
+var_name = "integrity"
+value = "sha512-z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "ftp/package-lock.json.bak"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "image_digest"
+value = "04d189814d7b7c9c87d92f5aeed378e77868d8d7cb1bfac86bb546203359d7d7"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "docker-compose.yml"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "session_id"
+value = "7f3a91c4d8e20b65a9f12c0de4b87631"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "agents/skills/speech-to-text/references/realtime-events.md"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "MD5"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "pubkey"
+value = "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRCREEyMkJGOTFENzFGNjAKUldNOVFNL1Robnp2NUxoa0MrckN3bzM1WFVTTFhsZGpTS0NzbEVhT3BaMFpWY3M0RkJQQmhvTGYK"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "translator/src/conf.json"
+concept_labels = ["public_crypto_artifact"]
+
+[[training_examples]]
+var_name = "KeyFrame"
+value = "79ffdc174191ed0f2d01d465c10c80c8c9542cb"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/ui/animation.ts"
+concept_labels = ["ordinary_identifier_words"]
+
+[[training_examples]]
+var_name = "render_key"
+value = "31ea5df94d64f1a13f1e7f01f1ff7fd291cda2cb"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/ui/rendering.ts"
+concept_labels = ["ordinary_identifier_words"]
+
+[[training_examples]]
+var_name = "cardNum"
+value = "1234567887654321"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "test/api/payment.test.ts"
+value_rejected = true
+rejection_kind = "placeholder"
+rejection_category = "placeholder"
+rejection_pattern = "12345"
+concept_labels = ["placeholder_value", "test_fixture"]
+
+[[training_examples]]
+var_name = "idempotency_key"
+value = "7b3e2c59b5c79e7bf3fd359a32dae32adbc2b346"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/payments/request.py"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "client_id"
+value = "wt8shMqZBumrYjSCVDFJMKhsLoQUgiB-kc0QpbL9"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/oauth-development-guide.md"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "commit_id"
+value = "6ff08d511cd729f04031155dc9135bdab3b766d4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/releases/manifest.json"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+concept_labels = ["hash_artifact", "version_or_reference_artifact"]
+
+[[training_examples]]
+var_name = "clientId"
+value = "Mz66IExNZyqOd_rGkgxdCZF75-ETr0jpDeWIWYpF"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "frontend/src/lib/oauth/oauthClient.ts"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "value"
+value = "18446744073709551615"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "funnel-udf/src/parsing.rs"
+concept_labels = ["generic_assignment_name"]
