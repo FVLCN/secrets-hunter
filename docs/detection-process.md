@@ -151,6 +151,7 @@ Example inline private key:
 Some PEM blocks are rejected instead of being treated as actionable findings:
 
 - Public keys and certificates are not secret material and are rejected as false positives.
+- Encrypted messages (`PGP MESSAGE`, `AGE ENCRYPTED FILE`) hold only ciphertext and are rejected as false positives. SOPS stores its wrapped data keys this way.
 - Blocks where the footer is missing or doesn't match the header type are rejected as malformed.
 - Blocks whose body is not valid base64, or decodes to something too short to be a real key, are rejected as malformed.
 

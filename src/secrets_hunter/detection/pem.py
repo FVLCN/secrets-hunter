@@ -18,6 +18,8 @@ class PemType(StrEnum):
     CRL = "CRL"
     PGP_PUBLIC_KEY_BLOCK = "PGP PUBLIC KEY BLOCK"
     PGP_PRIVATE_KEY_BLOCK = "PGP PRIVATE KEY BLOCK"
+    PGP_MESSAGE = "PGP MESSAGE"
+    AGE_ENCRYPTED_FILE = "AGE ENCRYPTED FILE"
 
     @property
     def footer_marker(self) -> str:
@@ -27,6 +29,7 @@ class PemType(StrEnum):
 class PemDisposition(StrEnum):
     SECRET_MATERIAL = "secret_material"
     PUBLIC_ARTIFACT = "public_artifact"
+    ENCRYPTED_PAYLOAD = "encrypted_payload"
 
 
 @dataclass(frozen=True)
@@ -101,6 +104,16 @@ PEM_TYPE_SPECS: dict[PemType, PemTypeSpec] = {
         disposition=PemDisposition.SECRET_MATERIAL,
         shape_tokens=(),
         display_category="PGP private key"
+    ),
+    PemType.PGP_MESSAGE: PemTypeSpec(
+        disposition=PemDisposition.ENCRYPTED_PAYLOAD,
+        shape_tokens=(),
+        display_category="PGP encrypted message"
+    ),
+    PemType.AGE_ENCRYPTED_FILE: PemTypeSpec(
+        disposition=PemDisposition.ENCRYPTED_PAYLOAD,
+        shape_tokens=(),
+        display_category="age encrypted file"
     )
 }
 
