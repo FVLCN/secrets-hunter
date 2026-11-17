@@ -77,6 +77,13 @@ class CandidateRejectionAnalyzer:
         if not pem_key.body:
             return MISSING_PEM_BODY
 
+        if pem_key.pem_analysis.disposition is PemDisposition.ENCRYPTED_PAYLOAD:
+            return RejectionReason(
+                kind=RejectionKind.ENCRYPTED,
+                name="Encrypted",
+                category=pem_key.pem_analysis.display_category
+            )
+
         normalized_body = (
             pem_key.body
             .replace("\\r\\n", "\n")

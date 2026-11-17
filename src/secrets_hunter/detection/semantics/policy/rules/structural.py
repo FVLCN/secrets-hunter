@@ -32,6 +32,7 @@ def exact_value_rejection(context: DecisionContext) -> bool:
     return rejection is not None and rejection.kind in {
         RejectionKind.PLACEHOLDER,
         RejectionKind.STRUCTURAL_PEM,
+        RejectionKind.ENCRYPTED,
     }
 
 

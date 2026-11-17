@@ -169,3 +169,21 @@ pattern = 'webpack'
 category = "ID"
 name = "Stripe price"
 pattern = '\bprice_[A-Za-z0-9]{24}\b'
+
+# Public keys and ciphertext written by encryption tools (SOPS metadata)
+
+[[rejection_patterns]]
+kind = "public_crypto"
+category = "public key"
+name = "age recipient"
+pattern = '''\bage1[02-9ac-hj-np-z]{58}\b'''
+
+[[rejection_patterns]]
+category = "ciphertext"
+name = "GCP KMS"
+pattern = '''\bciqa[a-z0-9+/]{40,}'''
+
+[[rejection_patterns]]
+category = "ciphertext"
+name = "AWS KMS"
+pattern = '''\baq[ie][a-d]ah[a-z0-9+/]{40,}'''

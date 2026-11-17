@@ -10,6 +10,7 @@ class RejectionKind(StrEnum):
     HASH = "hash"
     STRUCTURAL_PEM = "structural_pem"
     PUBLIC_CRYPTO = "public_crypto"
+    ENCRYPTED = "encrypted"
 
 
 @dataclass(frozen=True)
