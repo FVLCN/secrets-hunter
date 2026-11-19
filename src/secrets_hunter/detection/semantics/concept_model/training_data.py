@@ -1,5 +1,7 @@
 import hashlib
 import json
+import math
+import warnings
 
 from collections.abc import Mapping
 from dataclasses import dataclass
@@ -25,6 +27,11 @@ from secrets_hunter.detection.semantics.catalog.taxonomy import (
     ConceptId,
     require_concept_id,
 )
+from secrets_hunter.detection.semantics.concept_model.log_odds import (
+    _SOURCE_SUPPORTED_TARGET_CONCEPTS,
+    _USAGE_CONCEPTS,
+)
+from secrets_hunter.detection.value_context import MAX_CONTEXT_BYTES, MAX_CONTEXT_LINES
 from secrets_hunter.models import (
     DetectionMethod,
     FindingKind,
@@ -34,11 +41,19 @@ from secrets_hunter.models import (
 from secrets_hunter.resources import load_toml, read_resource_bytes
 
 
-POSITIVE_TRAINING_EXAMPLES_RESOURCE = "semantics/positive/training_examples.toml"
-NEGATIVE_TRAINING_EXAMPLES_RESOURCE = "semantics/negative/training_examples.toml"
+POSITIVE_TRAINING_EXAMPLE_RESOURCES = (
+    "semantics/positive/synthetic.toml",
+    "semantics/positive/source_derived.toml",
+    "semantics/positive/synthetic_identifiers.toml",
+)
+NEGATIVE_TRAINING_EXAMPLE_RESOURCES = (
+    "semantics/negative/synthetic.toml",
+    "semantics/negative/source_derived.toml",
+    "semantics/negative/synthetic_identifiers.toml",
+)
 TRAINING_EXAMPLE_RESOURCES = (
-    POSITIVE_TRAINING_EXAMPLES_RESOURCE,
-    NEGATIVE_TRAINING_EXAMPLES_RESOURCE,
+    *POSITIVE_TRAINING_EXAMPLE_RESOURCES,
+    *NEGATIVE_TRAINING_EXAMPLE_RESOURCES,
 )
 MODEL_TRAINING_RESOURCES = (
     POSITIVE_CONCEPTS_RESOURCE,
@@ -61,6 +76,11 @@ class SemanticExample:
     file_path: str
     value_rejection: RejectionReason | None
     concept_labels: tuple[ConceptId, ...]
+    support_group: str | None = None
+    labeled_concepts: tuple[ConceptId, ...] | None = None
+    sample_weight: float = 1.0
+    source_context: str | None = None
+    source_line: int | None = None
 
 
 def _load_detection_method(
@@ -144,6 +164,61 @@ def _load_example(
 ) -> SemanticExample:
     var_name = example_data.get("var_name", "")
     raw_lexical_subject = example_data.get("lexical_subject")
+    concept_labels = tuple(
+        require_concept_id(label, "concept label", source)
+        for label in require_string_list(example_data, "concept_labels", source)
+    )
+    labeled_concepts = None
+    if "labeled_concepts" in example_data:
+        labeled_concepts = tuple(
+            require_concept_id(label, "labeled concept", source)
+            for label in require_string_list(example_data, "labeled_concepts", source)
+        )
+        if not labeled_concepts or not set(labeled_concepts).issubset(
+            _SOURCE_SUPPORTED_TARGET_CONCEPTS | _USAGE_CONCEPTS
+            | {ConceptId.IDENTIFIER_CONTEXT}
+        ):
+            raise ValueError(
+                f"'labeled_concepts' must name supported target, usage, or identifier concepts in {source}"
+            )
+        if not set(concept_labels).issubset(labeled_concepts):
+            raise ValueError(f"Concept labels must be within 'labeled_concepts' in {source}")
+
+    sample_weight = example_data.get("sample_weight", 1.0)
+    if (
+        isinstance(sample_weight, bool)
+        or not isinstance(sample_weight, (int, float))
+        or not math.isfinite(sample_weight)
+        or sample_weight <= 0
+    ):
+        raise ValueError(f"'sample_weight' must be positive and finite in {source}")
+    if labeled_concepts is None and sample_weight != 1.0:
+        raise ValueError(f"'sample_weight' requires scoped target labels in {source}")
+    if sample_weight != 1.0 and set(labeled_concepts or ()) & _USAGE_CONCEPTS:
+        raise ValueError(f"Usage concept examples require sample_weight = 1 in {source}")
+    if sample_weight != 1.0 and ConceptId.IDENTIFIER_CONTEXT in (labeled_concepts or ()):
+        warnings.warn(
+            f"sample_weight={sample_weight} for {var_name!r} in {source} "
+            "has no effect on identifier_context; it applies only to regularized targets.",
+            stacklevel=2,
+        )
+
+    source_context = None
+    source_line = example_data.get("source_line")
+    if "source_context" in example_data:
+        source_context = require_string(example_data["source_context"], "source_context", source)
+        context_lines = source_context.splitlines()
+        if len(source_context.encode("utf-8")) > MAX_CONTEXT_BYTES or len(context_lines) > MAX_CONTEXT_LINES:
+            raise ValueError(f"'source_context' exceeds the supported bounds in {source}")
+        if isinstance(source_line, bool) or not isinstance(source_line, int) or not 1 <= source_line <= len(context_lines):
+            raise ValueError(f"'source_line' must locate a line in 'source_context' in {source}")
+        if not set(labeled_concepts or ()).issubset(_USAGE_CONCEPTS) or labeled_concepts is None:
+            raise ValueError(f"'source_context' requires scoped usage concept labels in {source}")
+        value = require_string(example_data.get("value"), "value", source)
+        if context_lines[source_line - 1].count(value) != 1:
+            raise ValueError(f"'source_line' must contain the candidate exactly once in {source}")
+    elif source_line is not None:
+        raise ValueError(f"'source_line' requires 'source_context' in {source}")
 
     return SemanticExample(
         associated_name=require_string_or_empty(var_name, "var_name", source),
@@ -168,10 +243,16 @@ def _load_example(
         ),
         file_path=require_string(example_data.get("file_path"), "file_path", source),
         value_rejection=_load_value_rejection(example_data, source),
-        concept_labels=tuple(
-            require_concept_id(label, "concept label", source)
-            for label in require_string_list(example_data, "concept_labels", source)
-        )
+        concept_labels=concept_labels,
+        support_group=(
+            require_string(example_data["support_group"], "support_group", source)
+            if "support_group" in example_data
+            else None
+        ),
+        labeled_concepts=labeled_concepts,
+        sample_weight=float(sample_weight),
+        source_context=source_context,
+        source_line=source_line,
     )
 
 
@@ -196,7 +277,7 @@ def _load_training_examples(
 
         labels = require_string_list(example_data, "concept_labels", source)
 
-        if not labels:
+        if not labels and "labeled_concepts" not in example_data:
             var_name = example_data.get("var_name", "")
             raise ValueError(
                 f"Example {var_name!r} in {source} must include at least one concept label"
@@ -215,24 +296,25 @@ def load_semantic_training_examples(
     secret_training_examples_path: str | Path | None = None,
     false_positive_training_examples_path: str | Path | None = None
 ) -> tuple[SemanticExample, ...]:
-    secret_document = load_toml(
-        secret_training_examples_path,
-        fallback_resource=POSITIVE_TRAINING_EXAMPLES_RESOURCE
-    )
-    false_positive_document = load_toml(
-        false_positive_training_examples_path,
-        fallback_resource=NEGATIVE_TRAINING_EXAMPLES_RESOURCE
-    )
+    documents = []
+    for path, resources in (
+        (secret_training_examples_path, POSITIVE_TRAINING_EXAMPLE_RESOURCES),
+        (false_positive_training_examples_path, NEGATIVE_TRAINING_EXAMPLE_RESOURCES),
+    ):
+        if path is not None:
+            documents.append(load_toml(path))
+        else:
+            documents.extend(
+                load_toml(fallback_resource=resource)
+                for resource in resources
+            )
 
-    return (
-        _load_training_examples(
-            secret_document.data,
-            secret_document.source,
-            finding_kinds
-        )
-        + _load_training_examples(
-            false_positive_document.data,
-            false_positive_document.source,
+    return tuple(
+        example
+        for document in documents
+        for example in _load_training_examples(
+            document.data,
+            document.source,
             finding_kinds
         )
     )

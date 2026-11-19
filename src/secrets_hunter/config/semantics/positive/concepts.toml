@@ -1,4 +1,5 @@
 [compact_aliases]
+pgpassword = ["postgres", "password"]
 
 [[concepts]]
 id = "product_service_target"

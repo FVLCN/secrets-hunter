@@ -1,9 +1,12 @@
+from collections.abc import Callable
+
 from secrets_hunter.detection.assignment_resolver import AssignmentResolver
 from secrets_hunter.detection.candidate_assessor import CandidateAssessor
 from secrets_hunter.detection.detectors.base import Detector
 from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter.fragmenter import SourceFragmenter
-from secrets_hunter.detection.fragmenter.models import LineFragment, SourceFragment
+from secrets_hunter.detection.fragmenter.models import LineFragment, SourceContext, SourceFragment
+from secrets_hunter.detection.value_context import value_context_facts
 from secrets_hunter.models import Finding, SourceLocation
 
 
@@ -41,8 +44,8 @@ class DetectionEngine:
             source_location,
             fragments
         )
-        pattern_matches = {
-            candidate.match
+        pattern_fragments = {
+            candidate.fragment.content
             for candidate in pattern_candidates
         }
 
@@ -51,14 +54,16 @@ class DetectionEngine:
             *(
                 candidate
                 for candidate in entropy_candidates
-                if candidate.match not in pattern_matches
+                if candidate.fragment.content not in pattern_fragments
             )
         ]
 
     def scan_fragment(
         self,
         source_fragment: SourceFragment,
-        source_location: SourceLocation
+        source_location: SourceLocation,
+        *,
+        context_provider: Callable[[], SourceContext | None] | None = None
     ) -> list[Finding]:
         fragments = self.source_fragmenter.extract(source_fragment)
 
@@ -75,6 +80,11 @@ class DetectionEngine:
         if not candidates:
             return []
 
+        source_context = (
+            context_provider()
+            if context_provider is not None
+            else source_fragment.source_context
+        )
         assignment_context = self.assignment_resolver.build(
             source_fragment.content
         )
@@ -82,8 +92,15 @@ class DetectionEngine:
             self.candidate_assessor.assess(
                 candidate,
                 assignment_context.associated_names_for(
-                    match=candidate.match,
+                    match=candidate.fragment.content,
                     candidate_context=candidate.context
+                ),
+                source_text=source_fragment.content,
+                usage_facts=value_context_facts(
+                    source_context,
+                    candidate_line=candidate.location.line,
+                    candidate_value=candidate.match,
+                    file_path=source_location.locator
                 )
             )
             for candidate in candidates

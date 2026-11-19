@@ -27,6 +27,7 @@ class SemanticInput:
     pem_analysis: PemAnalysis | None = None
     value_rejection: RejectionReason | None = None
     provider_pattern_id: str | None = None
+    usage_facts: frozenset[FactId] = frozenset()
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,8 @@ class SemanticObservation:
     value_rejection: RejectionReason | None = None
     provider_pattern_id: str | None = None
     facts: frozenset[FactId] = frozenset()
+    hash_algorithm: str | None = None
+    value_entropy: float | None = None
 
     def has_fact(self, fact: FactId) -> bool:
         return fact in self.facts

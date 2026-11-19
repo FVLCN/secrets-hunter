@@ -23,12 +23,13 @@ class PatternDetector:
         line: str,
         line_num: int,
         source_location: SourceLocation,
-        pattern: DetectionPattern | None = None
+        pattern: DetectionPattern | None = None,
+        match: str | None = None
     ) -> DetectionCandidate:
         return DetectionCandidate(
             location=source_location.at_line(line_num),
             finding_kind=finding_kind,
-            match=fragment.content,
+            match=match if match is not None else fragment.content,
             context=line.strip()[:100],
             detection_method=DetectionMethod.PATTERN,
             fragment=fragment,
@@ -63,14 +64,21 @@ class PatternDetector:
                 continue
 
             for pattern in self.plan.patterns:
-                if pattern.search(fragment.content):
+                seen_matches: set[str] = set()
+                for match in pattern.compiled.finditer(fragment.content):
+                    value = match.group(0)
+                    if value in seen_matches:
+                        continue
+                    seen_matches.add(value)
+
                     candidate = self._create_candidate(
                         pattern.kind,
                         fragment,
                         line,
                         line_num,
                         source_location,
-                        pattern
+                        pattern,
+                        match=value
                     )
                     candidates.append(candidate)
 

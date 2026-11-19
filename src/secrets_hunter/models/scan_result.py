@@ -28,6 +28,12 @@ class ScanFailure:
 
 
 @dataclass(frozen=True)
+class ScanSkip:
+    label: str
+    message: str
+
+
+@dataclass(frozen=True)
 class ScanResult:
     findings: tuple[Finding, ...] = ()
     total_items: int | None = 0
@@ -35,12 +41,18 @@ class ScanResult:
     successful_items: int = 0
     failures: tuple[ScanFailure, ...] = ()
     aborted: bool = False
+    skips: tuple[ScanSkip, ...] = ()
 
     def __post_init__(self) -> None:
         if not 0 <= self.successful_items <= self.attempted_items:
             raise ValueError(
                 "Scan item counts must satisfy "
                 "0 <= successful_items <= attempted_items"
+            )
+
+        if self.successful_items + self.skipped_items > self.attempted_items:
+            raise ValueError(
+                "successful_items + skipped_items must not exceed attempted_items"
             )
 
         if (
@@ -52,6 +64,10 @@ class ScanResult:
             )
 
     @property
+    def skipped_items(self) -> int:
+        return len(self.skips)
+
+    @property
     def status(self) -> ScanStatus:
         if self.aborted:
             return ScanStatus.ABORTED
@@ -59,11 +75,11 @@ class ScanResult:
         if (
             self.total_items is not None
             and not self.failures
-            and self.successful_items == self.total_items
+            and self.successful_items + self.skipped_items == self.total_items
         ):
             return ScanStatus.COMPLETE
 
-        if self.successful_items:
+        if self.successful_items or self.skips:
             return ScanStatus.PARTIAL
 
         return ScanStatus.FAILED

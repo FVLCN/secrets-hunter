@@ -2,7 +2,7 @@ import argparse
 
 from typing import Any, Protocol
 
-from secrets_hunter.scanning.modes import ScanModeDefinition
+from secrets_hunter.scanning.modes import ScanModeDefinition, ScanSource
 
 
 class SubparserRegistry(Protocol):
@@ -22,12 +22,11 @@ class CommandModule(Protocol):
 
 
 class ScanSourceAdapter(Protocol):
-    NAME: str
+    NAMES: tuple[str, ...]
     SCAN_MODE: ScanModeDefinition[Any]
 
-    def register(
+    def create_source(
         self,
-        subparsers: SubparserRegistry,
-        common_parser: argparse.ArgumentParser
-    ) -> None:
+        args: argparse.Namespace
+    ) -> ScanSource:
         ...

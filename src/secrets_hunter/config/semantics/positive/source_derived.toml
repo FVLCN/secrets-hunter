@@ -1,0 +1,999 @@
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L6
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: privateKey: string | Buffer;
+[[training_examples]]
+var_name = "privateKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L7
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: publicCert?: string;
+[[training_examples]]
+var_name = "publicCert"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L409
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: publicCerts?: string | string[] | null;
+[[training_examples]]
+var_name = "publicCerts"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L99
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: idpCert: string | string[] | IdpCertCallback;
+[[training_examples]]
+var_name = "idpCert"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L305
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: decryptionPvk?: string | Buffer;
+[[training_examples]]
+var_name = "decryptionPvk"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L101
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: callbackUrl: string;
+[[training_examples]]
+var_name = "callbackUrl"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L100
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: issuer: string;
+[[training_examples]]
+var_name = "issuer"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L324
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: audience: string | false;
+[[training_examples]]
+var_name = "audience"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/node-saml/node-saml/master/src/types.ts#L304
+# Source snapshot SHA256: dec11f9a642f4b4972800e1a90cdbdd8626bb5c70043a6cb92b39b1c9fea6e3b
+# Source field: entryPoint?: string;
+[[training_examples]]
+var_name = "entryPoint"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/types.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "node-saml/node-saml"
+sample_weight = 0.1111111111111111
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/sign.ts#L141
+# Source snapshot SHA256: c4fb6e2e5919dccc12aedad0279a2550f0d19fbdf9c99e39592f2096b60e86cb
+# Source field: async sign(key: types.KeyInput, options?: types.SignOptions): Promise<string> {
+[[training_examples]]
+var_name = "key"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/sign.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/sign.ts#L141
+# Source snapshot SHA256: c4fb6e2e5919dccc12aedad0279a2550f0d19fbdf9c99e39592f2096b60e86cb
+# Source field: async sign(key: types.KeyInput, options?: types.SignOptions): Promise<string> {
+[[training_examples]]
+var_name = "options"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/sign.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/sign.ts#L13
+# Source snapshot SHA256: c4fb6e2e5919dccc12aedad0279a2550f0d19fbdf9c99e39592f2096b60e86cb
+# Source field: /** @param payload Initial JWT Claims Set. Defaults to an empty object. */
+[[training_examples]]
+var_name = "payload"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/sign.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/sign.ts#L128
+# Source snapshot SHA256: c4fb6e2e5919dccc12aedad0279a2550f0d19fbdf9c99e39592f2096b60e86cb
+# Source field: setProtectedHeader(protectedHeader: types.JWTHeaderParameters): this {
+[[training_examples]]
+var_name = "protectedHeader"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/sign.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/verify.ts#L38
+# Source snapshot SHA256: 7549a77e4db39257ddfcb6752ec3d107fe1c52d85d5df3c262f9896e4199fddf
+# Source field: key: KeyType,
+[[training_examples]]
+var_name = "key"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/verify.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/verify.ts#L13
+# Source snapshot SHA256: 7549a77e4db39257ddfcb6752ec3d107fe1c52d85d5df3c262f9896e4199fddf
+# Source field: /** JWS verification and JWT Claims Set validation options. */
+[[training_examples]]
+var_name = "options"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/verify.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/verify.ts#L231
+# Source snapshot SHA256: 7549a77e4db39257ddfcb6752ec3d107fe1c52d85d5df3c262f9896e4199fddf
+# Source field: throw new JWTInvalid('JWTs MUST NOT use unencoded payload')
+[[training_examples]]
+var_name = "payload"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/verify.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/panva/jose/main/src/jwt/verify.ts#L234
+# Source snapshot SHA256: 7549a77e4db39257ddfcb6752ec3d107fe1c52d85d5df3c262f9896e4199fddf
+# Source field: const payload = validateClaimsSet(verified.protectedHeader!, verified.payload, options)
+[[training_examples]]
+var_name = "protectedHeader"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/jwt/verify.ts"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "panva/jose"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L64
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_accessor :private_key
+[[training_examples]]
+var_name = "private_key"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L63
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_accessor :certificate
+[[training_examples]]
+var_name = "certificate"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L77
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_accessor :issuer
+[[training_examples]]
+var_name = "issuer"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L37
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_accessor :idp_cert
+[[training_examples]]
+var_name = "idp_cert"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L34
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_writer   :idp_sso_service_url
+[[training_examples]]
+var_name = "idp_sso_service_url"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L46
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_accessor :assertion_consumer_service_url
+[[training_examples]]
+var_name = "assertion_consumer_service_url"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/SAML-Toolkits/ruby-saml/master/lib/onelogin/ruby-saml/settings.rb#L45
+# Source snapshot SHA256: 075c1bed6ec3ba33cb7d4ce7d8ff662bec04e292a83d4c2177401f5496e863b4
+# Source field: attr_writer   :sp_entity_id
+[[training_examples]]
+var_name = "sp_entity_id"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "lib/onelogin/ruby-saml/settings.rb"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "SAML-Toolkits/ruby-saml"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L25
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: privateKey: string | Buffer;
+[[training_examples]]
+var_name = "privateKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L22
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: keyPairId: string;
+[[training_examples]]
+var_name = "keyPairId"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L45
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: url: string;
+[[training_examples]]
+var_name = "url"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L48
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: dateLessThan: string | number | Date;
+[[training_examples]]
+var_name = "dateLessThan"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L51
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: dateGreaterThan?: string | number | Date;
+[[training_examples]]
+var_name = "dateGreaterThan"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L54
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: ipAddress?: string;
+[[training_examples]]
+var_name = "ipAddress"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-js-v3/main/packages/cloudfront-signer/src/sign.ts#L27
+# Source snapshot SHA256: 56e9fd467ed15365901411f14df398d7a7fd6da94b5093dd79ab8c943a859bf7
+# Source field: /** The passphrase of the RSA key. */
+[[training_examples]]
+var_name = "passphrase"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/cloudfront-signer/src/sign.ts"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-js-v3"
+sample_weight = 0.14285714285714285
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-php/master/src/CloudFront/UrlSigner.php#L30
+# Source snapshot SHA256: 48defcd0d9dba6c635d2d4d7d2eac3c981c1e23f5f99d2f2f73d4145161631a6
+# Source field: public function __construct($keyPairId, $privateKey, $algorithm = Signer::DEFAULT_ALGORITHM)
+[[training_examples]]
+var_name = "privateKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/CloudFront/UrlSigner.php"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-php"
+sample_weight = 0.2
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-php/master/src/CloudFront/UrlSigner.php#L30
+# Source snapshot SHA256: 48defcd0d9dba6c635d2d4d7d2eac3c981c1e23f5f99d2f2f73d4145161631a6
+# Source field: public function __construct($keyPairId, $privateKey, $algorithm = Signer::DEFAULT_ALGORITHM)
+[[training_examples]]
+var_name = "keyPairId"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/CloudFront/UrlSigner.php"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-php"
+sample_weight = 0.2
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-php/master/src/CloudFront/UrlSigner.php#L57
+# Source snapshot SHA256: 48defcd0d9dba6c635d2d4d7d2eac3c981c1e23f5f99d2f2f73d4145161631a6
+# Source field: public function getSignedUrl($url, $expires = null, $policy = null)
+[[training_examples]]
+var_name = "url"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/CloudFront/UrlSigner.php"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-php"
+sample_weight = 0.2
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-php/master/src/CloudFront/UrlSigner.php#L57
+# Source snapshot SHA256: 48defcd0d9dba6c635d2d4d7d2eac3c981c1e23f5f99d2f2f73d4145161631a6
+# Source field: public function getSignedUrl($url, $expires = null, $policy = null)
+[[training_examples]]
+var_name = "expires"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/CloudFront/UrlSigner.php"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-php"
+sample_weight = 0.2
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/aws/aws-sdk-php/master/src/CloudFront/UrlSigner.php#L57
+# Source snapshot SHA256: 48defcd0d9dba6c635d2d4d7d2eac3c981c1e23f5f99d2f2f73d4145161631a6
+# Source field: public function getSignedUrl($url, $expires = null, $policy = null)
+[[training_examples]]
+var_name = "policy"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/CloudFront/UrlSigner.php"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "aws/aws-sdk-php"
+sample_weight = 0.2
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L134
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: signer,
+[[training_examples]]
+var_name = "signer"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L135
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: service_account_email,
+[[training_examples]]
+var_name = "service_account_email"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L136
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: token_uri,
+[[training_examples]]
+var_name = "token_uri"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L113
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: specify additional scopes and a subject if necessary::
+[[training_examples]]
+var_name = "scopes"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L140
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: project_id=None,
+[[training_examples]]
+var_name = "project_id"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/googleapis/google-auth-library-python/main/google/oauth2/service_account.py#L68
+# Source snapshot SHA256: d9e6bd459bed37fcc3bcd69cbe7432db79a17240f3fae36ba64e7150450de15e
+# Source field: specific subject using :meth:`~Credentials.with_subject`.
+[[training_examples]]
+var_name = "subject"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "google/oauth2/service_account.py"
+concept_labels = ["auth_system_target", "cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "googleapis/google-auth-library-python"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L43
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: const privateKey = await Util.exec('wg genkey');
+[[training_examples]]
+var_name = "privateKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L44
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: const publicKey = await Util.exec(`echo ${privateKey} | wg pubkey`, {
+[[training_examples]]
+var_name = "publicKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L119
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: ${client.preSharedKey ? `PresharedKey = ${client.preSharedKey}\n` : ''
+[[training_examples]]
+var_name = "preSharedKey"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L47
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: const address = WG_DEFAULT_ADDRESS.replace('x', '1');
+[[training_examples]]
+var_name = "address"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L169
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: endpoint, // eslint-disable-line no-unused-vars
+[[training_examples]]
+var_name = "endpoint"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/wg-easy/wg-easy/v14/src/lib/WireGuard.js#L112
+# Source snapshot SHA256: e2e9b9f2fccd8a14fded9bf273ffd66f2f8a7f8817dd77e2df9f75c5d8dcda55
+# Source field: if (!client.enabled) continue;
+[[training_examples]]
+var_name = "enabled"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/lib/WireGuard.js"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "wg-easy/wg-easy"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L635
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: # If the master is password protected (using the "requirepass" configuration
+[[training_examples]]
+var_name = "requirepass"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L640
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: # masterauth <master-password>
+[[training_examples]]
+var_name = "masterauth"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L88
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: bind 127.0.0.1 -::1
+[[training_examples]]
+var_name = "bind"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L139
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: port 6379
+[[training_examples]]
+var_name = "port"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L1412
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: lazyfree-lazy-user-del no
+[[training_examples]]
+var_name = "user"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/redis/redis/unstable/redis.conf#L1167
+# Source snapshot SHA256: 05c6e7466f5f3d59cbe35635870439d2c39615375426651dade5dec035dbfa27
+# Source field: # aclfile /etc/redis/users.acl
+[[training_examples]]
+var_name = "aclfile"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "redis.conf"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "redis/redis"
+sample_weight = 0.16666666666666666
+
+# Additive usage-fact supervision; existing examples above stay unchanged.
+
+# Usage role supervision: appwrite@32b6a5d9b8ff52c2aeb0196624d5ba2507acaba2:src/Appwrite/Utopia/Response/Model/JWT.php:16
+# JWT decode/authentication response fixture or user bearer token explicitly used in requests.
+[[training_examples]]
+var_name = "example"
+value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+detector = "pattern"
+finding_kind_id = "jwt_token"
+file_path = "src/Appwrite/Utopia/Response/Model/JWT.php"
+concept_labels = ["token_credential"]
+labeled_concepts = ["token_credential"]
+support_group = "appwrite/src/Appwrite/Utopia/Response/Model/JWT.php"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:frontend/src/app/last-login-ip/last-login-ip.component.spec.ts:72
+# JWT decode/authentication response fixture or user bearer token explicitly used in requests.
+[[training_examples]]
+var_name = "token"
+value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7Imxhc3RMb2dpbklwIjoiMS4yLjMuNCJ9fQ.RAkmdqwNypuOxv3SDjPO4xMKvd1CddKvDFYDBfUt3bg"
+detector = "pattern"
+finding_kind_id = "jwt_token"
+file_path = "frontend/src/app/last-login-ip/last-login-ip.component.spec.ts"
+concept_labels = ["token_credential"]
+labeled_concepts = ["token_credential"]
+support_group = "juice-shop/frontend/src/app/last-login-ip/last-login-ip.component.spec.ts"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:tests/blackbox/tests/db/routes/items/case-when.test.ts:10
+# JWT decode/authentication response fixture or user bearer token explicitly used in requests.
+[[training_examples]]
+var_name = "userToken"
+value = "pp2KIAA3mGdgqngRVDuegxNuVj7gM-es"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/blackbox/tests/db/routes/items/case-when.test.ts"
+concept_labels = ["token_credential"]
+labeled_concepts = ["token_credential"]
+support_group = "directus/tests/blackbox/tests/db/routes/items/case-when.test.ts"
+
+# Usage role supervision: outline@4845da08ace34f3d47637adb069f7d3292504c9b:.github/workflows/ci.yml:15
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "SECRET_KEY"
+value = "F0E5AD933D7F6FD8F4DBB3E038C501C052DC0593C686D21ACB30AE205D2F634B"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ci.yml"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "outline/.github/workflows/ci.yml"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:.github/actions/docker-build-and-test/action.yml:157
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "NEXTAUTH_SECRET"
+value = "EI4qqDpcfdvf4A+0aQEEx8JjHxHSy4uWiZw/F32K+pA="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = ".github/actions/docker-build-and-test/action.yml"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "cal/.github/actions/docker-build-and-test/action.yml"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/api/v2/.env.example:14
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "NEXTAUTH_SECRET"
+value = "RbyBOfiZFt/IsBL2E2Zy2idcKRH+WclnHEiu1FmRdf0="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "apps/api/v2/.env.example"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "cal/apps/api/v2/.env.example"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/api/v2/test/setEnvVars.ts:11
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "NEXTAUTH_SECRET"
+value = "XF+Hws3A5g2eyWA5uGYYVJ74X+wrCWJ8oWo6kAfU6O8="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "apps/api/v2/test/setEnvVars.ts"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "cal/apps/api/v2/test/setEnvVars.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/api/v2/README-PLATFORM.md:50
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "secret"
+value = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWNtZSAiLCJwZXJtaXNzaW9ucyI6MTAyMywicmVkaXJlY3RVcmlzIjpbImh0dHA6Ly9sb2NhbGhvc3Q6NDMyMSJdLCJib29raW5nUmVkaXJlY3RVcmkiOiIiLCJib29raW5nQ2FuY2VsUmVkaXJlY3RVcmkiOiIiLCJib29raW5nUmVzY2hlZHVsZVJlZGlyZWN0VXJpIjoiIiwiYXJlRW1haWxzRW5hYmxlZCI6dHJ1ZSwiaWF0IjoxNzE5NTk1ODA4fQ.L5_jSS14fcKLCD_9_DAOgtGd6lUSZlU5CEpCPaPt41I"
+detector = "pattern"
+finding_kind_id = "jwt_token"
+file_path = "apps/api/v2/README-PLATFORM.md"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "cal/apps/api/v2/README-PLATFORM.md"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:data/static/users.yml:151
+# Configured application/session signing secret, TOTP shared secret, or documented client authentication secret.
+[[training_examples]]
+var_name = "totpSecret"
+value = "IFTXE3SPOEYVURT2MRYGI52TKJ4HC3KH"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "data/static/users.yml"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "juice-shop/data/static/users.yml"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:api/src/utils/jwt.test.ts:9
+# HMAC key passed to jwt.sign and jwt.verify.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "secret"
+value = "test-secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "api/src/utils/jwt.test.ts"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "directus/api/src/utils/jwt.test.ts"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:api/src/auth/drivers/oauth2.test.ts:141
+# OAuth clientSecret used by the OAuth source fixture.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "clientSecret"
+value = "test-client-secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "api/src/auth/drivers/oauth2.test.ts"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "directus/api/src/auth/drivers/oauth2.test.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/api/v2/src/modules/auth/oauth2/controllers/oauth2.controller.e2e-spec.ts:89
+# Confidential OAuth client secret fixture.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "testClientSecret"
+value = "test-secret-123"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "apps/api/v2/src/modules/auth/oauth2/controllers/oauth2.controller.e2e-spec.ts"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "cal/apps/api/v2/src/modules/auth/oauth2/controllers/oauth2.controller.e2e-spec.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/web/app/api/auth/oauth/token/__tests__/route.test.ts:188
+# OAuth access_token in mocked successful token response.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "access_token"
+value = "mock_jwt_token"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "apps/web/app/api/auth/oauth/token/__tests__/route.test.ts"
+concept_labels = ["token_credential"]
+labeled_concepts = ["token_credential"]
+support_group = "cal/apps/web/app/api/auth/oauth/token/__tests__/route.test.ts"
+
+# Usage role supervision: appwrite@32b6a5d9b8ff52c2aeb0196624d5ba2507acaba2:tests/e2e/Services/Webhooks/WebhooksBase.php:763
+# Webhook signing secret after explicit rotation.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "newSecret"
+value = "new-key-after-rotation"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/e2e/Services/Webhooks/WebhooksBase.php"
+concept_labels = ["secret_credential"]
+labeled_concepts = ["secret_credential"]
+support_group = "appwrite/tests/e2e/Services/Webhooks/WebhooksBase.php"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:api/src/services/mcp-oauth/index.test.ts:934
+# Session token used by validateAuthorization fixture, passed directly to SHA256 update.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "session-token-123"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "api/src/services/mcp-oauth/index.test.ts"
+concept_labels = ["token_credential"]
+labeled_concepts = ["token_credential"]
+support_group = "directus/api/src/services/mcp-oauth/index.test.ts"
+source_context = "\t\tconst sessionHash = crypto.createHash('sha256').update('session-token-123').digest('hex');\n"
+source_line = 1

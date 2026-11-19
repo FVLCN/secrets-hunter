@@ -6,7 +6,7 @@ from secrets_hunter.detection.semantics.tokenization import split_identifier
 from secrets_hunter.immutability import frozen_mapping
 
 from .policy import SemanticPolicyConfig
-from .taxonomy import ConceptCategory, ConceptId, ConceptPolicy
+from .taxonomy import ConceptCategory, ConceptId, ConceptPolicy, EvidenceStrength
 
 
 @dataclass(frozen=True)
@@ -14,6 +14,7 @@ class SemanticEvidenceRule:
     sources: tuple[EvidenceSource, ...]
     terms: tuple[str, ...] = ()
     phrases: tuple[tuple[str, ...], ...] = ()
+    strength: EvidenceStrength = EvidenceStrength.STRONG
 
 
 @dataclass(frozen=True)

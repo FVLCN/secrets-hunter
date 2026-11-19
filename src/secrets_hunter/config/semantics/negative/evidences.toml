@@ -4,14 +4,11 @@ sources = ["var_name", "path"]
 terms = [
     "test",
     "tests",
+    "testing",
     "mock",
     "mocks",
     "fixture",
     "fixtures",
-    "fake",
-    "dummy",
-    "example",
-    "placeholder",
     "template",
     "sample",
     "demo"
@@ -19,16 +16,18 @@ terms = [
 
 [[evidence]]
 concept = "test_fixture"
+sources = ["path"]
+terms = ["example", "placeholder", "dummy", "fake"]
+
+[[evidence]]
+concept = "test_fixture"
 sources = ["file_extension"]
-terms = ["example"]
+terms = ["example", "test", "tests", "spec", "sample", "template"]
 
 [[evidence]]
 concept = "hash_artifact"
-sources = ["var_name", "path", "rejection_pattern", "value_shape"]
+sources = ["var_name", "path"]
 terms = [
-    "idempotency",
-    "idempotence",
-    "idempotent",
     "checksum",
     "hash",
     "hashed",
@@ -49,16 +48,25 @@ terms = [
 concept = "public_crypto_artifact"
 sources = ["var_name", "path", "value_shape"]
 terms = [
-    "public",
     "certificate",
     "cert",
     "pubkey"
 ]
+phrases = ["public_key"]
+
+[[evidence]]
+concept = "public_crypto_artifact"
+sources = ["var_name", "path"]
+terms = ["public"]
+strength = "weak"
 
 [[evidence]]
 concept = "identifier_context"
 sources = ["var_name"]
 terms = [
+    "idempotency",
+    "idempotence",
+    "idempotent",
     "identifier",
     "uuid",
     "guid"
@@ -87,6 +95,7 @@ terms = [
 concept = "version_or_reference_artifact"
 sources = ["var_name", "path"]
 terms = [
+    "commit",
     "version",
     "reference",
     "path",
@@ -105,3 +114,8 @@ terms = [
 concept = "placeholder_value"
 sources = ["rejection_pattern"]
 terms = ["placeholder"]
+
+[[evidence]]
+concept = "placeholder_value"
+sources = ["var_name"]
+terms = ["example", "placeholder", "dummy", "fake"]

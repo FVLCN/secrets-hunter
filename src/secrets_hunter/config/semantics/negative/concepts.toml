@@ -1,7 +1,7 @@
 [[concepts]]
 id = "test_fixture"
-category = "hard_reject"
-policy = "hard_reject"
+category = "weak_negative"
+policy = "evidence"
 
 [[concepts]]
 id = "hash_artifact"

@@ -6,7 +6,11 @@ from secrets_hunter.config import (
     DEFAULT_SCAN_OPTIONS
 )
 
-from .defaults import DEFAULT_FAIL_ON_FINDINGS, DEFAULT_LOG_LEVEL
+from .defaults import (
+    DEFAULT_FAIL_ON_FINDINGS,
+    DEFAULT_LOG_LEVEL,
+    DEFAULT_SKIP_TLS_VERIFY
+)
 
 
 def add_config_option(parser: argparse.ArgumentParser) -> None:
@@ -20,6 +24,27 @@ def add_config_option(parser: argparse.ArgumentParser) -> None:
 
 
 def add_scan_options(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--revset",
+        dest="git_revset",
+        type=str,
+        metavar="REVSET",
+        help="git revision expression to scan (required for --source git)"
+    )
+    parser.add_argument(
+        "--max-count",
+        dest="git_max_count",
+        type=int,
+        default=None,
+        metavar="N",
+        help="limit commits selected by --revset (requires --source git)"
+    )
+    parser.add_argument(
+        "--skip-tls-verify",
+        action="store_true",
+        default=DEFAULT_SKIP_TLS_VERIFY,
+        help="skip TLS certificate verification (requires --source domain)"
+    )
     parser.add_argument(
         "--reveal-findings",
         action="store_true",

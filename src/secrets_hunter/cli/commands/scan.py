@@ -10,7 +10,7 @@ from secrets_hunter.cli.scan_reporting import (
 )
 from secrets_hunter.cli.source_adapters import (
     CLI_SCAN_MODE_REGISTRY,
-    SCAN_SOURCE_ADAPTERS
+    CLI_SOURCE_ADAPTERS
 )
 from secrets_hunter.config import (
     FindingPresentationOptions,
@@ -30,6 +30,7 @@ from secrets_hunter.reporters.json_reporter import JSONReporter
 from secrets_hunter.reporters.sarif_reporter import SARIFReporter
 from secrets_hunter.runtime import load_application_runtime
 
+from ..defaults import DEFAULT_CLI_SCAN_SOURCE
 from ..options import add_scan_options
 from ..protocols import SubparserRegistry
 from ..validation import (
@@ -52,21 +53,35 @@ def register(subparsers: SubparserRegistry) -> None:
         command_validator=validate
     )
 
-    common_parser = argparse.ArgumentParser(add_help=False)
-    add_scan_options(common_parser)
-    source_subparsers = parser.add_subparsers(
-        dest="scan_mode",
-        required=True,
-        help="available scan sources"
+    parser.add_argument(
+        "--source",
+        choices=tuple(CLI_SOURCE_ADAPTERS),
+        default=DEFAULT_CLI_SCAN_SOURCE,
+        help=f"source to scan (default: {DEFAULT_CLI_SCAN_SOURCE})"
     )
-    for adapter in SCAN_SOURCE_ADAPTERS:
-        adapter.register(source_subparsers, common_parser)
+    parser.add_argument(
+        "--target",
+        metavar="TARGET",
+        help=(
+            "file, directory, domain, or local git target "
+            "(default: current directory for directory and git sources)"
+        )
+    )
+    add_scan_options(parser)
 
 
 def validate(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
     validate_config_options(parser, args)
 
     try:
+        if args.source != "git":
+            if args.git_revset is not None:
+                raise ValueError("--revset requires --source git")
+            if args.git_max_count is not None:
+                raise ValueError("--max-count requires --source git")
+        if args.skip_tls_verify and args.source != "domain":
+            raise ValueError("--skip-tls-verify requires --source domain")
+
         ScanOptionsValidator.validate(create_scan_options(args))
         FindingSelectionOptionsValidator.validate(
             create_finding_selection_options(args)
@@ -74,7 +89,7 @@ def validate(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
         FindingPresentationOptionsValidator.validate(
             create_finding_presentation_options(args)
         )
-        source = args.source_factory(args)
+        source = CLI_SOURCE_ADAPTERS[args.source].create_source(args)
         CLI_SCAN_MODE_REGISTRY.bind(source).validate()
         args.scan_source = source
     except (TypeError, ValueError) as error:

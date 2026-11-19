@@ -2,6 +2,7 @@ from collections.abc import Mapping
 
 from secrets_hunter.detection.semantics.parsing import (
     normalize_token,
+    require_string,
     require_string_list,
     require_table
 )
@@ -16,6 +17,7 @@ from .validation import require_unique_ids
 from .taxonomy import (
     ConceptId,
     ConceptPolicy,
+    EvidenceStrength,
     require_concept_category,
     require_concept_id,
     require_concept_policy,
@@ -57,7 +59,7 @@ def _load_concepts(
         if "examples" in concept_data or "training_examples" in concept_data:
             raise ValueError(
                 f"Concept {concept_id!r} in {source} must define training examples in "
-                "training_examples.toml, not in concepts.toml"
+                "training data files, not in concepts.toml"
             )
 
         concepts.append(
@@ -126,10 +128,20 @@ def _load_evidence_rule(
     if not terms and not phrases:
         raise ValueError(f"Evidence rule in {source} must include terms or phrases")
 
+    try:
+        strength = EvidenceStrength(normalize_token(require_string(
+            raw_rule.get("strength", "strong"), "strength", source
+        )))
+    except ValueError as exc:
+        raise ValueError(
+            f"Evidence strength in {source} must be 'weak' or 'strong'"
+        ) from exc
+
     return SemanticEvidenceRule(
         sources=tuple(dict.fromkeys(sources)),
         terms=tuple(dict.fromkeys(terms)),
-        phrases=tuple(dict.fromkeys(phrases))
+        phrases=tuple(dict.fromkeys(phrases)),
+        strength=strength,
     )
 
 

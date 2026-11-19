@@ -1,10 +1,7 @@
 from secrets_hunter.models import GitLocation, HttpLocation
 from secrets_hunter.reporters.console_base import BaseConsoleReporter
 from secrets_hunter.reporters.finding_view import FindingView
-from secrets_hunter.reporters.semantic_analysis_view import (
-    SemanticConceptView,
-    SemanticKeywordView,
-)
+from secrets_hunter.reporters.semantic_analysis_view import SemanticConceptView
 
 
 class ConsoleReporter(BaseConsoleReporter):
@@ -16,23 +13,14 @@ class ConsoleReporter(BaseConsoleReporter):
         return s if len(s) <= max_len else s[: max_len - 3] + "..."
 
     @staticmethod
-    def _format_keyword(keyword: SemanticKeywordView) -> str:
-        return keyword.display_term or keyword.term
+    def _format_concept(concept: SemanticConceptView, name_width: int = 0) -> str:
+        display_name = concept.display_name.ljust(name_width)
 
-    @staticmethod
-    def _format_concept(concept: SemanticConceptView) -> str:
-        display_name = concept.display_name
-        probability_percent = round(concept.probability * 100)
+        presentation = concept.presentation
+        if presentation is None:
+            return f"{display_name} [{concept.strength}]"
 
-        keywords = [
-            formatted
-            for keyword in concept.strongest_keywords
-            for formatted in [ConsoleReporter._format_keyword(keyword)]
-            if formatted
-        ]
-        keyword_suffix = f" [{', '.join(keywords)}]" if keywords else ""
-
-        return f"{display_name} {probability_percent}%{keyword_suffix}"
+        return f"{display_name} {presentation['text']}"
 
     @staticmethod
     def format_report(findings: list[FindingView]) -> None:
@@ -46,35 +34,92 @@ class ConsoleReporter(BaseConsoleReporter):
 
         for i, f in enumerate(findings, 1):
             lines.append(f"[{i}] {f.title}")
-            severity_detail = f"Confidence: {f.confidence}%"
+            match_str = ConsoleReporter._truncate(f.match, 120)
+            if match_str:
+                lines.append(f"    Value:      {match_str}")
 
-            if f.confidence_reasoning:
-                severity_detail += f", {f.confidence_reasoning}"
+            lines.append(f"    Confidence: {f.confidence}% [{f.severity}]")
 
-            lines.append(f"    Severity:   {f.severity} ({severity_detail})")
+            if f.associated_name:
+                lines.append(f"    Name:       {f.associated_name}")
+
+            ctx_str = ConsoleReporter._truncate(f.context, 160)
+            if ctx_str:
+                lines.append(f"    Context:    {ctx_str}")
+
+            decision_summary = f.disposition.value.capitalize()
+            if f.selected_rule_id == "strong_fixture_confidence_cap":
+                decision_summary += " — strong fixture evidence"
+            elif f.confidence_reasoning:
+                decision_summary += f" — {f.confidence_reasoning}"
+
+            lines.append(f"    Decision:   {decision_summary}")
 
             semantic_analysis = f.semantic_analysis
 
             if semantic_analysis:
-                facts = semantic_analysis.facts
-                signals = [
-                    ConsoleReporter._format_concept(concept)
+                fact_details = semantic_analysis.fact_details
+                facts: list[str] = []
+                for fact in semantic_analysis.facts:
+                    if fact == "known_pattern_match":
+                        facts.append(f"{fact} ({f.kind.display_name})")
+                    elif fact == "hash_shaped_value" and fact in fact_details:
+                        algorithm = str(fact_details[fact]["algorithm"]).upper()
+                        facts.append(f"{fact} ({algorithm} shape)")
+                    elif fact == "high_entropy" and fact in fact_details:
+                        entropy = float(fact_details[fact]["bits_per_character"])
+                        facts.append(f"{fact} ({entropy:.2f} bits/char)")
+                    else:
+                        facts.append(fact)
+                matched = [
+                    concept
                     for concept in semantic_analysis.concepts
+                    if concept.origin == "evidence"
+                ]
+                inferred = [
+                    concept
+                    for concept in semantic_analysis.concepts
+                    if concept.origin == "model"
                 ]
 
                 if facts:
                     lines.append(f"    Facts:      {', '.join(facts)}")
 
-                if signals:
-                    lines.append(f"    Signals:    {', '.join(signals)}")
+                if matched:
+                    lines.append("    Matched:")
+                    for concept in matched:
+                        lines.append(f"      {ConsoleReporter._format_concept(concept)}")
+                        keyword_groups = concept.keyword_groups
+                        providers = {
+                            provider["id"]: provider["name"]
+                            for group in keyword_groups
+                            for provider in group["providers"]
+                        }
+                        details: list[tuple[str, str]] = []
+                        if providers:
+                            label = "Provider" if len(providers) == 1 else "Providers"
+                            details.append((label, ", ".join(providers.values())))
+                        details.extend(
+                            (group["label"].capitalize(), ", ".join(group["terms"]))
+                            for group in keyword_groups
+                            if group["terms"]
+                        )
+                        label_width = max(
+                            (len(label) for label, _ in details),
+                            default=0,
+                        )
+                        lines.extend(
+                            f"          {(label + ':').ljust(label_width + 1)} {value}"
+                            for label, value in details
+                        )
 
-            shadowed_rules = f.shadowed_rule_ids
-            decision_summary = f.selected_rule_id
-
-            if shadowed_rules:
-                decision_summary += f" (shadowed: {', '.join(shadowed_rules)})"
-
-            lines.append(f"    Decision:   {decision_summary}")
+                if inferred:
+                    lines.append("    Inferred:")
+                    name_width = max(len(concept.display_name) for concept in inferred)
+                    lines.extend(
+                        f"      {ConsoleReporter._format_concept(concept, name_width)}"
+                        for concept in inferred
+                    )
 
             location = f.location
             if isinstance(location, GitLocation):
@@ -86,17 +131,6 @@ class ConsoleReporter(BaseConsoleReporter):
                     lines.append(
                         f"    Requested:  {location.requested_url}"
                     )
-
-            if f.associated_name:
-                lines.append(f"    Associated name: {f.associated_name}")
-
-            match_str = ConsoleReporter._truncate(f.match, 120)
-            if match_str:
-                lines.append(f"    Match:      {match_str}")
-
-            ctx_str = ConsoleReporter._truncate(f.context, 160)
-            if ctx_str:
-                lines.append(f"    Context:    {ctx_str}")
 
             lines.append(dash)
 

@@ -44,7 +44,7 @@ class JSONReporter:
             raise ValueError("elapsed_seconds must not be negative")
 
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "tool": {
                 "name": "secrets-hunter",
                 "version": __version__
@@ -59,12 +59,17 @@ class JSONReporter:
                 "items": {
                     "total": result.total_items,
                     "attempted": result.attempted_items,
-                    "successful": result.successful_items
+                    "successful": result.successful_items,
+                    "skipped": result.skipped_items,
                 },
                 "failures": [
                     _scan_failure_to_dict(failure)
                     for failure in result.failures
-                ]
+                ],
+                "skips": [
+                    {"label": skipped.label, "message": skipped.message}
+                    for skipped in result.skips
+                ],
             },
             "reporting": {
                 "min_confidence": selection_options.min_confidence,
@@ -103,8 +108,8 @@ class JSONReporter:
             presentation_options=presentation_options
         )
 
-        with open(output_file, "w", encoding="utf-8") as output:
-            json.dump(report, output, indent=4)
+        with open(output_file, "w", encoding="utf-8", errors="backslashreplace") as output:
+            json.dump(report, output, indent=4, ensure_ascii=False)
             output.write("\n")
 
         logger.info(f"Results exported to {output_file}")

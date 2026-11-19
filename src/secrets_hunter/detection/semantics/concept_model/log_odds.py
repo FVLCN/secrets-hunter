@@ -22,11 +22,13 @@ from secrets_hunter.detection.semantics.catalog.taxonomy import (
 )
 from secrets_hunter.detection.semantics.concept_model.features import (
     SEMANTIC_FEATURE_SCHEMA_VERSION,
+    name_overlap_scales,
 )
 from secrets_hunter.detection.semantics.concept_model.manifest import ModelManifest
 from secrets_hunter.detection.semantics.concept_model.validation import (
     ConceptModelDataValidator
 )
+from secrets_hunter.detection.semantics.observation.facts import USAGE_FACT_IDS
 from secrets_hunter.immutability import frozen_mapping
 
 
@@ -35,6 +37,14 @@ MODEL_TYPE = "semantic_concept_log_odds_v1"
 DEFAULT_CONCEPT_SMOOTHING = 0.1
 CONCEPT_FEATURE_SUPPORT_SHRINKAGE = 2.0
 MAX_CONCEPT_FEATURE_WEIGHT = 2.0
+MIN_TARGET_PATH_SUPPORT_GROUPS = 2
+_SOURCE_SUPPORTED_TARGET_CONCEPTS = frozenset({
+    ConceptId.AUTH_SYSTEM_TARGET,
+    ConceptId.CLOUD_PROVIDER_TARGET,
+    ConceptId.INFRASTRUCTURE_TARGET,
+})
+_USAGE_CONCEPTS = frozenset({ConceptId.TOKEN_CREDENTIAL, ConceptId.SECRET_CREDENTIAL})
+_USAGE_FACT_FEATURES = frozenset(f"fact={fact}" for fact in USAGE_FACT_IDS)
 _NAME_FEATURES = frozenset({
     "name_present",
     "neutral_identifier_present"
@@ -55,18 +65,22 @@ _REJECTION_FEATURE_PREFIXES = (
     "value_rejection_category="
 )
 _NAME_ONLY_CONCEPTS = frozenset({
-    ConceptId.CREDENTIAL_GENERIC,
-    ConceptId.KEY_CREDENTIAL,
-    ConceptId.ORDINARY_IDENTIFIER_WORDS,
-    ConceptId.PASSWORD_CREDENTIAL,
-    ConceptId.SECRET_CREDENTIAL,
-    ConceptId.TOKEN_CREDENTIAL,
-    ConceptId.WEBHOOK_CREDENTIAL
+    ConceptId.IDENTIFIER_CONTEXT,
+    ConceptId.ORDINARY_IDENTIFIER_WORDS
 })
 _NAME_AND_PATH_CONCEPTS = frozenset({
+    ConceptId.AUTH_SYSTEM_TARGET,
     ConceptId.CLOUD_PROVIDER_TARGET,
+    ConceptId.CREDENTIAL_GENERIC,
+    ConceptId.INFRASTRUCTURE_TARGET,
+    ConceptId.KEY_CREDENTIAL,
+    ConceptId.PASSWORD_CREDENTIAL,
+    ConceptId.PRODUCT_SERVICE_TARGET,
+    ConceptId.SECRET_CREDENTIAL,
     ConceptId.TEST_FIXTURE,
-    ConceptId.VERSION_OR_REFERENCE_ARTIFACT
+    ConceptId.TOKEN_CREDENTIAL,
+    ConceptId.VERSION_OR_REFERENCE_ARTIFACT,
+    ConceptId.WEBHOOK_CREDENTIAL
 })
 
 
@@ -105,7 +119,15 @@ def _features_for_concept(
         return {
             feature
             for feature in feature_set
-            if _is_name_feature(feature) or _is_path_feature(feature)
+            if feature.startswith(_NAME_FEATURE_PREFIXES)
+            or (
+                _is_path_feature(feature)
+                and not (
+                    concept_id in _SOURCE_SUPPORTED_TARGET_CONCEPTS
+                    and feature.startswith("file_extension=")
+                )
+            )
+            or (concept_id in _USAGE_CONCEPTS and feature in _USAGE_FACT_FEATURES)
         }
 
     if concept_id is ConceptId.HASH_ARTIFACT:
@@ -144,9 +166,22 @@ class ConceptLogOddsClassifier:
 
     def score_probability(self, feature_names: tuple[str, ...]) -> float:
         log_odds = self.prior_weight
+        name_contributions: list[tuple[frozenset[str], float]] = []
 
-        for feature in feature_names:
-            log_odds += self.feature_weights.get(feature, 0.0)
+        for feature in dict.fromkeys(feature_names):
+            weight = self.feature_weights.get(feature, 0.0)
+            if weight == 0:
+                continue
+
+            if feature.startswith(_NAME_FEATURE_PREFIXES):
+                tokens = frozenset(feature.partition("=")[2].split("_"))
+                name_contributions.append((tokens, weight))
+            else:
+                log_odds += weight
+
+        scales = name_overlap_scales(tokens for tokens, _ in name_contributions)
+        for (_, weight), scale in zip(name_contributions, scales):
+            log_odds += weight * scale
 
         return self._probability(log_odds)
 
@@ -215,6 +250,8 @@ class SemanticConceptLogOddsModel:
         return {
             concept_id: classifier.score_probability(feature_names)
             for concept_id, classifier in sorted(self.classifiers.items())
+            if concept_id not in _SOURCE_SUPPORTED_TARGET_CONCEPTS
+            or any(classifier.feature_weights.get(feature, 0.0) > 0 for feature in feature_names)
         }
 
 class SemanticConceptScorer:
@@ -348,9 +385,13 @@ def train_concept_model(
     label_rows: list[tuple[ConceptId, ...]],
     concept_ids: tuple[ConceptId, ...],
     *,
+    support_groups: list[str] | None = None,
     smoothing: float = DEFAULT_CONCEPT_SMOOTHING,
     metadata: Mapping[str, object] | None = None
 ) -> SemanticConceptLogOddsModel:
+    if support_groups is not None and len(support_groups) != len(feature_rows):
+        raise ValueError("Support groups must align with training feature rows")
+
     classifiers: dict[str, ConceptLogOddsClassifier] = {}
     feature_support: Counter[str] = Counter()
 
@@ -368,6 +409,7 @@ def train_concept_model(
         if positive_count > 0 and negative_count > 0:
             positive_feature_counts: Counter[str] = Counter()
             negative_feature_counts: Counter[str] = Counter()
+            positive_path_groups: dict[str, set[str | None]] = {}
             all_features: set[str] = set()
 
             for index, features in enumerate(feature_rows):
@@ -376,6 +418,11 @@ def train_concept_model(
 
                 if index in positive_indices:
                     positive_feature_counts.update(feature_set)
+                    if concept_id in _SOURCE_SUPPORTED_TARGET_CONCEPTS:
+                        group = support_groups[index] if support_groups is not None else None
+                        for feature in feature_set:
+                            if feature.startswith("path_token="):
+                                positive_path_groups.setdefault(feature, set()).add(group)
                 else:
                     negative_feature_counts.update(feature_set)
 
@@ -397,6 +444,13 @@ def train_concept_model(
                     support + CONCEPT_FEATURE_SUPPORT_SHRINKAGE
                 )
                 feature_weight = raw_feature_weight * support_factor
+                if (
+                    feature_weight > 0
+                    and concept_id in _SOURCE_SUPPORTED_TARGET_CONCEPTS
+                    and feature.startswith("path_token=")
+                    and len(positive_path_groups.get(feature, set())) < MIN_TARGET_PATH_SUPPORT_GROUPS
+                ):
+                    feature_weight = 0.0
                 feature_weights[feature] = max(
                     -MAX_CONCEPT_FEATURE_WEIGHT,
                     min(MAX_CONCEPT_FEATURE_WEIGHT, feature_weight)

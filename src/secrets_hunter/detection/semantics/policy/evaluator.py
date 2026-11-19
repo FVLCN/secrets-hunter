@@ -37,8 +37,6 @@ class ConceptSecretPolicy:
         self.providers = ProviderMatcher(catalog)
         self.decision = SecretDecisionPolicy(catalog)
         self.presentation = PolicyPresentation(
-            catalog,
-            self.indexes,
             report_probability_threshold=self.report_probability_threshold,
             report_limit=self.report_limit,
         )
@@ -55,22 +53,24 @@ class ConceptSecretPolicy:
             observation,
             provider_matches=provider_matches
         )
-        groups = PolicyConceptGroups.classify(
+        groups = PolicyConceptGroups.resolve(
             concept_scores,
+            evidence_by_concept,
             self.indexes,
             self.policy,
         )
         decision = self.decision.decide(
             observation,
             groups,
-            evidence_by_concept
         )
 
         return ConceptPolicyResult(
             analysis=build_semantic_analysis_result(
-                concepts=self.presentation.reported_concepts(groups, evidence_by_concept),
+                concepts=self.presentation.reported_concepts(groups),
                 providers=provider_matches,
                 facts=tuple(sorted(observation.facts)),
+                hash_algorithm=observation.hash_algorithm,
+                value_entropy=observation.value_entropy,
             ),
             decision=decision,
         )

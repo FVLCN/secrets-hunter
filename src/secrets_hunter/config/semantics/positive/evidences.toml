@@ -15,8 +15,10 @@ terms = [
     "root",
     "backend",
     "service",
+    "server",
     "worker"
 ]
+phrases = ["license_server"]
 
 [[evidence]]
 concept = "cloud_provider_target"
@@ -29,9 +31,11 @@ sources = ["var_name"]
 terms = [
     "api",
     "auth",
+    "authenticator",
     "oauth",
     "oidc",
     "saml",
+    "totp",
     "session",
     "consumer",
     "client"
@@ -49,20 +53,29 @@ terms = [
 concept = "key_credential"
 sources = ["var_name", "finding_kind"]
 terms = ["key"]
+strength = "weak"
 
 [[evidence]]
 concept = "key_credential"
 sources = ["var_name"]
-terms = ["pat"]
+strength = "strong"
 phrases = [
     "access_key",
     "access_key_id",
     "api_key",
     "auth_key",
+    "decryption_key",
     "encryption_key",
+    "fernet_key",
+    "hmac_key",
+    "master_key",
+    "pre_shared_key",
+    "preshared_key",
     "private_key",
     "secret_access_key",
     "secret_key",
+    "signer_key",
+    "signing_key",
     "ssh_key"
 ]
 
@@ -74,6 +87,11 @@ terms = [
     "bearer",
     "jwt"
 ]
+
+[[evidence]]
+concept = "token_credential"
+sources = ["var_name", "finding_kind"]
+terms = ["pat"]
 
 [[evidence]]
 concept = "token_credential"
@@ -103,11 +121,16 @@ phrases = ["connection_string"]
 [[evidence]]
 concept = "connection_credential"
 sources = ["var_name"]
+strength = "weak"
 terms = [
     "url",
     "uri",
     "dsn"
 ]
+
+[[evidence]]
+concept = "connection_credential"
+sources = ["var_name"]
 phrases = [
     "database_url",
     "database_uri"
@@ -125,7 +148,8 @@ terms = [
     "password",
     "passwd",
     "pass",
-    "pwd"
+    "pwd",
+    "passphrase"
 ]
 
 [[evidence]]

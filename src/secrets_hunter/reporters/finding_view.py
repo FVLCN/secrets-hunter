@@ -80,14 +80,6 @@ class FindingView:
             if activation.selected
         )
 
-    @property
-    def shadowed_rule_ids(self) -> tuple[str, ...]:
-        return tuple(
-            activation.rule_id
-            for activation in self.decision_trace
-            if not activation.selected
-        )
-
     def to_dict(self) -> dict[str, object]:
         data: dict[str, object] = {
             "title": self.title,

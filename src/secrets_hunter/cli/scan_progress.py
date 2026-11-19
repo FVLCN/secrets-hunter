@@ -125,6 +125,9 @@ class TerminalScanProgressObserver(ScanProgressObserver):
             add_spacing=not self.single_source or result.aborted
         )
 
+        for skipped in result.skips:
+            logger.info(f"Skipped {skipped.label}: {skipped.message}")
+
         for failure in result.failures:
             if failure.kind is ScanFailureKind.INTERNAL:
                 error_name = failure.exception_type or "InternalError"

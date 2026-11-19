@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from secrets_hunter.detection.semantics.catalog import ConceptId, Provider
+from secrets_hunter.detection.semantics.catalog import ConceptId, EvidenceStrength, Provider
 from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.models import Decision, SemanticAnalysisResult
 
@@ -9,6 +9,7 @@ from secrets_hunter.models import Decision, SemanticAnalysisResult
 class ConceptKeywordEvidence:
     term: str
     source: EvidenceSource
+    strength: EvidenceStrength = EvidenceStrength.STRONG
     display_term: str | None = None
     provider: Provider | None = None
 
@@ -37,11 +38,12 @@ class ProviderMatch:
 
 
 @dataclass(frozen=True)
-class ConceptProbability:
+class ResolvedConcept:
     concept_id: ConceptId
-    probability: float
+    origin: str
+    strength: EvidenceStrength
     strongest_keywords: tuple[ConceptKeywordEvidence, ...]
-    display_name: str | None = None
+    probability: float | None = None
 
 
 @dataclass(frozen=True)

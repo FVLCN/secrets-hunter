@@ -1,8 +1,24 @@
+from collections import Counter
+from collections.abc import Collection, Iterable
+
 from secrets_hunter.detection.semantics.observation.models import SemanticObservation
 from secrets_hunter.detection.semantics.observation.facts import FactId
 
 
-SEMANTIC_FEATURE_SCHEMA_VERSION = 1
+SEMANTIC_FEATURE_SCHEMA_VERSION = 2
+
+
+def name_overlap_scales(
+    token_groups: Iterable[Collection[str]],
+) -> tuple[float, ...]:
+    groups = tuple(token_groups)
+    coverage = Counter(
+        token for group in groups for token in group
+    )
+    return tuple(
+        sum(1 / coverage[token] for token in group) / len(group)
+        for group in groups
+    )
 
 
 def concept_feature_names(

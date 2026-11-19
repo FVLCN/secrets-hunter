@@ -1,0 +1,109 @@
+# Locally generated credential/identifier contrasts; labels affect only identifier_context.
+
+# TOTP shared key and animation frame identifier.
+[[training_examples]]
+var_name = "key"
+value = "cfe078179db99a263b7f363653fa212266d4b0c4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/config/runtime.ts"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+
+# API authentication key and request identifier.
+[[training_examples]]
+var_name = "api_key"
+value = "4992692df8cdb8ad544af0ec33bb19bbcc978d1f"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/settings.ini"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+
+# AES-256 key and session identifier.
+[[training_examples]]
+var_name = "encryption_key"
+value = "9563ae5a0688a39e185ff9d8799a77576edb0fef6e746b20ddf2305acdd8b9c4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/runtime.json"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+
+# HMAC signing key and correlation identifier.
+[[training_examples]]
+var_name = "signing_key"
+value = "ca8efc7bab520ea494378a6c06f5fd7da4563bb9decd51ce1ada7e464271dd46"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/application.yaml"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+
+# HMAC key and tracing identifier.
+[[training_examples]]
+var_name = "hmac_key"
+value = "15c0da9f7a312b66291f4f3f48cf228e7c5a4fc44b7543b9838cb8c8e13b063c"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/config/request.py"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+
+# OAuth client secret and public client identifier.
+[[training_examples]]
+var_name = "client_secret"
+value = "be6caee9ec28cb49b192a55220b53844184ec8799a2d3d24d8288e5995a1301e"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/oauth.json"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+
+# Device access token and device identifier.
+[[training_examples]]
+var_name = "access_token"
+value = "fc4611ece6e6e8a770487cdaf07da0b8adfc09aa"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/device.ini"
+concept_labels = []
+labeled_concepts = ["identifier_context"]
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+
+# Service password and request idempotency key.
+[[training_examples]]
+var_name = "password"
+value = "55ha7LFmKBTJ0n3tZGkRrUJ5Lv8hKH2a"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "config/runtime.env"
+concept_labels = []
+labeled_concepts = ["identifier_context"]

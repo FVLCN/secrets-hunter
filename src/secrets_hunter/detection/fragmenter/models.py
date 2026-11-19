@@ -10,11 +10,18 @@ from secrets_hunter.models import FindingKind
 
 
 @dataclass(frozen=True)
+class SourceContext:
+    content: str
+    start_line: int
+
+
+@dataclass(frozen=True)
 class SourceFragment:
     # Raw source block yielded by the reader.
     content: str
     start_line: int
     end_line: int
+    source_context: SourceContext | None = None
 
 
 @dataclass(frozen=True)

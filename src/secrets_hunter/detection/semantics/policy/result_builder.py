@@ -8,7 +8,7 @@ from secrets_hunter.models.semantic_analysis import (
 
 from .models import (
     ConceptKeywordEvidence,
-    ConceptProbability,
+    ResolvedConcept,
     ProviderMatch,
 )
 
@@ -20,6 +20,7 @@ def _keyword_result(
     return SemanticKeywordEvidenceResult(
         term=evidence.term,
         source=evidence.source.value,
+        strength=evidence.strength.value,
         display_term=evidence.display_term,
         provider_id=provider.id if provider is not None else None,
         provider_name=provider.name if provider is not None else None,
@@ -29,20 +30,23 @@ def _keyword_result(
 
 def build_semantic_analysis_result(
     *,
-    concepts: tuple[ConceptProbability, ...],
+    concepts: tuple[ResolvedConcept, ...],
     providers: tuple[ProviderMatch, ...],
     facts: tuple[FactId, ...],
+    hash_algorithm: str | None = None,
+    value_entropy: float | None = None,
 ) -> SemanticAnalysisResult:
     return SemanticAnalysisResult(
         concepts=tuple(
             SemanticConceptResult(
                 concept_id=concept.concept_id.value,
                 probability=concept.probability,
+                origin=concept.origin,
+                strength=concept.strength.value,
                 strongest_keywords=tuple(
                     _keyword_result(keyword)
                     for keyword in concept.strongest_keywords
                 ),
-                display_name=concept.display_name
             )
             for concept in concepts
         ),
@@ -61,4 +65,6 @@ def build_semantic_analysis_result(
             for provider in providers
         ),
         facts=tuple(fact.value for fact in facts),
+        hash_algorithm=hash_algorithm,
+        value_entropy=value_entropy,
     )

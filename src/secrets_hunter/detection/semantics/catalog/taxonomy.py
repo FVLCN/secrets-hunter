@@ -6,6 +6,11 @@ from secrets_hunter.detection.semantics.parsing import normalize_token, require_
 SEMANTIC_ONTOLOGY_VERSION = 1
 
 
+class EvidenceStrength(StrEnum):
+    WEAK = "weak"
+    STRONG = "strong"
+
+
 class ConceptId(StrEnum):
     AUTH_SYSTEM_TARGET = "auth_system_target"
     CLOUD_PROVIDER_TARGET = "cloud_provider_target"

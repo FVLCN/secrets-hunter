@@ -5,7 +5,7 @@ from .finding import (
     severity_for_confidence
 )
 from .finding_kind import FindingKind
-from .scan_result import ScanFailure, ScanFailureKind, ScanResult, ScanStatus
+from .scan_result import ScanFailure, ScanFailureKind, ScanResult, ScanSkip, ScanStatus
 from .decision import Decision, Disposition, RuleActivation
 from .rejection import RejectionKind, RejectionPattern, RejectionReason
 from .semantic_analysis import SemanticAnalysisResult
@@ -36,6 +36,7 @@ __all__ = [
     'ScanFailure',
     'ScanFailureKind',
     'ScanResult',
+    'ScanSkip',
     'ScanStatus',
     'SemanticAnalysisResult',
     'SourceLocation',

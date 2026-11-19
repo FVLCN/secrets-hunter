@@ -1,38 +1,69 @@
+from secrets_hunter.detection.semantics.catalog import ConceptId
 from secrets_hunter.detection.semantics.observation import FactId
 from secrets_hunter.models import Disposition, RejectionKind, ValueKind
 
 from .context import DecisionContext
 from .models import DecisionPhase
 from .rule_set import RuleSet
-from ..signals import (
-    has_direct_fixture_evidence,
-    has_direct_hash_artifact_evidence,
-    has_direct_identifier_evidence
-)
 
 rules = RuleSet(DecisionPhase.SEMANTIC)
+
+
+@rules.when(
+    priority=2510,
+    disposition=Disposition.REJECT,
+    confidence=lambda values: values.artifact_reject,
+    reasoning="value rejection classification without strong credential evidence",
+)
+def value_rejection_classification(context: DecisionContext) -> bool:
+    return (
+        context.has_value_rejection_context
+        and not context.has_strong_direct_credential_evidence
+    )
+
+
+@rules.when(
+    priority=2505,
+    disposition=Disposition.REJECT,
+    reasoning="explicit public credential name",
+)
+def public_credential_name(context: DecisionContext) -> bool:
+    return (
+        "public" in context.observation.name_tokens
+        and context.has_strong_direct_credential_evidence
+    )
+
+
+@rules.when(
+    priority=2450,
+    disposition=Disposition.REVIEW,
+    reasoning="conflicting credential and non-secret context evidence",
+)
+def context_reject_with_credential(context: DecisionContext) -> bool:
+    return context.has_role_conflict
 
 
 @rules.when(
     priority=2400,
     disposition=Disposition.REPORT,
     confidence=lambda values: values.credential_with_hash_shaped_value,
-    reasoning="credential classification with hash-shaped value",
+    reasoning="credential evidence with hash-shaped value",
 )
 def credential_with_hash_shape(context: DecisionContext) -> bool:
     rejection = context.observation.value_rejection
     has_hash_shape = (
-        rejection is not None
-        and rejection.kind is RejectionKind.HASH
-    ) or (
-        context.observation.value_kind is ValueKind.HEX
-        and context.has_fact(FactId.HIGH_ENTROPY)
+        context.has_fact(FactId.HASH_SHAPED_VALUE)
+        or (rejection is not None and rejection.kind is RejectionKind.HASH)
+        or (
+            context.observation.value_kind is ValueKind.HEX
+            and context.has_fact(FactId.HIGH_ENTROPY)
+        )
     )
-
     return (
         has_hash_shape
         and context.has_strong_direct_credential_evidence
-        and not has_direct_fixture_evidence(context.evidence_by_concept)
+        and not context.has_fixture_context
+        and not context.has_role_conflict
     )
 
 
@@ -40,18 +71,20 @@ def credential_with_hash_shape(context: DecisionContext) -> bool:
     priority=2300,
     disposition=Disposition.REJECT,
     confidence=lambda values: values.artifact_reject,
-    reasoning="non-secret artifact classification",
+    reasoning="non-secret artifact evidence",
 )
 def artifact_classification(context: DecisionContext) -> bool:
+    return context.has_artifact_context and not context.has_credential_context
+
+
+def _value_rejection_reasoning(context: DecisionContext) -> str:
+    rejection = context.observation.value_rejection
+    if rejection is None:
+        return "value matched a rejection pattern"
+
     return (
-        (
-            bool(context.reject_evidence)
-            or has_direct_hash_artifact_evidence(
-                context.evidence_by_concept
-            )
-        )
-        and not context.strong_secret_context
-        and not context.has_strong_direct_credential_evidence
+        f"value matched a rejection pattern: {rejection.name} "
+        f"({rejection.category})"
     )
 
 
@@ -59,7 +92,7 @@ def artifact_classification(context: DecisionContext) -> bool:
     priority=2200,
     disposition=Disposition.REJECT,
     confidence=lambda values: values.value_rejected,
-    reasoning="value matched a rejection pattern",
+    reasoning=_value_rejection_reasoning,
 )
 def value_rejection(context: DecisionContext) -> bool:
     rejection = context.observation.value_rejection
@@ -68,6 +101,8 @@ def value_rejection(context: DecisionContext) -> bool:
         and rejection.kind not in {
             RejectionKind.PLACEHOLDER,
             RejectionKind.STRUCTURAL_PEM,
+            RejectionKind.STRUCTURAL_VALUE,
+            RejectionKind.PUBLIC_CRYPTO,
         }
         and not context.strong_secret_context
     )
@@ -87,47 +122,16 @@ def english_text_value(context: DecisionContext) -> bool:
 
 
 @rules.when(
-    priority=1800,
-    disposition=Disposition.REVIEW,
-    reasoning="artifact context with credential classification",
-)
-def context_reject_with_credential(context: DecisionContext) -> bool:
-    thresholds = context.policy.decision_thresholds
-    has_identifier_context = (
-        context.context_reject_probability >= thresholds.context_reject
-        or has_direct_identifier_evidence(context.evidence_by_concept)
-    )
-    has_credential_context = (
-        context.credential_probability >= thresholds.credential
-        or context.has_strong_direct_credential_evidence
-    )
-
-    return (
-        has_identifier_context
-        and has_credential_context
-    )
-
-
-@rules.when(
     priority=1790,
     disposition=Disposition.REVIEW,
-    reasoning="artifact context with secret-target classification",
+    reasoning="inferred identifier context with secret-target evidence",
 )
 def context_reject_with_target(context: DecisionContext) -> bool:
-    thresholds = context.policy.decision_thresholds
-    has_identifier_context = (
-        context.context_reject_probability >= thresholds.context_reject
-        or has_direct_identifier_evidence(context.evidence_by_concept)
-    )
-    has_credential_context = (
-        context.credential_probability >= thresholds.credential
-        or context.has_strong_direct_credential_evidence
-    )
-
     return (
-        has_identifier_context
-        and not has_credential_context
-        and context.target_probability >= thresholds.target
+        context.has_identifier_context
+        and not context.has_explicit_identifier_context
+        and not context.has_credential_context
+        and context.has_target_context
     )
 
 
@@ -137,20 +141,46 @@ def context_reject_with_target(context: DecisionContext) -> bool:
     reasoning="non-secret identifier context",
 )
 def context_reject(context: DecisionContext) -> bool:
-    thresholds = context.policy.decision_thresholds
-    has_identifier_context = (
-        context.context_reject_probability >= thresholds.context_reject
-        or has_direct_identifier_evidence(context.evidence_by_concept)
-    )
-    has_credential_context = (
-        context.credential_probability >= thresholds.credential
-        or context.has_strong_direct_credential_evidence
+    return (
+        context.has_identifier_context
+        and not context.has_credential_context
+        and (
+            context.has_explicit_identifier_context
+            or not context.has_target_context
+        )
     )
 
+
+@rules.when(
+    priority=2515,
+    disposition=Disposition.REPORT,
+    confidence=lambda values: values.credential_with_hash_shaped_value,
+    reasoning="credential evidence with hash-shaped value",
+)
+def hash_shaped_key_assignment(context: DecisionContext) -> bool:
+    rejection = context.observation.value_rejection
     return (
-        has_identifier_context
-        and not has_credential_context
-        and context.target_probability < thresholds.target
+        (
+            context.has_fact(FactId.HASH_SHAPED_VALUE)
+            or (
+                rejection is not None
+                and rejection.kind is RejectionKind.HASH
+            )
+        )
+        and context.groups.matched(
+            (ConceptId.KEY_CREDENTIAL,),
+            strong_only=False,
+        )
+        and not context.has_strong_direct_credential_evidence
+        and not context.has_fact(FactId.TERMINAL_IDENTIFIER_SUFFIX)
+        and "public" not in context.observation.name_tokens
+        and not context.groups.matched(
+            context.groups.artifacts + context.groups.identifiers
+        )
+        and not context.groups.matched(
+            context.groups.ordinary,
+            strong_only=False,
+        )
     )
 
 

@@ -12,6 +12,7 @@ class DecisionPhase(IntEnum):
     SEMANTIC = 100
     KNOWN_PATTERN = 200
     STRUCTURAL = 300
+    CONSTRAINT = 400
 
 
 @dataclass(frozen=True)

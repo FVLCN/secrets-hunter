@@ -6,7 +6,6 @@ from secrets_hunter._version import __version__
 
 from .banner import display_random_logo
 from .commands import COMMAND_NAMES, register_commands
-from .defaults import DEFAULT_CLI_SCAN_MODE
 
 
 ROOT_OPTIONS = frozenset({"-h", "--help", "--version"})
@@ -15,9 +14,9 @@ ROOT_OPTIONS = frozenset({"-h", "--help", "--version"})
 def normalize_argv(argv: Sequence[str]) -> list[str]:
     normalized = list(argv)
     if not normalized:
-        return ["scan", DEFAULT_CLI_SCAN_MODE]
+        return ["scan"]
     if normalized[0] not in COMMAND_NAMES | ROOT_OPTIONS:
-        return ["scan", DEFAULT_CLI_SCAN_MODE, *normalized]
+        return ["scan", *normalized]
     return normalized
 
 

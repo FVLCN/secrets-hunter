@@ -24,6 +24,3 @@ class DetectionPattern:
     kind: FindingKind
     compiled: re.Pattern[str]
     provider_pattern_id: str | None = None
-
-    def search(self, text: str) -> re.Match[str] | None:
-        return self.compiled.search(text)

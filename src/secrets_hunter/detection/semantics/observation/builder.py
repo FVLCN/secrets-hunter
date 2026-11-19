@@ -66,10 +66,9 @@ class SemanticObservationBuilder:
         )
         path = PurePath(file_path)
         file_extension = path.suffix.lower()
-        file_extension_tokens = (
-            (file_extension.removeprefix("."),)
-            if file_extension
-            else ()
+        file_extension_tokens = tuple(
+            suffix.removeprefix(".").lower()
+            for suffix in path.suffixes
         )
         english_words_in_value_tokens = (
             lexical_analysis.corpus_tokens
@@ -111,10 +110,12 @@ class SemanticObservationBuilder:
             dict.fromkeys(public_crypto_shape_tokens + hash_shape_tokens)
         )
         value_entropy = value_analysis.entropy
-        facts: set[FactId] = set()
+        facts: set[FactId] = set(item.usage_facts)
 
         if not associated_name:
             facts.add(FactId.NO_ASSIGNMENT_CONTEXT)
+        elif len(associated_name) < 3:
+            facts.add(FactId.SHORT_ASSIGNMENT_NAME)
 
         if detection_method is DetectionMethod.ENTROPY:
             facts.add(FactId.HIGH_ENTROPY)
@@ -124,6 +125,9 @@ class SemanticObservationBuilder:
 
         if public_crypto_shape_tokens:
             facts.add(FactId.PUBLIC_CRYPTO_ARTIFACT)
+
+        if hash_classification is not None:
+            facts.add(FactId.HASH_SHAPED_VALUE)
 
         if has_terminal_identifier_suffix(name_tokens):
             facts.add(FactId.TERMINAL_IDENTIFIER_SUFFIX)
@@ -152,7 +156,13 @@ class SemanticObservationBuilder:
             english_words_in_value_tokens=english_words_in_value_tokens,
             value_rejection=value_rejection,
             provider_pattern_id=item.provider_pattern_id,
-            facts=frozenset(facts)
+            facts=frozenset(facts),
+            hash_algorithm=(
+                hash_classification.algorithm.value
+                if hash_classification is not None
+                else None
+            ),
+            value_entropy=value_entropy,
         )
 
 

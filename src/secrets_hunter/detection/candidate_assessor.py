@@ -2,7 +2,7 @@ from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter.models import PEMKeyFragment
 from secrets_hunter.detection.rejection_analyzer import CandidateRejectionAnalyzer
 from secrets_hunter.detection.semantics import ConceptPolicyResult, SemanticRuntime
-from secrets_hunter.detection.semantics.observation import SemanticInput
+from secrets_hunter.detection.semantics.observation import FactId, SemanticInput
 from secrets_hunter.detection.value_analysis import (
     ValueAnalysis,
     ValueAnalyzer
@@ -28,7 +28,8 @@ class CandidateAssessor:
         *,
         lexical_subject: str,
         rejection: RejectionReason | None,
-        value_analysis: ValueAnalysis
+        value_analysis: ValueAnalysis,
+        usage_facts: frozenset[FactId] = frozenset()
     ) -> ConceptPolicyResult:
         item = SemanticInput(
             associated_name=associated_name or "",
@@ -43,7 +44,8 @@ class CandidateAssessor:
                 else None
             ),
             value_rejection=rejection,
-            provider_pattern_id=candidate.provider_pattern_id
+            provider_pattern_id=candidate.provider_pattern_id,
+            usage_facts=usage_facts
         )
         return self.semantic_runtime.analyze(item)
 
@@ -54,7 +56,8 @@ class CandidateAssessor:
         *,
         lexical_subject: str,
         rejection: RejectionReason | None,
-        value_analysis: ValueAnalysis
+        value_analysis: ValueAnalysis,
+        usage_facts: frozenset[FactId] = frozenset()
     ) -> tuple[str | None, ConceptPolicyResult]:
         names = sorted(associated_names)
 
@@ -64,7 +67,8 @@ class CandidateAssessor:
                 None,
                 lexical_subject=lexical_subject,
                 rejection=rejection,
-                value_analysis=value_analysis
+                value_analysis=value_analysis,
+                usage_facts=usage_facts
             )
 
         associated_name_results = [
@@ -75,7 +79,8 @@ class CandidateAssessor:
                     name,
                     lexical_subject=lexical_subject,
                     rejection=rejection,
-                    value_analysis=value_analysis
+                    value_analysis=value_analysis,
+                    usage_facts=usage_facts
                 )
             )
             for name in names
@@ -92,7 +97,10 @@ class CandidateAssessor:
     def assess(
         self,
         candidate: DetectionCandidate,
-        associated_names: tuple[str, ...]
+        associated_names: tuple[str, ...],
+        *,
+        source_text: str | None = None,
+        usage_facts: frozenset[FactId] = frozenset()
     ) -> Finding:
         lexical_subject = self.rejection_analyzer.lexical_subject_for_candidate(
             candidate
@@ -104,14 +112,17 @@ class CandidateAssessor:
         rejection = self.rejection_analyzer.rejection_for_candidate(
             candidate,
             lexical_subject,
-            value_analysis.hash_classification
+            value_analysis.hash_classification,
+            source_text=source_text,
+            associated_names=associated_names
         )
         associated_name, semantic_result = self._best_associated_name_result(
             candidate,
             associated_names,
             lexical_subject=lexical_subject,
             rejection=rejection,
-            value_analysis=value_analysis
+            value_analysis=value_analysis,
+            usage_facts=usage_facts
         )
 
         return Finding(

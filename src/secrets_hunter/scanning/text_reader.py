@@ -8,6 +8,10 @@ class SourceReadLimitError(OperationalScanError):
     """Raised when source content exceeds a configured scanning safety limit."""
 
 
+class SourceLineLengthLimitError(SourceReadLimitError):
+    """Raised when a source must be skipped because a line is too long."""
+
+
 class SourceTextReader:
     def __init__(self, policy: ContentSafetyPolicy) -> None:
         self.policy = policy
@@ -22,22 +26,23 @@ class SourceTextReader:
     def safe_lines(self, lines: Iterable[str]) -> Iterator[str]:
         for line_number, line in enumerate(lines, 1):
             if len(line) > self.policy.max_line_length:
-                raise SourceReadLimitError(
+                raise SourceLineLengthLimitError(
                     f"Line {line_number} exceeds the maximum supported length "
                     f"of {self.policy.max_line_length} characters"
                 )
 
-            run = 1
-            for index in range(1, len(line)):
-                if line[index] == line[index - 1]:
-                    run += 1
-                    if run >= self.policy.max_repeat_run:
-                        raise SourceReadLimitError(
-                            f"Line {line_number} contains a repeated-character "
-                            f"run of at least {self.policy.max_repeat_run} "
-                            f"characters"
-                        )
-                else:
-                    run = 1
+            if len(line) >= self.policy.max_repeat_run:
+                run = 1
+                for index in range(1, len(line)):
+                    if line[index] == line[index - 1]:
+                        run += 1
+                        if run >= self.policy.max_repeat_run:
+                            raise SourceReadLimitError(
+                                f"Line {line_number} contains a repeated-character "
+                                f"run of at least {self.policy.max_repeat_run} "
+                                f"characters"
+                            )
+                    else:
+                        run = 1
 
             yield line

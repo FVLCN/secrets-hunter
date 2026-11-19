@@ -20,6 +20,7 @@ from .taxonomy import (
     ConceptCategory,
     ConceptId,
     ConceptPolicy,
+    EvidenceStrength,
 )
 
 __all__ = [
@@ -33,6 +34,7 @@ __all__ = [
     "ConceptCategory",
     "ConceptId",
     "ConceptPolicy",
+    "EvidenceStrength",
     "Provider",
     "ProviderPattern",
     "SemanticCatalog",

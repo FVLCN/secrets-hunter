@@ -61,23 +61,23 @@ def log_findings_summary(
     if total_findings == 0:
         if total_detected_findings:
             logger.info(
-                "No findings met the minimum confidence threshold"
+                "No candidates met the minimum confidence threshold"
             )
         else:
-            logger.info("No secrets found")
+            logger.info("No candidates found")
     elif total_findings == 1:
         finding = findings[0]
-        logger.info(f"1 {finding.severity.lower()} severity secret was found")
+        logger.info(f"Found 1 candidate: {finding.severity.lower()}")
     else:
         severity_summary = " ".join(
             f"{severity_counts[severity]} {severity.lower()},"
             for severity in Severity
             if severity_counts[severity]
         ).removesuffix(",")
-        logger.info(f"Found {total_findings} secrets: {severity_summary}")
+        logger.info(f"Found {total_findings} candidates: {severity_summary}")
 
     if total_findings > 0 and not selection_options.min_confidence:
         logger.info(
-            "Showing all findings, including rejected ones. "
+            "Showing all candidates, including rejected ones. "
             "Use the --min-confidence flag to exclude them from the report."
         )

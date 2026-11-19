@@ -6,7 +6,7 @@ from concurrent.futures import (
 )
 from dataclasses import dataclass, field
 
-from secrets_hunter.models import Finding, ScanFailure, ScanResult
+from secrets_hunter.models import Finding, ScanFailure, ScanResult, ScanSkip
 from secrets_hunter.scanning.cancellation import ScanCancelledError
 from secrets_hunter.scanning.control import ScanControl
 from secrets_hunter.scanning.failures import scan_failure_from_exception
@@ -17,6 +17,7 @@ from secrets_hunter.scanning.work import ScanWorkItem, ScanWorkPlan
 class _ExecutionState:
     findings: list[Finding] = field(default_factory=list)
     failures: list[ScanFailure] = field(default_factory=list)
+    skips: list[ScanSkip] = field(default_factory=list)
     discovered_items: int = 0
     attempted_items: int = 0
     successful_items: int = 0
@@ -37,6 +38,7 @@ class _ExecutionState:
         self.attempted_items += result.attempted_items
         self.successful_items += result.successful_items
         self.failures.extend(result.failures)
+        self.skips.extend(result.skips)
         self.processed_items += 1
 
     def total_items(self, plan: ScanWorkPlan) -> int | None:
@@ -60,7 +62,8 @@ class _ExecutionState:
             attempted_items=self.attempted_items,
             successful_items=self.successful_items,
             failures=tuple(self.failures),
-            aborted=aborted
+            aborted=aborted,
+            skips=tuple(self.skips),
         )
 
 

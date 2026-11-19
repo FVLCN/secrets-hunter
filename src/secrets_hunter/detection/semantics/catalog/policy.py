@@ -24,6 +24,7 @@ class DecisionThresholds:
 @dataclass(frozen=True)
 class ConfidencePolicy:
     value_rejected_blocking: float
+    known_public_secret: float
     artifact_reject: float
     value_rejected: float
     no_assignment_entropy_with_secret_evidence: float
@@ -31,7 +32,9 @@ class ConfidencePolicy:
     strong_secret_pattern: float
     strong_secret_context: float
     strong_secret_context_with_fixture: float
+    fixture_confidence_cap: float
     known_pattern: float
+    public_credential_name: float
     context_reject_with_credential: float
     context_reject_with_target: float
     context_reject: float

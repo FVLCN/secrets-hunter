@@ -5,6 +5,7 @@ from dataclasses import dataclass
 class SemanticKeywordEvidenceResult:
     term: str
     source: str
+    strength: str = "strong"
     display_term: str | None = None
     provider_id: str | None = None
     provider_name: str | None = None
@@ -14,8 +15,10 @@ class SemanticKeywordEvidenceResult:
 @dataclass(frozen=True)
 class SemanticConceptResult:
     concept_id: str
-    probability: float
+    probability: float | None
     strongest_keywords: tuple[SemanticKeywordEvidenceResult, ...]
+    origin: str
+    strength: str
     display_name: str | None = None
 
 
@@ -34,6 +37,8 @@ class SemanticAnalysisResult:
     concepts: tuple[SemanticConceptResult, ...]
     providers: tuple[SemanticProviderMatchResult, ...]
     facts: tuple[str, ...]
+    hash_algorithm: str | None = None
+    value_entropy: float | None = None
 
     @property
     def pattern_provider_match(self) -> SemanticProviderMatchResult | None:

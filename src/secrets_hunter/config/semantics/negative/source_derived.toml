@@ -1,0 +1,518 @@
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L46
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: token: Optional[str] = None,
+[[training_examples]]
+var_name = "token"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L47
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: base_url: str = BASE_URL,
+[[training_examples]]
+var_name = "base_url"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L48
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: timeout: int = 30,
+[[training_examples]]
+var_name = "timeout"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L50
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: proxy: Optional[str] = None,
+[[training_examples]]
+var_name = "proxy"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L14
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: from ssl import SSLContext
+[[training_examples]]
+var_name = "ssl"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/slackapi/python-slack-sdk/main/slack_sdk/web/base_client.py#L51
+# Source snapshot SHA256: e42cd2b05a983c32a85120ccad4979a6e66b6487cc546723a1ba7090fa527257
+# Source field: headers: Optional[dict] = None,
+[[training_examples]]
+var_name = "headers"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "slack_sdk/web/base_client.py"
+concept_labels = []
+labeled_concepts = ["cloud_provider_target", "infrastructure_target"]
+support_group = "slackapi/python-slack-sdk"
+sample_weight = 0.16666666666666666
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/python/cpython/main/Lib/hmac.py#L87
+# Source snapshot SHA256: 534223e79f40ea3907652809850c7f8a4254d2e9816a10ff623a5abe75b0f397
+# Source field: def __init__(self, key, msg=None, digestmod=''):
+[[training_examples]]
+var_name = "key"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "Lib/hmac.py"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "python/cpython"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/python/cpython/main/Lib/hmac.py#L87
+# Source snapshot SHA256: 534223e79f40ea3907652809850c7f8a4254d2e9816a10ff623a5abe75b0f397
+# Source field: def __init__(self, key, msg=None, digestmod=''):
+[[training_examples]]
+var_name = "msg"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "Lib/hmac.py"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "python/cpython"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/python/cpython/main/Lib/hmac.py#L87
+# Source snapshot SHA256: 534223e79f40ea3907652809850c7f8a4254d2e9816a10ff623a5abe75b0f397
+# Source field: def __init__(self, key, msg=None, digestmod=''):
+[[training_examples]]
+var_name = "digestmod"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "Lib/hmac.py"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "python/cpython"
+sample_weight = 0.25
+
+# Real-source field context; value is a context-only placeholder.
+# Source: https://raw.githubusercontent.com/python/cpython/main/Lib/hmac.py#L54
+# Source snapshot SHA256: 534223e79f40ea3907652809850c7f8a4254d2e9816a10ff623a5abe75b0f397
+# Source field: blocksize = obj.block_size
+[[training_examples]]
+var_name = "blocksize"
+value = "context_input_only"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "Lib/hmac.py"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+support_group = "python/cpython"
+sample_weight = 0.25
+
+# Additive usage-fact supervision; existing examples above stay unchanged.
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:.github/workflows/ci.yml:29
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "11bd71901bbe5b1630ceea73d27597364c9af683"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ci.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/.github/workflows/ci.yml"
+source_context = "        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 #v4.2.2\n"
+source_line = 1
+
+# Usage role supervision: outline@4845da08ace34f3d47637adb069f7d3292504c9b:.github/workflows/calibreapp-image-actions.yml:46
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "3d5873ac3e7bf1a38b24d9778d8dc639d5706d8b"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/calibreapp-image-actions.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "outline/.github/workflows/calibreapp-image-actions.yml"
+source_context = "        uses: calibreapp/image-actions@3d5873ac3e7bf1a38b24d9778d8dc639d5706d8b  # main\n"
+source_line = 1
+
+# Usage role supervision: outline@4845da08ace34f3d47637adb069f7d3292504c9b:.github/workflows/ci.yml:30
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "4512585405083f25c027a35db413c2b3b9006d50"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ci.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "outline/.github/workflows/ci.yml"
+source_context = "      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2\n"
+source_line = 1
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:.github/workflows/cleanup-report.yml:16
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "7e473efe3cb98aa54f8d4bac15400b15fad77d94"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/cleanup-report.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "cal/.github/workflows/cleanup-report.yml"
+source_context = "        uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94\n"
+source_line = 1
+
+# Usage role supervision: appwrite@32b6a5d9b8ff52c2aeb0196624d5ba2507acaba2:.github/workflows/ai-moderator.yml:28
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "81159c370785e295c97461ade67d7c33576e9319"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ai-moderator.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "appwrite/.github/workflows/ai-moderator.yml"
+source_context = "        uses: github/ai-moderator@81159c370785e295c97461ade67d7c33576e9319 # v1.1.4\n"
+source_line = 1
+
+# Usage role supervision: appwrite@32b6a5d9b8ff52c2aeb0196624d5ba2507acaba2:.github/workflows/auto-label-issue.yml:16
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "c1b0f9f52a63158c4adc09425e858e87b32e9685"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/auto-label-issue.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "appwrite/.github/workflows/auto-label-issue.yml"
+source_context = "        uses: github/issue-labeler@c1b0f9f52a63158c4adc09425e858e87b32e9685 # v3.4\n"
+source_line = 1
+
+# Usage role supervision: vite@e347fef1df224f93207e3ae1513b3ff7eb69ae67:.github/actions/issues-helper/action.yml:28
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "3a2844b7e9c422d3c10d287c895573f7108da1b3"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/actions/issues-helper/action.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "vite/.github/actions/issues-helper/action.yml"
+source_context = "      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9\n"
+source_line = 1
+
+# Usage role supervision: vite@e347fef1df224f93207e3ae1513b3ff7eb69ae67:.github/workflows/ci.yml:42
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/ci.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "vite/.github/workflows/ci.yml"
+source_context = "        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7\n"
+source_line = 1
+
+# Usage role supervision: dotfiles@04ac7749c8eed7647e2e9f61febc2b8e96d01a27:.github/workflows/deno.yml:30
+# Exact action commit pin, not a credential. Literal extracted from uses reference for role supervision.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = "uses"
+value = "61fe2df320078202e33d7d5ad347e7dcfa0e8f31"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = ".github/workflows/deno.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "dotfiles/.github/workflows/deno.yml"
+source_context = "        uses: denoland/setup-deno@61fe2df320078202e33d7d5ad347e7dcfa0e8f31  # v1.1.2\n"
+source_line = 1
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:config/default.yml:90
+# CSAF content digest, not a token or secret.
+[[training_examples]]
+var_name = "csafHashValue"
+value = "7e7ce7c65db3bf0625fcea4573d25cff41f2f7e3474f2c74334b14fc65bb4fd26af802ad17a3a03bf0eee6827a00fb8f7905f338c31b5e6ea9cb31620242e843"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "config/default.yml"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/config/default.yml"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:ftp/package-lock.json.bak:97
+# Dependency integrity digest.
+[[training_examples]]
+var_name = "integrity"
+value = "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "ftp/package-lock.json.bak"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/ftp/package-lock.json.bak"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:data/static/web3-snippets/HoneyPotNFT.sol:17
+# Public IPFS metadata content identifier.
+[[training_examples]]
+var_name = "fixedMetadataHash"
+value = "QmRad1vxT3soFMNx9j3bBmkABb4C86anY1f5XeonosHy3m"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "data/static/web3-snippets/HoneyPotNFT.sol"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/data/static/web3-snippets/HoneyPotNFT.sol"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:api/src/services/schema.test.ts:99
+# Expected schema content hash.
+[[training_examples]]
+var_name = "hash"
+value = "22da9fb6231a83de9405cdd4c313aa47967c3448"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "api/src/services/schema.test.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "directus/api/src/services/schema.test.ts"
+
+# Usage role supervision: directus@0030cdb12b964cbf8777782cf6eba395088ffaaf:app/src/views/private/components/comparison/use-comparison.test.ts:948
+# Content comparison/version hash.
+[[training_examples]]
+var_name = "versionCompareHash"
+value = "2b0ca481b8b806ca320d628ce13c6b15c9bc4d09"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "app/src/views/private/components/comparison/use-comparison.test.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "directus/app/src/views/private/components/comparison/use-comparison.test.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:packages/app-store/_utils/oauth/OAuthManager.ts:20
+# Imported OAuth schema/type identifier, not a credential literal.
+[[training_examples]]
+var_name = ""
+value = "OAuth2TokenResponseInDbWhenExistsSchema"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/app-store/_utils/oauth/OAuthManager.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "cal/packages/app-store/_utils/oauth/OAuthManager.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:packages/app-store/_utils/oauth/universalSchema.ts:36
+# OAuth schema/type identifier, not a token.
+[[training_examples]]
+var_name = ""
+value = "OAuth2UniversalSchemaWithCalcomBackwardCompatibility"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "packages/app-store/_utils/oauth/universalSchema.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "cal/packages/app-store/_utils/oauth/universalSchema.ts"
+
+# Usage role supervision: dotfiles@04ac7749c8eed7647e2e9f61febc2b8e96d01a27:functions:365
+# Public certificate/public key block; not a token or signing secret.
+[[training_examples]]
+var_name = ""
+value = "-----BEGIN CERTIFICATE-----"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "functions"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "dotfiles/functions"
+
+# Usage role supervision: reverse-skill@fe2e2def5ec21dbda9d84f69c1ef8b20d53fc269:skills/pentest-tools/src-hunter/references/payloader/waf-bypass.md:5226
+# Public certificate/public key block; not a token or signing secret.
+[[training_examples]]
+var_name = ""
+value = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqh...\n-----END PUBLIC KEY-----"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "skills/pentest-tools/src-hunter/references/payloader/waf-bypass.md"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "reverse-skill/skills/pentest-tools/src-hunter/references/payloader/waf-bypass.md"
+
+# Usage role supervision: vite@e347fef1df224f93207e3ae1513b3ff7eb69ae67:packages/vite/src/node/__tests__/utils.spec.ts:38
+# Public certificate/public key block; not a token or signing secret.
+[[training_examples]]
+var_name = ""
+value = "-----BEGIN CERTIFICATE-----\nMIID7zCCAtegAwIBAgIJS9D2rIN7tA8mMA0GCSqGSIb3DQEBCwUAMGkxFDASBgNV\nBAMTC2V4YW1wbGUub3JnMQswCQYDVQQGEwJVUzERMA8GA1UECBMIVmlyZ2luaWEx\nEzARBgNVBAcTCkJsYWNrc2J1cmcxDTALBgNVBAoTBFRlc3QxDTALBgNVBAsTBFRl\nc3QwHhcNMjUwMTMwMDQxNTI1WhcNMjUwMzAxMDQxNTI1WjBpMRQwEgYDVQQDEwtl\neGFtcGxlLm9yZzELMAkGA1UEBhMCVVMxETAPBgNVBAgTCFZpcmdpbmlhMRMwEQYD\nVQQHEwpCbGFja3NidXJnMQ0wCwYDVQQKEwRUZXN0MQ0wCwYDVQQLEwRUZXN0MIIB\nIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxNPlCqTmUZ7/F7GyFWDopqZ6\nw19Y7/98B10JEeFGTAQIj/RP2UgZNcTABQDUvtkF7y+bOeoVJW7Zz8ozQYhRaDp8\nCN2gXMcYeTUku/pKLXyCzHHVrOPAXTeU7sMRgLvPCrrJtx5OjvndW+O/PhohPRi3\niEpPvpM8gi7MVRGhnWVSx0/Ynx5c0+/vqyBTzrM2OX7Ufg8Nv7LaTXpCAnmIQp+f\nSqq7HZ7t6Y7laS4RApityvlnFHZ4f2cEibAKv/vXLED7bgAlGb8R1viPRdMtAPuI\nMYvHBgGFjyX1fmq6Mz3aqlAscJILtbQlwty1oYyaENE0lq8+nZXQ+t6I+CIVLQID\nAQABo4GZMIGWMAsGA1UdDwQEAwIC9DAxBgNVHSUEKjAoBggrBgEFBQcDAQYIKwYB\nBQUHAwIGCCsGAQUFBwMDBggrBgEFBQcDCDBUBgNVHREETTBLgglsb2NhbGhvc3SC\nDWZvby5sb2NhbGhvc3SCECoudml0ZS5sb2NhbGhvc3SCBVs6OjFdhwR/AAABhxD+\ngAAAAAAAAAAAAAAAAAABMA0GCSqGSIb3DQEBCwUAA4IBAQBi302qLCgxWsUalgc2\nolFxVKob1xCciS8yUVX6HX0vza0WJ7oGW6qZsBbQtfgDwB/dHv7rwsfpjRWvFhmq\ngEUrewa1h0TIC+PPTYYz4M0LOwcLIWZLZr4am1eI7YP9NDgRdhfAfM4hw20vjf2a\nkYLKyRTC5+3/ly5opMq+CGLQ8/gnFxhP3ho8JYrRnqLeh3KCTGen3kmbAhD4IOJ9\nlxMwFPTTWLFFjxbXjXmt5cEiL2mpcq13VCF2HmheCen37CyYIkrwK9IfLhBd5QQh\nWEIBLwjKCAscrtyayXWp6zUTmgvb8PQf//3Mh2DiEngAi3WI/nL+8Y0RkqbvxBar\nX2JN\n-----END CERTIFICATE-----"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "packages/vite/src/node/__tests__/utils.spec.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "vite/packages/vite/src/node/__tests__/utils.spec.ts"
+
+# Usage role supervision: vite@e347fef1df224f93207e3ae1513b3ff7eb69ae67:playground/assets/index.html:619
+# Base64 body of a public inline image data URI.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "iVBORw0KGgoAAAANSUhEUgAAADwAAAA0CAYAAADWr1sfAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6NTAyNkI1RkE4N0VCMTFFQUFBQzJENzUzNDFGRjc1N0UiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6NTAyNkI1Rjk4N0VCMTFFQUFBQzJENzUzNDFGRjc1N0UiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QTc3NzA2Q0Y4N0FCMTFFM0I3MERFRTAzNzcwNkMxMjMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QTc3NzA2RDA4N0FCMTFFM0I3MERFRTAzNzcwNkMxMjMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6nwnGxAAAJtklEQVR42txZ6W9c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"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "playground/assets/index.html"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "vite/playground/assets/index.html"
+
+# Usage role supervision: outline@4845da08ace34f3d47637adb069f7d3292504c9b:shared/editor/components/Styles.ts:1522
+# Base64 body of a public inline image data URI.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3QgeD0iOCIgeT0iNyIgd2lkdGg9IjMiIGhlaWdodD0iMiIgcng9IjEiIGZpbGw9IiM0RTVDNkUiLz4KPHJlY3QgeD0iOCIgeT0iMTEiIHdpZHRoPSIzIiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSIjNEU1QzZFIi8+CjxyZWN0IHg9IjgiIHk9IjE1IiB3aWR0aD0iMyIgaGVpZ2h0PSIyIiByeD0iMSIgZmlsbD0iIzRFNUM2RSIvPgo8cmVjdCB4PSIxMyIgeT0iNyIgd2lkdGg9IjMiIGhlaWdodD0iMiIgcng9IjEiIGZpbGw9IiM0RTVDNkUiLz4KPHJlY3QgeD0iMTMiIHk9IjExIiB3aWR0aD0iMyIgaGVpZ2h0PSIyIiByeD0iMSIgZmlsbD0iIzRFNUM2RSIvPgo8cmVjdCB4PSIxMyIgeT0iMTUiIHdpZHRoPSIzIiBoZWlnaHQ9IjIiIHJ4PSIxIiBmaWxsPSIjNEU1QzZFIi8+Cjwvc3ZnPgo="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "shared/editor/components/Styles.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "outline/shared/editor/components/Styles.ts"
+
+# Usage role supervision: cal@62317bd4e1c80ca7c520cfd8485d93969d9725f9:apps/api/v2/src/modules/users/validators/avatarValidator.spec.ts:86
+# Base64 body of a public inline image data URI.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "apps/api/v2/src/modules/users/validators/avatarValidator.spec.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "cal/apps/api/v2/src/modules/users/validators/avatarValidator.spec.ts"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:frontend/src/assets/private/dat.gui.min.js:59
+# Base64 body of a public inline image data URI.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "iVBORw0KGgoAAAANSUhEUgAAAAsAAAANCAYAAAB/9ZQ7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAQJJREFUeNpiYKAU/P//PwGIC/ApCABiBSAW+I8AClAcgKxQ4T9hoMAEUrxx2QSGN6+egDX+/vWT4e7N82AMYoPAx/evwWoYoSYbACX2s7KxCxzcsezDh3evFoDEBYTEEqycggWAzA9AuUSQQgeYPa9fPv6/YWm/Acx5IPb7ty/fw+QZblw67vDs8R0YHyQhgObx+yAJkBqmG5dPPDh1aPOGR/eugW0G4vlIoTIfyFcA+QekhhHJhPdQxbiAIguMBTQZrPD7108M6roWYDFQiIAAv6Aow/1bFwXgis+f2LUAynwoIaNcz8XNx3Dl7MEJUDGQpx9gtQ8YCueB+D26OECAAQDadt7e46D42QAAAABJRU5ErkJggg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "frontend/src/assets/private/dat.gui.min.js"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/frontend/src/assets/private/dat.gui.min.js"
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:test/server/insecurity.unit.test.ts:193
+# Expected MD5 result in explicit assertion; never a password/hash input.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "0192023a7bbd73250516f069df18b500"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "test/server/insecurity.unit.test.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/test/server/insecurity.unit.test.ts"
+source_context = "      assert.equal(security.hash('admin123'), '0192023a7bbd73250516f069df18b500')\n"
+source_line = 1
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:test/server/insecurity.unit.test.ts:194
+# Expected MD5 result in explicit assertion; never a password/hash input.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "5f4dcc3b5aa765d61d8327deb882cf99"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "test/server/insecurity.unit.test.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/test/server/insecurity.unit.test.ts"
+source_context = "      assert.equal(security.hash('password'), '5f4dcc3b5aa765d61d8327deb882cf99')\n"
+source_line = 1
+
+# Usage role supervision: juice-shop@03645895eac4172b94401a8b6711956b25910b32:test/server/insecurity.unit.test.ts:195
+# Expected MD5 result in explicit assertion; never a password/hash input.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "d41d8cd98f00b204e9800998ecf8427e"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "test/server/insecurity.unit.test.ts"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "juice-shop/test/server/insecurity.unit.test.ts"
+source_context = "      assert.equal(security.hash(''), 'd41d8cd98f00b204e9800998ecf8427e')\n"
+source_line = 1
+
+# Usage role supervision: python3-saml@52d2ac8da3f35262755f6e1c32ba7c62a6011fe1:tests/data/requests/authn_request.xml.base64:1
+# Published AuthnRequest fixture; decoded root checked by extractor. Not a bearer assertion.
+# Literal role projection; does not imply current detector coverage.
+[[training_examples]]
+var_name = ""
+value = "PHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiBJRD0iX09ORUxPR0lOMTAzNDI4OTA5YWJlYzQyNGZhNTgzMjdmNzk0NzQ5ODQiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDE0LTExLTEzVDExOjM5OjM0WiIgRm9yY2VBdXRobj0iZmFsc2UiIElzUGFzc2l2ZT0iZmFsc2UiIFByb3RvY29sQmluZGluZz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmJpbmRpbmdzOkhUVFAtUE9TVCIgQXNzZXJ0aW9uQ29uc3VtZXJTZXJ2aWNlVVJMPSJodHRwOi8vZXhhbXBsZS5jb20vYWNzIj4NCiAgICA8c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+DQogICAgICAgIGh0dHA6Ly9pZHAuZXhhbXBsZS5jb20vbWV0YWRhdGENCiAgICA8L3NhbWw6SXNzdWVyPg0KICAgIDxzYW1scDpOYW1lSURQb2xpY3kgeG1sbnM6c2FtbHA9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpwcm90b2NvbCIgRm9ybWF0PSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6bmFtZWlkLWZvcm1hdDpwZXJzaXN0ZW50IiBTUE5hbWVRdWFsaWZpZXI9ImV4YW1wbGUuY29tIiBBbGxvd0NyZWF0ZT0idHJ1ZSIgLz4NCiAgICA8c2FtbHA6UmVxdWVzdGVkQXV0aG5Db250ZXh0IHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIENvbXBhcmlzb249ImV4YWN0Ij4NCiAgICAgICAgPHNhbWw6QXV0aG5Db250ZXh0Q2xhc3NSZWYgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+DQogICAgICAgICAgICB1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YWM6Y2xhc3NlczpQYXNzd29yZA0KICAgICAgICA8L3NhbWw6QXV0aG5Db250ZXh0Q2xhc3NSZWY+DQogICAgPC9zYW1scDpSZXF1ZXN0ZWRBdXRobkNvbnRleHQ+DQo8L3NhbWxwOkF1dGhuUmVxdWVzdD4="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/data/requests/authn_request.xml.base64"
+concept_labels = []
+labeled_concepts = ["token_credential", "secret_credential"]
+support_group = "python3-saml/tests/data/requests/authn_request.xml.base64"
+source_context = "PHNhbWxwOkF1dGhuUmVxdWVzdCB4bWxuczpzYW1scD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOnByb3RvY29sIiBJRD0iX09ORUxPR0lOMTAzNDI4OTA5YWJlYzQyNGZhNTgzMjdmNzk0NzQ5ODQiIFZlcnNpb249IjIuMCIgSXNzdWVJbnN0YW50PSIyMDE0LTExLTEzVDExOjM5OjM0WiIgRm9yY2VBdXRobj0iZmFsc2UiIElzUGFzc2l2ZT0iZmFsc2UiIFByb3RvY29sQmluZGluZz0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmJpbmRpbmdzOkhUVFAtUE9TVCIgQXNzZXJ0aW9uQ29uc3VtZXJTZXJ2aWNlVVJMPSJodHRwOi8vZXhhbXBsZS5jb20vYWNzIj4NCiAgICA8c2FtbDpJc3N1ZXIgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+DQogICAgICAgIGh0dHA6Ly9pZHAuZXhhbXBsZS5jb20vbWV0YWRhdGENCiAgICA8L3NhbWw6SXNzdWVyPg0KICAgIDxzYW1scDpOYW1lSURQb2xpY3kgeG1sbnM6c2FtbHA9InVybjpvYXNpczpuYW1lczp0YzpTQU1MOjIuMDpwcm90b2NvbCIgRm9ybWF0PSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6bmFtZWlkLWZvcm1hdDpwZXJzaXN0ZW50IiBTUE5hbWVRdWFsaWZpZXI9ImV4YW1wbGUuY29tIiBBbGxvd0NyZWF0ZT0idHJ1ZSIgLz4NCiAgICA8c2FtbHA6UmVxdWVzdGVkQXV0aG5Db250ZXh0IHhtbG5zOnNhbWxwPSJ1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6cHJvdG9jb2wiIENvbXBhcmlzb249ImV4YWN0Ij4NCiAgICAgICAgPHNhbWw6QXV0aG5Db250ZXh0Q2xhc3NSZWYgeG1sbnM6c2FtbD0idXJuOm9hc2lzOm5hbWVzOnRjOlNBTUw6Mi4wOmFzc2VydGlvbiI+DQogICAgICAgICAgICB1cm46b2FzaXM6bmFtZXM6dGM6U0FNTDoyLjA6YWM6Y2xhc3NlczpQYXNzd29yZA0KICAgICAgICA8L3NhbWw6QXV0aG5Db250ZXh0Q2xhc3NSZWY+DQogICAgPC9zYW1scDpSZXF1ZXN0ZWRBdXRobkNvbnRleHQ+DQo8L3NhbWxwOkF1dGhuUmVxdWVzdD4=\n"
+source_line = 1

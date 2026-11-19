@@ -2,10 +2,9 @@ from dataclasses import dataclass
 
 from secrets_hunter.detection.semantics.catalog import ConceptId, SemanticCatalog
 from secrets_hunter.detection.semantics.observation import SemanticObservation
-from secrets_hunter.models import Decision, RuleActivation
+from secrets_hunter.models import Decision, Disposition, RuleActivation
 
 from .concept_groups import PolicyConceptGroups
-from .models import ConceptKeywordEvidence
 from .rules import (
     DEFAULT_REGISTRY,
     DecisionContext,
@@ -41,10 +40,6 @@ class SecretDecisionPolicy:
         self,
         observation: SemanticObservation,
         groups: PolicyConceptGroups,
-        evidence_by_concept: dict[
-            ConceptId,
-            tuple[ConceptKeywordEvidence, ...]
-        ]
     ) -> Decision:
         if groups.policy != self.policy:
             raise ValueError("Decision groups use a different semantic policy")
@@ -52,7 +47,6 @@ class SecretDecisionPolicy:
         context = DecisionContext.build(
             observation,
             groups,
-            evidence_by_concept
         )
         matches: list[_RuleMatch] = []
         fallback: DecisionRule | None = None
@@ -79,6 +73,29 @@ class SecretDecisionPolicy:
             matches.append(_RuleMatch(rule=fallback, outcome=fallback_outcome))
 
         winner = matches[0]
+        fixture_cap: RuleActivation | None = None
+        confidence_cap = self.policy.confidence.fixture_confidence_cap
+        if (
+            groups.matched((ConceptId.TEST_FIXTURE,))
+            and winner.outcome.disposition is not Disposition.REJECT
+            and (
+                winner.outcome.disposition is Disposition.REPORT
+                or winner.outcome.confidence > confidence_cap
+            )
+        ):
+            fixture_cap = RuleActivation(
+                rule_id="strong_fixture_confidence_cap",
+                phase=DecisionPhase.CONSTRAINT.name.lower(),
+                priority=0,
+                disposition=Disposition.REVIEW,
+                confidence=min(winner.outcome.confidence, confidence_cap),
+                reasoning=(
+                    "strong fixture evidence caps confidence "
+                    f"at {confidence_cap:.0%}"
+                ),
+                selected=True,
+            )
+
         trace = tuple(
             RuleActivation(
                 rule_id=match.rule.rule_id,
@@ -87,9 +104,12 @@ class SecretDecisionPolicy:
                 disposition=match.outcome.disposition,
                 confidence=match.outcome.confidence,
                 reasoning=match.outcome.reasoning,
-                selected=match is winner,
+                selected=match is winner and fixture_cap is None,
             )
             for match in matches
         )
+
+        if fixture_cap is not None:
+            trace = (fixture_cap, *trace)
 
         return Decision(trace=trace)

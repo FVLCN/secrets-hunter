@@ -1,0 +1,1066 @@
+[[training_examples]]
+var_name = "fake_key"
+value = "nA861W3S7bE2oqzIVdBWtehx"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "config/settings.py"
+concept_labels = ["test_fixture", "key_credential"]
+
+[[training_examples]]
+var_name = "test_token"
+value = "eMHFQU5lBdtS3iky2UhuYVjah"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "test/api/auth.ts"
+concept_labels = ["test_fixture", "token_credential"]
+
+[[training_examples]]
+var_name = "integrity"
+value = "sha512-z4PhNX7vuL3xVChQ1m2AB9Yg5AULVxXcg/SpIdNs6c5H0NE8XYXysP+DGNKHfuwvY7kxvUdBeoGlODJ6+SfaPg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "ftp/package-lock.json.bak"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "image_digest"
+value = "04d189814d7b7c9c87d92f5aeed378e77868d8d7cb1bfac86bb546203359d7d7"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "docker-compose.yml"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA256"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "session_id"
+value = "7f3a91c4d8e20b65a9f12c0de4b87631"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "agents/skills/speech-to-text/references/realtime-events.md"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "MD5"  # Shape match only: 32 hex characters, not a confirmed hash.
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "pubkey"
+value = "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDRCREEyMkJGOTFENzFGNjAKUldNOVFNL1Robnp2NUxoa0MrckN3bzM1WFVTTFhsZGpTS0NzbEVhT3BaMFpWY3M0RkJQQmhvTGYK"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "translator/src/conf.json"
+concept_labels = ["public_crypto_artifact"]
+
+[[training_examples]]
+var_name = "KeyFrame"
+value = "79ffdc174191ed0f2d01d465c10c80c8c9542cb"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/ui/animation.ts"
+concept_labels = ["ordinary_identifier_words"]
+
+[[training_examples]]
+var_name = "render_key"
+value = "31ea5df94d64f1a13f1e7f01f1ff7fd291cda2cb"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/ui/rendering.ts"
+concept_labels = ["ordinary_identifier_words"]
+
+[[training_examples]]
+var_name = "cardNum"
+value = "1234567887654321"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "test/api/payment.test.ts"
+value_rejected = true
+rejection_kind = "placeholder"
+rejection_category = "placeholder"
+rejection_pattern = "12345"
+concept_labels = ["placeholder_value", "test_fixture"]
+
+[[training_examples]]
+var_name = "idempotency_key"
+value = "7b3e2c59b5c79e7bf3fd359a32dae32adbc2b346"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/payments/request.py"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"  # Shape match only: 40 hex characters, not a confirmed hash.
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "client_id"
+value = "wt8shMqZBumrYjSCVDFJMKhsLoQUgiB-kc0QpbL9"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/oauth-development-guide.md"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "commit_id"
+value = "6ff08d511cd729f04031155dc9135bdab3b766d4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/releases/manifest.json"
+value_rejected = true
+rejection_kind = "hash"
+rejection_category = "hash"
+rejection_pattern = "SHA1"
+concept_labels = ["hash_artifact", "version_or_reference_artifact"]
+
+[[training_examples]]
+var_name = "value"
+value = "18446744073709551615"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "funnel-udf/src/parsing.rs"
+concept_labels = ["generic_assignment_name"]
+
+[[training_examples]]
+var_name = "checksum"
+value = "e6a2c90f7b4138d5a0c67e91b42fd853"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "build/manifest.json"
+concept_labels = ["hash_artifact"]
+
+[[training_examples]]
+var_name = "request_id"
+value = "J8qV2mN7xK4pT9wC6rH3zF5bL0sD1yUa"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "logs/request.json"
+concept_labels = ["identifier_context"]
+
+[[training_examples]]
+var_name = "mock_password"
+value = "J8qV2mN7xK4pT9wC6rH3zF5bL0sD1yUa"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/fixtures/users.yaml"
+concept_labels = ["test_fixture", "password_credential"]
+
+[[training_examples]]
+var_name = "fake_api_token"
+value = "J8qV2mN7xK4pT9wC6rH3zF5bL0sD1yUa"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "config/settings.py"
+concept_labels = ["test_fixture", "auth_system_target", "token_credential"]
+
+[[training_examples]]
+var_name = "value"
+value = "J8qV2mN7xK4pT9wC6rH3zF5bL0sD1yUa"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "config/runtime.env"
+concept_labels = ["generic_assignment_name"]
+
+# Public half of the same WireGuard keypair.
+[[training_examples]]
+var_name = ""
+value = "XOZnetbSLDvJJXA1cnhJV5WwCYKJXgwNoTeSpc/t0Ho="
+file_path = "wireguard/publickey"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+concept_labels = ["infrastructure_target", "public_crypto_artifact"]
+
+# Additional target-only training examples.
+# Original complete-label examples above are retained unchanged.
+
+# Synthetic target context: training:negative:identifier:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "request_id"
+value = "585a73084c3adca340d9998185a7eb74"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "api/requests/log.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "correlation_id"
+value = "9a4729328414b4f1d7b72bc81660ae9d"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "services/tracing/span.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "session_id"
+value = "f873684a85da64d7ccddda6e0481d906"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "docs/references/session-events.md"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "client_id"
+value = "VWd0Qe772pDPmfHWOvlM08PViGqUaInzWVrGT3jNO6g9tY4b"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "identity/oauth/registration.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "idempotency_key"
+value = "eb5d4b5c1da56ce47d5e3860baf3b894276283f9"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "payments/requests/headers.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "cache_key"
+value = "Z76N_scy2OOQhi92y94a4oE2_p7qIiyamsfw_WP1dlkJhs0s"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "caching/lookups/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "trace_id"
+value = "4536d40ed4b0b73cbcfddd221f74b6e7"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "telemetry/tracing/context.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "span_id"
+value = "472f0684fbd00531"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "observability/logs/span.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:8
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "device_id"
+value = "V9Tw-CA1HmWziVES43RmfJU3mwo-mohGYTsuxe5ckMvBefPt"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "devices/registry/record.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:9
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "account_id"
+value = "91d4b6d08785e4fb27d748303ee66864"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "billing/accounts/record.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:10
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "document_id"
+value = "RuJfMwMsA_-V1wFqEdTaIKct_Fc800yl5-FYG8dxOmAbzBx5"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "storage/documents/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:11
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "resource_id"
+value = "r4E366KjvZlVOky66g3wDYJbWAPLqycWbrEMGaRMxvTG7kEm"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "api/resources/catalog.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:12
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "job_id"
+value = "klauB2tMKD9-MArZ7fLdd9CtKq960isW2zCaWQZZ2qj9WIFe"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "workers/scheduler/queue.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:13
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "transaction_id"
+value = "289ae3f16ac52450299af218cd16f2e9"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "ledger/events/entry.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:14
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "build_id"
+value = "bf3a03427bd22c56ca57f5f69b06583cf613dbae"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "secrets/runtime-reference.txt"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:identifier:15
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "key_id"
+value = "4a035d610d00f4be940dfd8b633a0fcd"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "crypto/metadata/keyring.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "checksum"
+value = "93532fb0d0c4ef01d780dfc742cab3bb1781653ece1a30c8f2bf50dd39631fac"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "downloads/manifest.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "integrity"
+value = "sha512-6g1T/qdNTNd5lgKkUIV+PxGnrLAOX9TsXc43E+c0Jbwgwc4PxGJvezUW9oaQpEvFL1RRgIiyG+HL92V23O6qxQ=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "web/package-lock.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "image_digest"
+value = "bf029cf0b7c8c15562fbc7f34a05288a21859a906d8d1eb165ae5e79a5e516ba"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "containers/images/manifest.yaml"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "content_hash"
+value = "cc0592d4a9b36a931d07057183952bf875db2aa567cdb34d24a0dec36b7c0579"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "assets/cache/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "sha256"
+value = "f12222f59f0386b45cfec3ffe6cdef9ad6a0a3ee36ccb5c414878dde50529bf8"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "artifacts/checksums.txt"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "digest"
+value = "93af0ed12e6fcec641fd7aa96d92841a52f1014d6758f29a31737dafcd403c51ca67c307499861ec7f7f92e97d2cc09d08c3e2bcf760f9b8946a1a43f5180b92"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "packages/registry/metadata.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "etag"
+value = "497fdcb6f2310760ea91c74fca2510e2"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "objects/storage/headers.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "fingerprint"
+value = "a0a0b53ea5765cd48fcf91ab0286bdf8d5f8ae7fa2ad7e747613fc9740bad7ef"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "certificates/pins.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:8
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "blob_hash"
+value = "eef29fa6d345fd2b9827e21925696e7dbe5a73f6"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "uploads/content/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:9
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "checksum"
+value = "sha256-BnMtRgVh8QIALBReq1BsKII7LRUOvMbgWySotGnPrW4="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/references/downloads.md"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:10
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "digest"
+value = "dcc764cb11f2a155a0c49518b6b8f673b8132b591ab8fee1048072cd7e312416"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "secrets/digest-catalog.txt"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:hash:11
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "integrity"
+value = "sha512-QkDvZ6wOmNd5URN0ywx3kS5DyOsbznb+Drp2C55ZnO9mDCMfizt6RsIvFUCo6un5gxedbamemOjWp4VHRuRHjg=="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "bundles/assets/manifest.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "public_key"
+value = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzjKAKH/++IP4Qf3ekJFD\nSqChWoPA71VCiI+xwkU76e6AWhVsf775qfXGwj0TlNd8EFtQMpgrFHbjFYu0Adoq\nAJ5SMcLy7XaOLTHVqkLCktHVa3q8EEL2sS1JynneK7DrijWgwo/EjgKuWa/X8Ul1\n6e4YCxvl/G2nYYi2WY0muSUZti7u3fyv93Jot/sB19PGRlIHOAx63DCfOYRJPWw/\nyRt9JJp7NTzaR+Fa8mvyJhuPdQGJIqUPWKzUaR0gpPxYgFt9cPwF+MnuKQWqX9k7\nKtUGw3PIGgR5Pd6IK7U/JUYwzeqyQPf2n7nkg2vF7d8LHcHVlok1Yg/YpoJDS0ot\noQIDAQAB\n-----END PUBLIC KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "signatures/verification.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "SSH_PUBLIC_KEY"
+value = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJffHOPHvrGeANA0y3siQpCEZJFOq2gEmgWF4KNwIWQ4"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "automation/ssh/authorized.env"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "certificate"
+value = "-----BEGIN CERTIFICATE-----\nMIIDGTCCAgGgAwIBAgIUeoxGS9Y1matzScDSmM4fLw3pm0IwDQYJKoZIhvcNAQEL\nBQAwHDEaMBgGA1UEAwwRc3ludGhldGljLmludmFsaWQwHhcNMjYxMTE4MTQyNzE3\nWhcNMjYxMTE5MTQyNzE3WjAcMRowGAYDVQQDDBFzeW50aGV0aWMuaW52YWxpZDCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAN6G0/6EYvDAQM53jkNS76TA\nDRgjCmAiuSwEzSgOy9jg5lnXeo1cP0HvpF4fb9H2GYcVR9PC1qmY7y23Fd/fe6ZZ\nSjzeKP3fmfSiCJcYnUlCDhrAhH6Cnw2bnHbZuu+nZS39tAw3hj+T1+cJVMs7cUVb\nHoBQQwgg9PS/uMFsvCfbsH1g9Yu1yrTyjDaqQfZxvpRX3Y4cxX1SuJEVgWTT4N33\nAPmnZkNkNuvSbKjNzaGwDJybFXCIOJyF1qQZIzli6H+acsn9eqOpZlzO+f8Dz4cL\nW59lDORDIFRnbFyap5RHofkSynMNcE2xhFstOoP1IQklvLqEo7SYlndE2WQzbf0C\nAwEAAaNTMFEwHQYDVR0OBBYEFMinHWRSfKKdm3xKS+KbUQYeTv7sMB8GA1UdIwQY\nMBaAFMinHWRSfKKdm3xKS+KbUQYeTv7sMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\nhvcNAQELBQADggEBAKEnhbi60YDdvW2nKCgh8tcP50DD6A2PNaYsTiXg039omTvW\nUg8ADiqkbZXYN5TKAiQ/md/343/13a0D/iDoDLXiC+5krnyqpkYx12S76PuMHUVT\nuHS3nfm+PC3vb19D+h8t5t7IYo2eFZ7ygFIYjmE7G539GwgVl6S6Igu35yFTt9Co\nu869gsp/LvgPz2u14cLOUTedBTaLNybTM6j8TZo5VcQ+VS1BzpWUJRl6DIKID9Hq\nm7HJhEwtB1mEYIC41sfg7zdZD4b6kP7RkxgkHIN7aa/hf2Q1zobN8IVmBtXz6C4w\n9e7hoUvr7atZLoLG7gD4HmAhXgKaTUQWX3chdoo=\n-----END CERTIFICATE-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "transport/tls/trust.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "verify_key"
+value = "ui0eI5V7w+yeew0rYeSyE9QN97eJHQHP0X7QgYJlxb4="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "updates/signatures/trusted.yaml"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "publicKey"
+value = "jc0ceDdfCYU3Eo0X60M4WVQRT2msLyT8nw3x9Qi2sbg="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "notifications/webpush/client.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "PUBLIC_KEY"
+value = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzjKAKH/++IP4Qf3ekJFD\nSqChWoPA71VCiI+xwkU76e6AWhVsf775qfXGwj0TlNd8EFtQMpgrFHbjFYu0Adoq\nAJ5SMcLy7XaOLTHVqkLCktHVa3q8EEL2sS1JynneK7DrijWgwo/EjgKuWa/X8Ul1\n6e4YCxvl/G2nYYi2WY0muSUZti7u3fyv93Jot/sB19PGRlIHOAx63DCfOYRJPWw/\nyRt9JJp7NTzaR+Fa8mvyJhuPdQGJIqUPWKzUaR0gpPxYgFt9cPwF+MnuKQWqX9k7\nKtUGw3PIGgR5Pd6IK7U/JUYwzeqyQPf2n7nkg2vF7d8LHcHVlok1Yg/YpoJDS0ot\noQIDAQAB\n-----END PUBLIC KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "identity/jwt/verifier.env"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "ca_certificate"
+value = "-----BEGIN CERTIFICATE-----\nMIIDGTCCAgGgAwIBAgIUK1VKDAmhuFVnKY2j5r4sXr4H2/IwDQYJKoZIhvcNAQEL\nBQAwHDEaMBgGA1UEAwwRc3ludGhldGljLmludmFsaWQwHhcNMjYxMTE4MTQyNzE3\nWhcNMjYxMTE5MTQyNzE3WjAcMRowGAYDVQQDDBFzeW50aGV0aWMuaW52YWxpZDCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALOH6JqjjTBunMG2DM1fqUuI\naA0S5ospIlaiFQCMgeleEGagRbvZZs7GjdtN6X2nFyv1Wo3dVlHKbDC53E2JGRNQ\nUxCZ92oE+o/e1yb5oJ4EWmhQ+hEvxZeGJPwjIUczTpmidzoawWsE7yflqUYqdprI\n8dkgkGaTM1iyc4wf2IJlLreUV0n4NneHgtT8V5foSM/XnCMZUR+SMm4Eu2Py56aR\nyazDSrSBnwuklctJCVJewMs3Qh0aqC0HIlcl5a91cP6WeI6wglyrn656D4KW3V5g\ngcUThhmptjI1KskmdHYjCXdyT/rclTcKhTPhzOPOn/84RQgFrDcw6K/peYhgzaMC\nAwEAAaNTMFEwHQYDVR0OBBYEFKdIq3QZzM/LXZTL+41CRGgtUaDZMB8GA1UdIwQY\nMBaAFKdIq3QZzM/LXZTL+41CRGgtUaDZMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\nhvcNAQELBQADggEBACeOHSZcTJyipkX6tBeRKCOOmOMYSlQ3aEv153/H1lDLf9bc\nzqQ7WaBdlVxEUA4Lv781GqSx2uCdt/iMS6DgD8hl2z1Dsobhxl/5rTJmqGnky6rb\nZapUILmY2Wdi59oW3SbmuzXemaFGyQFe6U5zxMEm22AgJObzSP447LkZJGSaKnhd\nfpfo7YtWFOXasSSRnYO9ZEl+OzmAtyjdnbJNi9vmrF2M25d/aAHBOzSEcw+BlpYj\nnUv8W1BvsJ0dtgz+NG/A0Fktlhydu2RvelR9Jyh3gavDLDQ63cGOhKsthPjJyba6\nldzJSHiDAc91mmz/COUTQPLzaPlqyYpIpSqyUWQ=\n-----END CERTIFICATE-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "databases/tls/truststore.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "pubkey"
+value = "da4GtArNmkJNAfs9JXgBKIHw5t5zkkrmICgeijX6waQ="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "network/wireguard/peer.yaml"
+concept_labels = ["infrastructure_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:8
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "signing_public_key"
+value = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvPKezx4qkQWjHUjvLDR2\nOzxz6kLGuiJIDo3osd99wAxmZch3Alwqp5+/2wkI+z1IYUfqFP5Ho8/iRMI+493K\n0AiAq6dK7W13eBHQt6KPA2xnDA/sZogiLwIB7Ylqnk+mc7lmva5cLypzhbX5tUpJ\nmUS2xzSmha59xaGbAn0q4meZJ+Gj2H6UBxMDTJSf7DU1ERiCAUy0lSTJzvegtqzt\nWxl8o0aAnRbM6J6kCX9e6WmVN3ZyDE6hzZ27MuAnn6Y68ZFPkaxPw6x2EUGcbdHO\nCH5qZXZjcfdfNe4YtM1uk+BpXMpYtzyKmy8aS3GYfUjRnQK28Bbh5pxyw7qi+bpy\nxQIDAQAB\n-----END PUBLIC KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "packages/signatures/verification.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:9
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "certificate"
+value = "-----BEGIN CERTIFICATE-----\nMIIDGTCCAgGgAwIBAgIUHc6k7Cby97QP50beidJAoCdxWbkwDQYJKoZIhvcNAQEL\nBQAwHDEaMBgGA1UEAwwRc3ludGhldGljLmludmFsaWQwHhcNMjYxMTE4MTQyNzE3\nWhcNMjYxMTE5MTQyNzE3WjAcMRowGAYDVQQDDBFzeW50aGV0aWMuaW52YWxpZDCC\nASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANq+0HIZNvNG5CP3JrHX4wPg\nbhROZ+o6wEAWPPduQQpcvq0LVtZeLamt0ts07BMNt3788lSqqyk7+9qE5iFyVf5H\nGIJjzaASgSVaL8V8tuebAav9NwCHVlucQ98vquOI6i342+e8rA5lUo0zorXAgpqf\n4LtW+vsuPJSph9WS+T35cpRQCPwYZK8+6c9/XUHMERzGajZ63AEQ+3l/fP/YO2lg\nXGSvbv8TeucuI5jjUncmuQcTZxqAX3GtD5Wod73kWqeoj79jHk/1GV3kFdlAddJC\nmADBp9PakSuvtFhNO4FzT2vdxaJWXcg0lrY2+/qKNYb4v4S4hvJ2sJ9K2CTVWjsC\nAwEAAaNTMFEwHQYDVR0OBBYEFGjGTTlrteXKRUaRoWnBDmkZiBIOMB8GA1UdIwQY\nMBaAFGjGTTlrteXKRUaRoWnBDmkZiBIOMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZI\nhvcNAQELBQADggEBALPxga3hiWWj50axA5ty5P7q0RW3zlU4IEVwJ9u8ShBBjpTC\nEzpPoAPy0D+ls444gT/AtiS59SX8+I+eRvTIBsHGkVggBNwxfRijPt2BgrJQFBoD\nuGWgFoCKmKJ6VRParBcLhMRAE8hH91dJDCYVDx0UZmkescSGI5TvntMsm/Xhb3eZ\ng10D1292JXMw7BHaIs691nYgBz6WGBNg0Dspab3jQVBhCrOEVaGs52cR+Y0okYzx\ngbKTzdYAmdlPGgE4fLBORfu0BwlbD1jnponj13Qrc8zObaWl29YdE27gdML1K9pL\ntjw/HFWYk69heTgsRuDQcoePVpLqAVrEIYGwNPQ=\n-----END CERTIFICATE-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "documents/signatures/trust.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:10
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "public_key"
+value = "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs4fomqONMG6cwbYMzV+p\nS4hoDRLmiykiVqIVAIyB6V4QZqBFu9lmzsaN203pfacXK/Vajd1WUcpsMLncTYkZ\nE1BTEJn3agT6j97XJvmgngRaaFD6ES/Fl4Yk/CMhRzNOmaJ3OhrBawTvJ+WpRip2\nmsjx2SCQZpMzWLJzjB/YgmUut5RXSfg2d4eC1PxXl+hIz9ecIxlRH5IybgS7Y/Ln\nppHJrMNKtIGfC6SVy0kJUl7AyzdCHRqoLQciVyXlr3Vw/pZ4jrCCXKufrnoPgpbd\nXmCBxROGGam2MjUqySZ0diMJd3JP+tyVNwqFM+HM486f/zhFCAWsNzDor+l5iGDN\nowIDAQAB\n-----END PUBLIC KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "backups/encryption/recipient.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:public:11
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "verifyKey"
+value = "oP2Wxiq0eYpoE33IyymU0POs9XS9Ha9ATdoLgnDrXmg="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/references/signature-format.md"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "fake_key"
+value = "93RXhZExX_HQLZgs1atqZR4gL7yOxfzm9NYL2laQx11dHIyJ"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/auth/fixtures.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "mock_password"
+value = "KBz7Nnw0AqxnP_BLpmw2cs5gax_pvDwqn51KEgyWQ3PGUuse"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/database/users.yaml"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "test_token"
+value = "4Tep7YhSC4hKaIktkK8Udk_t4yHBNvbx67Xy8XtBehWoAwOu"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "fixtures/api/session.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "example_secret"
+value = "replace_me_with_a_real_secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/samples/authentication.env"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "dummy_api_key"
+value = "oTKglpSG9onEcavn_memYoeepZcTCgM5qBcFJwmv5uJSKwBH"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/sdk/client.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "placeholder"
+value = "replace_me_with_a_real_secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "fixtures/credentials/settings.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "private_key"
+value = "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC88p7PHiqRBaMd\nSO8sNHY7PHPqQsa6IkgOjeix333ADGZlyHcCXCqnn7/bCQj7PUhhR+oU/kejz+JE\nwj7j3crQCICrp0rtbXd4EdC3oo8DbGcMD+xmiCIvAgHtiWqeT6ZzuWa9rlwvKnOF\ntfm1SkmZRLbHNKaFrn3FoZsCfSriZ5kn4aPYfpQHEwNMlJ/sNTURGIIBTLSVJMnO\n96C2rO1bGXyjRoCdFszonqQJf17paZU3dnIMTqHNnbsy4CefpjrxkU+RrE/DrHYR\nQZxt0c4IfmpldmNx91817hi0zW6T4Glcyli3PIqbLxpLcZh9SNGdArbwFuHmnHLD\nuqL5unLFAgMBAAECggEAAdpkTdY3Jyh1vtQICngyP6b6YQ4KGmm7KK9iHJp7Rn6o\no29poWOLhIzXyhtm0+X4N4IHzPBoffYMO03nZX83nb4zmttfbAAyl4IfOKnWursd\nsJvYXvIPWcQshiqemdJgqMpk9E/JNio1q1ZLTmid26u1mjMNPgrlz2IkHcxh9wn2\nQUu///hfAIsMFjrDyQmLx7JKb2p7ewpnXGdqV3QeDZdTLD92eKkjA3hI8EHLeosF\nQ+EtEr0vjmBpKMgIGUQ580zDQU94oQcJR7kCWC7HahG/neB0T5UytF629APvdu9/\nwnW7I856DtLAyN8ZeNuoKN4yaSb43ZT7olOmygm5OQKBgQDfaEojc+yxY7Y7MyrE\n8SalJ32QwdMg9UR016bxrTDagSl1UHRJmjh3fY3HtP8r7rLBxDSf8RJUZ5IGM2AD\n+Ay+wSc1xxWMc7f38iH+AvsKoA6JYmLoc7AAgn3xPDXEf0PwdOH0u1xE8hL4LBbx\nbNHzojnkAqTrCixGWB2GtT6lLQKBgQDYg1lALkE+Ldj+8+8Tt1DANUB6ecHoQG7C\nX3UHgmGvMjUGy/JKFHMf5896bxfabLl9wiREP/lfMnsDrt7hUgmEV/WUVeZYX1Kq\nOn19FXTYYOd9ltAYTW9iDy0c7KNr/7ct8cTnNHx0igTj1xxh+mhSkZgFq3m5Tc/G\nu8FO+U0y+QKBgH9EU+e6ZD3xhaBX16d1kQRIaNmL8RA3aJX/O9U1Sj1PkySHfpdn\nSX+YgKohy7NlOWP0t93dYQnALollvu7D4c7RDdsu3HG0gjq3LvIbFJPK9j0BVUMC\nlGLV85T3LdIQhc13aDkYesmz9WZ3B2LlEP1vjvb7IqPambpA/CD/Iv7JAoGBAKcD\nm0NQ6u8F+s+gZ5mz3MyHx3cymQuJOGcjr2jdgHDer9zQUdQnNi80Z+2v6JyLJgMG\nUWd8Wea/T/klWbRBzimSmFOWd5tP3LqHZ+mnNXz8M1XDkj5M7VCdGFWpjN5wYWNF\njngzGpXjKaZ/dtt1iCe5O6WUAs+YYGCS0KkU0iIxAoGBAMQ/8djh5wpsWHFLhGBw\nN9JO+KWQan3OuUQmGixKNmSH7iP7gVydIWvmHF2vhop4ZPPt7MJRzp3TtRNymXM4\nXiYoOyD5fnwFguAt/BEZ7YbQdhNCRE+qQ4prUysq/BEZz/Vpuz8IROQB8epSpS/3\n4+oLC2N69yhaZOsymTUwvatl\n-----END PRIVATE KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "tests/signing/mock-identity.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "GOOGLE_API_KEY"
+value = "AIzaZB_ODE8yNNBQbeaY5Ak_KNxHmxtvwe6nunk"
+detector = "pattern"
+finding_kind_id = "gcp_api_key"
+file_path = "tests/google/maps-fixture.env"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:8
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "AWS_CLOUDFRONT_PRIVATE_KEY"
+value = "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDSaCrjPw9hlM1q\nlcFT43GCBkyvrzXNYxlMt2ZoccxxuhuTBWEzrq2bIL1R9qBfiubu5uWARu0enxNQ\nKg/ejOHjqcUKM6HoHb5TGvGC0U86NQizLPBHL1Jqj5n9HSYwcXsJWuLMELVmVU3e\nPxBBbrNDYM2Gd9BT+YvDn+TqXD2nTG4SlrC5rJh/5rRqU3z/Qjgu+WH8jQZDF4/o\nv+HwpQeaI3HPb67A6+kJMuAa9mWWAGdt8A8Ube10SFOkacMEJRWKvUXAgD2vhCgP\npbyPupGN4Z3WwvgyWxeIiyfoJTv48hyzzMuWNE/2fPQHIYSO12kUpoQADbS0dDdW\n7NiuVCFdAgMBAAECggEACDz34OnpKkLvQAsZBLXVDeg9PGu5yY7lwLE1m0VJYfKN\nfdYqFiHyvi4r+3eSk+sWW6hCuCEOy7IiyXK8KFSPy6AsDNg0sKfpecuGRT74wSiu\nbIWH6uGZcn6o4tYvVpo63QTn+GF3GMiiQd9qPYWeEzdJFMjAKWmN5VzvU5XE/DXZ\np37gdkx+Y4ki+CiWyzNOcoyYTA85aAWOyguojdCBUZhOt9XM9Zez/fwSzlUp5ah5\nTGtfhMZvCLWCEjlxLHyFcxTImNBfpU5dPW2rXaDIScvH9tOvomXX6FjwmkhcTNWb\nu4MZg3iBOhEk7KIVwBPkNsw9zf+mVOpGtFaUECfOKQKBgQD6WL+LWKNX7ygK2XpZ\nsgKmkZbO/HxHR+GUCUhjayAqZFl4GNC4A9ec8xfMiq/6ZazqlctjlACssldS9Uj1\nePxceebRU9DJaXYWUDsJTsT8RaOdJlyrCwDYlQRAEYxQRpTnpr0Iu4TmDU+N/knk\ncw4ZKN8OotDbhJz1JdBYE1m0WwKBgQDXKIcjRDVHvuJUCWjn3LO7VNnPZK1upR3C\ncno6VYaL/Y7h9GyaN1OXJEQZ6HitjRJYPaNhD7IcVCUAtfX2p4XpMVaWL4gZt8mT\nQ9DIE0BqhkoytgV7b9W52BtDTTkWRwZapp5TDykPEQv6Ty0vwW8YLsbMvET/CqrN\nAUuNTV+OpwKBgA4Iz6QmMfIKDDqfeoZwvklMPCIacXUliHXeF1rLdKArxABBk+Hd\nBUddMWZcGAV3kbwM7bwFXgxQayjRa2engq5EfzYY9slzyhTyJn0dF1n1JXj335YP\nJdr+b6CP20fczRg3dr14lbi34k/Zg5b1BENQ0UBmzEKiKpJrrkRhwVOlAoGAFRSG\ncQEcy0O7fwpQ+e6YuXDtyjEOAPoyeTuoGBELFqooFqFRBqcHDJbkCTnKoQ5iTrzz\nRe44wCfKXFB3ocv2BcvstNhBWGu2VzRcv02LkSRJHsDQtrBVW1j+CtEFF9arm7QZ\nbP/eQPilmMerILOuA8uJdMO5ateLtnw6/8Ql6Z8CgYA0Op9b7hLBPrtB3/ns86x8\n9OdGxKspwCHdFhia1mQoJdGASRXl7A/WLtrZv4uWj1LGBZed4tJKhidUCoyqqAQO\nnROwn5yK1eDQSD5J+gc1DwVrfixlgp7tiXgxat79YVOoQp6zLuzz8UdmF/K9zmKU\n9uJx25LPIHerQGDbYhBWgw==\n-----END PRIVATE KEY-----\n"
+detector = "pattern"
+finding_kind_id = "pem_key"
+file_path = "fixtures/aws/cloudfront/env.json"
+concept_labels = ["cloud_provider_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:9
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "webhook_secret"
+value = "QL_8cCV_nPYmqC_acya1t5X6WuAFtc4WUwNmUZgv8eFc5mXb"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/github/signature.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:10
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "password"
+value = "replace_me_with_a_real_secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "fixtures/login/default-user.yaml"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:11
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "api_token"
+value = "OhEPQzTxv_OlH4RduaYRsZUENuKhjiQakg2FhvSx4kVkcLPW"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tests/jira/client-fixture.yaml"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:12
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "sample_key"
+value = "9e02028bfdec09ee8f24585f8acc60d9bf28e62f5d1922f5d33de7842a80c9f6"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "docs/samples/encryption.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:fixture:13
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "test_secret"
+value = "lP2266zNHDsftYs9DRklGWhT5ZGp5Cb74Z-FqlKYSuSt3FKC"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "fixtures/session/cookies.json"
+concept_labels = ["auth_system_target"]
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "KeyFrame"
+value = "ad811864d900250d232b52894ce864ad7d209697"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/animation/timeline.ts"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "render_key"
+value = "c7086c92e26a9a8440b4966ea946710f64975a77"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "ui/rendering/cache.ts"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "sort_key"
+value = "Xisp73E2tFnzi7tlgbvlcx73bpxlgzWuXn8RDxgzRihVZ7aF"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "tables/ordering/settings.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "hotkey"
+value = "VXkk8ES8jM4-YV1FDXXx6lBCe4D_r0z02n3owz2u3Hefzy43"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "editor/commands/bindings.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "lookup_key"
+value = "IDnCR7tgQLdFhXBmyBjyD1ous37ehn45iKi9ksbGXyoOAI8M"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/catalog/lookup.py"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "translation_key"
+value = "9wjdx9lvBRpQ3jxIeQq64sVi-OHb3yS2ZUecZGb9vhdjzrn4"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "locales/messages/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "keyboard_key"
+value = "g0KZVUVYJoKBW-13aquzvNXjhLulOxNJKHLY2-YXV5t53l4z"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "input/devices/mapping.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "map_key"
+value = "3e5NazwWxptqbc3_pqrOzMBJ202EmyA7x6sm-A-qnixyhLOX"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "collections/maps/entries.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:8
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "property_key"
+value = "TB6GXFNqhKVXOjbzp-A-xRtWDbvrz5ruLSxEOBJ4X9nI7TIq"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "src/serialization/schema.ts"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:9
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "partition_key"
+value = "qmDsDV7fqmD7BGWMBJ8rj-qUE64A0_XN4cyYiOY8VWDsMEoJ"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "analytics/events/schema.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:10
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "primary_key"
+value = "e07fef97bfbc7c6e99b70e04c144bebd"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "databases/schema/columns.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:ordinary:11
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "index_key"
+value = "b4BN_LAGqgNkREqNRTzIq7m7poH3FBLbgKK0S_1QJDD8P-JV"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "search/catalog/definition.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "commit_id"
+value = "35bc5b66948f293d84092598c98bf2ad98c3f3d2"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "releases/source/manifest.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "revision"
+value = "0be3a55b519b1f69db6870a6579c01ddc87045a7"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "build/source-version.txt"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "git_sha"
+value = "ad4694edd28755a0db522864098ba1c5863dd7c4"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "deploy/version.env"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "tree_hash"
+value = "ff9e5dee9e26db9f387a4a7d568f21bfae3c00a2"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "vcs/objects/tree.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "release_ref"
+value = "d31450e0b9844c643e4e8bf946c1486a02649e49"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "packages/releases/metadata.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "source_revision"
+value = "50352602dc1313a5ab52f60621183aa89eea93ff"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "containers/build/labels.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "commit"
+value = "5d9ba122fd5cadf8947ae2d9d8ac027029f03280"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "docs/references/release-notes.md"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:version:7
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "version_hash"
+value = "7326ad39f013f19b7dc36605227a37b3b3be29ba38060bd734bd5ca0002c5a8a"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "src/generated/version.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:0
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "value"
+value = "3b48def26dc58278a3d648bdae1cf905"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "api/resources/response.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:1
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "data"
+value = "49oMGflJs7lDchqgRcf7NzVq9SL4H18Px_CdY3H6Fh4E4A1y"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "docs/references/request-trace.md"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:2
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "entry"
+value = "ll08RuKrhmfFsrxW7hgZmHVTsJ0m8tfrxQzUxtNnSIBL5WGi"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "cache/records/index.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:3
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "content"
+value = "2288c823b6b35e37aee5fb024bc0ad7ef1f34f2bff20abe9bdc814fdee400274"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "artifacts/manifest/entry.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:4
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "result"
+value = "85bbec6ebe72697b2f8c9f751cf06bcab4a2af95"
+detector = "entropy"
+finding_kind_id = "high_entropy_hex"
+file_path = "build/source/result.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:5
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "raw"
+value = "OHd2Ginoy12lS2hdQeZweSkz1N3mNBHYUr8nbrX9lQU="
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "public/verification/settings.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
+
+# Synthetic target context: training:negative:generic:6
+# Scoped labels describe context, not whether the value is a secret.
+[[training_examples]]
+var_name = "text"
+value = "replace_me_with_a_real_secret"
+detector = "entropy"
+finding_kind_id = "high_entropy_base64"
+file_path = "fixtures/placeholder.json"
+concept_labels = []
+labeled_concepts = ["auth_system_target", "cloud_provider_target", "infrastructure_target"]
