@@ -71,9 +71,14 @@ class GitHistoryScanner(BaseScanner):
         )
 
         logger.info(f"Collecting commits from git revset {self.revset!r}...")
+        events = tuple(
+            self._work_events(git_reader, source_path_resolver)
+        )
+
         return ScanWorkPlan(
             label=str(self.target_path),
-            events=self._work_events(git_reader, source_path_resolver)
+            events=events,
+            total_items=len(events)
         )
 
     def _work_events(
@@ -82,6 +87,9 @@ class GitHistoryScanner(BaseScanner):
         source_path_resolver: SourcePathResolver
     ) -> Iterator[ScanWorkEvent]:
         for blob in self.iter_git_blobs(git_reader):
+            if self.session.control.cancellation.cancelled:
+                raise ScanCancelledError()
+
             yield ScanWorkItem(
                 label=f"{blob.commit_sha[:12]}:{blob.repo_rel_path}",
                 run=partial(

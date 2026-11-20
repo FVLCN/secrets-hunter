@@ -18,6 +18,7 @@ class ScanWorkPlan:
     label: str
     events: Iterable[ScanWorkEvent]
     total_items: int | None = None
+    single_source: bool = False
 
     def __post_init__(self) -> None:
         if self.total_items is not None and self.total_items < 0:

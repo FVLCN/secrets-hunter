@@ -32,7 +32,7 @@ class TerminalScanProgressObserver(ScanProgressObserver):
         stream: TextIO | None = None,
     ) -> None:
         self.bar_width = bar_width
-        self.stream = stream if stream is not None else sys.stderr
+        self.stream = stream if stream is not None else sys.stdout
         self.single_source = False
         self.progress_line_open = False
         self.last_percent = -1
@@ -161,7 +161,7 @@ class TerminalScanProgressObserver(ScanProgressObserver):
     def _render_source_progress(self, current_line: int) -> None:
         self.last_rendered_source_line = current_line
         self._write_progress(
-            f"\rScanned through line {current_line}..."
+            f"\rCurrent progress: scanning line #{current_line}..."
         )
 
     def _write_progress(self, text: str) -> None:

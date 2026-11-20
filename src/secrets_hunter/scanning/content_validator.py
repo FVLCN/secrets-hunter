@@ -3,6 +3,11 @@ from pathlib import Path
 from secrets_hunter.scanning.content_safety import ContentSafetyPolicy
 
 
+_BAD_CONTROL_BYTES = bytes(
+    byte for byte in range(32) if byte not in (9, 10, 13)
+) + b"\x7f"
+
+
 class TextContentValidator:
     def __init__(self, policy: ContentSafetyPolicy) -> None:
         self.policy = policy
@@ -24,12 +29,9 @@ class TextContentValidator:
         if b"\x00" in chunk:
             return False
 
-        bad_bytes = 0
-        for byte in chunk:
-            if byte == 127:
-                bad_bytes += 1
-            elif byte < 32 and byte not in (9, 10, 13):
-                bad_bytes += 1
+        bad_bytes = len(chunk) - len(
+            chunk.translate(None, _BAD_CONTROL_BYTES)
+        )
 
         return (
             bad_bytes / len(chunk)

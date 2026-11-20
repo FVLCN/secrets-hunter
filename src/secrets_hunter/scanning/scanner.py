@@ -23,7 +23,7 @@ class BaseScanner(ABC):
             control.progress.scan_started(
                 plan.total_items,
                 self.session.options.max_workers,
-                single_source=plan.total_items == 1
+                single_source=plan.single_source
             )
             result = self.session.executor.execute(plan)
         except (KeyboardInterrupt, ScanCancelledError):

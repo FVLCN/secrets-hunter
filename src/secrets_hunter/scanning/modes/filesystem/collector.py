@@ -141,6 +141,9 @@ class FilesystemCollector:
         safe_names: list[str] = []
 
         for directory_name in sorted(directory_names):
+            if directory_name in self.path_filter.ignore_dirs:
+                continue
+
             directory_path = directory / directory_name
 
             try:
@@ -171,6 +174,13 @@ class FilesystemCollector:
         failures: list[ScanFailure]
     ) -> Path | None:
         try:
+            if (
+                file_path.name in self.path_filter.ignore_files
+                or file_path.suffix.lower()
+                in self.path_filter.ignore_extensions
+            ):
+                return None
+
             if file_path.is_symlink() or file_path.is_junction():
                 return None
 

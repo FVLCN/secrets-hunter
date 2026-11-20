@@ -8,6 +8,7 @@ from secrets_hunter.models import (
     ScanFailure,
     ScanResult
 )
+from secrets_hunter.scanning.cancellation import ScanCancelledError
 from secrets_hunter.scanning.modes.filesystem.collector import FilesystemCollector
 from secrets_hunter.scanning.modes.filesystem.reader import FileReader
 from secrets_hunter.scanning.scanner import BaseScanner
@@ -47,15 +48,20 @@ class FilesystemScanner(BaseScanner):
         display_path = Path.cwd() if self.target == "." else self.target
         logger.info(f"Collecting files from {display_path}...")
         single_file = self.target_path.is_file()
+        events = tuple(self._work_events())
 
         return ScanWorkPlan(
             label=self.target,
-            events=self._work_events(),
-            total_items=1 if single_file else None
+            events=events,
+            total_items=len(events),
+            single_source=single_file
         )
 
     def _work_events(self) -> Iterator[ScanWorkEvent]:
         for entry in self.file_collector.iter_entries(self.target_path):
+            if self.session.control.cancellation.cancelled:
+                raise ScanCancelledError()
+
             if isinstance(entry, ScanFailure):
                 yield entry
             else:

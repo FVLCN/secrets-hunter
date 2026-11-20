@@ -31,7 +31,8 @@ class TextScanner(BaseScanner):
                     run=self.scan_text
                 ),
             ),
-            total_items=1
+            total_items=1,
+            single_source=True
         )
 
     def scan_text(self) -> ScanResult:

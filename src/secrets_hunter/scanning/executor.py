@@ -79,7 +79,7 @@ class ScanExecutor:
         self.control = control
 
     def execute(self, plan: ScanWorkPlan) -> ScanResult:
-        if plan.total_items == 1:
+        if plan.single_source:
             return self._execute_inline(plan)
 
         return self._execute_concurrently(plan)
