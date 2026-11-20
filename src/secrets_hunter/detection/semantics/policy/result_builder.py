@@ -1,4 +1,4 @@
-from secrets_hunter.detection.semantics.observation import FactId
+from secrets_hunter.models.fact import Fact
 from secrets_hunter.models.semantic_analysis import (
     SemanticAnalysisResult,
     SemanticConceptResult,
@@ -32,9 +32,7 @@ def build_semantic_analysis_result(
     *,
     concepts: tuple[ResolvedConcept, ...],
     providers: tuple[ProviderMatch, ...],
-    facts: tuple[FactId, ...],
-    hash_algorithm: str | None = None,
-    value_entropy: float | None = None,
+    facts: tuple[Fact, ...],
 ) -> SemanticAnalysisResult:
     return SemanticAnalysisResult(
         concepts=tuple(
@@ -64,7 +62,5 @@ def build_semantic_analysis_result(
             )
             for provider in providers
         ),
-        facts=tuple(fact.value for fact in facts),
-        hash_algorithm=hash_algorithm,
-        value_entropy=value_entropy,
+        facts=facts,
     )

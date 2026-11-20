@@ -1,67 +1,17 @@
 from dataclasses import dataclass
 from typing import Self, TypedDict
 
+from secrets_hunter.models.fact import Fact
 from secrets_hunter.models.semantic_analysis import (
     SemanticAnalysisResult,
     SemanticConceptResult,
-    SemanticKeywordEvidenceResult,
     SemanticProviderMatchResult,
 )
-
-
-@dataclass(frozen=True)
-class SemanticKeywordView:
-    term: str
-    source: str
-    strength: str = "strong"
-    display_term: str | None = None
-    provider_id: str | None = None
-    provider_name: str | None = None
-    provider_kind: str | None = None
-
-    @classmethod
-    def from_result(
-        cls,
-        evidence: SemanticKeywordEvidenceResult,
-    ) -> Self:
-        return cls(
-            term=evidence.term,
-            source=evidence.source,
-            strength=evidence.strength,
-            display_term=evidence.display_term,
-            provider_id=evidence.provider_id,
-            provider_name=evidence.provider_name,
-            provider_kind=evidence.provider_kind,
-        )
-
-    def to_dict(self) -> dict[str, object]:
-        data: dict[str, object] = {
-            "term": self.term,
-            "source": self.source,
-            "strength": self.strength,
-        }
-
-        if self.display_term:
-            data["display_term"] = self.display_term
-
-        if self.provider_id is not None:
-            data["provider_id"] = self.provider_id
-            data["provider_name"] = self.provider_name
-            data["provider_kind"] = self.provider_kind
-
-        return data
-
-
-class SemanticKeywordProvider(TypedDict):
-    id: str
-    name: str
-
-
-class SemanticKeywordGroup(TypedDict):
-    source: str
-    label: str
-    terms: list[str]
-    providers: list[SemanticKeywordProvider]
+from secrets_hunter.reporters.matched_evidence_view import (
+    MatchedEvidenceView,
+    concept_display_name,
+    source_display_name,
+)
 
 
 class SemanticConceptPresentation(TypedDict):
@@ -76,37 +26,9 @@ class SemanticConceptView:
     display_name: str
     concept_id: str
     probability: float | None
-    strongest_keywords: tuple[SemanticKeywordView, ...]
+    evidence: tuple[MatchedEvidenceView, ...]
     origin: str
     strength: str
-
-    @property
-    def keyword_groups(self) -> list[SemanticKeywordGroup]:
-        groups_by_source: dict[str, SemanticKeywordGroup] = {}
-        for keyword in self.strongest_keywords:
-            term = keyword.term
-            if not term:
-                continue
-
-            source = keyword.source
-            group = groups_by_source.setdefault(source, {
-                "source": source,
-                "label": "name" if source == "var_name" else source.replace("_", " "),
-                "terms": [],
-                "providers": [],
-            })
-            if term not in group["terms"]:
-                group["terms"].append(term)
-
-            if keyword.provider_id is not None:
-                provider: SemanticKeywordProvider = {
-                    "id": keyword.provider_id,
-                    "name": keyword.provider_name or keyword.provider_id,
-                }
-                if provider not in group["providers"]:
-                    group["providers"].append(provider)
-
-        return list(groups_by_source.values())
 
     @property
     def presentation(self) -> SemanticConceptPresentation | None:
@@ -130,39 +52,21 @@ class SemanticConceptView:
         cls,
         concept: SemanticConceptResult,
     ) -> Self:
+        display_name = concept.display_name or concept_display_name(concept.concept_id)
         return cls(
-            display_name=concept.display_name or concept.concept_id,
+            display_name=display_name,
             concept_id=concept.concept_id,
             probability=concept.probability,
             origin=concept.origin,
             strength=concept.strength,
-            strongest_keywords=tuple(
-                SemanticKeywordView.from_result(keyword)
+            evidence=tuple(
+                MatchedEvidenceView.from_result(
+                    keyword,
+                    concept_label=display_name,
+                )
                 for keyword in concept.strongest_keywords
             )
         )
-
-    def to_dict(self) -> dict[str, object]:
-        data: dict[str, object] = {
-            "display_name": self.display_name,
-            "concept_id": self.concept_id,
-            "probability": (
-                round(self.probability, 4) if self.probability is not None else None
-            ),
-            "origin": self.origin,
-            "strength": self.strength,
-            "keyword_groups": self.keyword_groups,
-            "strongest_keywords": [
-                keyword.to_dict()
-                for keyword in self.strongest_keywords
-            ]
-        }
-
-        presentation = self.presentation
-        if presentation is not None:
-            data["presentation"] = presentation
-
-        return data
 
 
 @dataclass(frozen=True)
@@ -171,7 +75,7 @@ class SemanticProviderView:
     name: str
     kind: str
     target_concept_id: str
-    strongest_keywords: tuple[SemanticKeywordView, ...]
+    evidence: tuple[MatchedEvidenceView, ...]
     matched_pattern_id: str | None = None
 
     @classmethod
@@ -184,24 +88,61 @@ class SemanticProviderView:
             name=provider.name,
             kind=provider.kind,
             target_concept_id=provider.target_concept_id,
-            strongest_keywords=tuple(
-                SemanticKeywordView.from_result(keyword)
+            evidence=tuple(
+                MatchedEvidenceView.from_result(
+                    keyword,
+                    concept_label=concept_display_name(provider.target_concept_id),
+                )
                 for keyword in provider.strongest_keywords
             ),
             matched_pattern_id=provider.matched_pattern_id,
         )
 
+
+@dataclass(frozen=True)
+class MatchedSignalView:
+    concept_id: str
+    display_name: str
+    strength: str
+    source: str
+    evidence: str
+    text: str
+    provider_id: str | None = None
+    provider_name: str | None = None
+    provider_kind: str | None = None
+    matched_pattern_id: str | None = None
+
+    def to_dict(self) -> dict[str, object]:
+        data: dict[str, object] = {
+            "concept_id": self.concept_id,
+            "display_name": self.display_name,
+            "strength": self.strength,
+            "source": self.source,
+            "evidence": self.evidence,
+            "text": self.text,
+        }
+        if self.provider_id is not None:
+            data["provider_id"] = self.provider_id
+            data["provider_name"] = self.provider_name
+            data["provider_kind"] = self.provider_kind
+        if self.matched_pattern_id is not None:
+            data["matched_pattern_id"] = self.matched_pattern_id
+        return data
+
+
+@dataclass(frozen=True)
+class InferredSignalView:
+    concept_id: str
+    display_name: str
+    probability: float | None
+    text: str
+
     def to_dict(self) -> dict[str, object]:
         return {
-            "id": self.id,
-            "name": self.name,
-            "kind": self.kind,
-            "target_concept_id": self.target_concept_id,
-            "matched_pattern_id": self.matched_pattern_id,
-            "strongest_keywords": [
-                keyword.to_dict()
-                for keyword in self.strongest_keywords
-            ],
+            "concept_id": self.concept_id,
+            "display_name": self.display_name,
+            "probability": self.probability,
+            "text": self.text,
         }
 
 
@@ -209,18 +150,7 @@ class SemanticProviderView:
 class SemanticAnalysisView:
     concepts: tuple[SemanticConceptView, ...]
     providers: tuple[SemanticProviderView, ...]
-    facts: tuple[str, ...]
-    hash_algorithm: str | None = None
-    value_entropy: float | None = None
-
-    @property
-    def fact_details(self) -> dict[str, dict[str, str | float]]:
-        details: dict[str, dict[str, str | float]] = {}
-        if "hash_shaped_value" in self.facts and self.hash_algorithm is not None:
-            details["hash_shaped_value"] = {"algorithm": self.hash_algorithm}
-        if "high_entropy" in self.facts and self.value_entropy is not None:
-            details["high_entropy"] = {"bits_per_character": self.value_entropy}
-        return details
+    facts: tuple[Fact, ...]
 
     @classmethod
     def from_result(
@@ -237,31 +167,85 @@ class SemanticAnalysisView:
                 for provider in analysis.providers
             ),
             facts=analysis.facts,
-            hash_algorithm=analysis.hash_algorithm,
-            value_entropy=analysis.value_entropy,
         )
 
     @property
-    def pattern_provider_match(self) -> SemanticProviderView | None:
-        return next(
-            (
-                provider
-                for provider in self.providers
-                if provider.matched_pattern_id is not None
-            ),
-            None,
+    def matched_signals(self) -> tuple[MatchedSignalView, ...]:
+        matched = [
+            (concept.concept_id, item)
+            for concept in self.concepts
+            if concept.origin == "evidence"
+            for item in concept.evidence
+        ]
+        name_width = max((
+            len(item.concept_label) for _, item in matched
+        ), default=0)
+        strength_width = max((
+            len(item.strength) for _, item in matched
+        ), default=0)
+        source_width = max((
+            len(source_display_name(item.source)) for _, item in matched
+        ), default=0)
+        matched_patterns = {
+            provider.id: provider.matched_pattern_id
+            for provider in self.providers
+            if provider.matched_pattern_id is not None
+        }
+        return tuple(
+            MatchedSignalView(
+                concept_id=concept_id,
+                display_name=item.concept_label,
+                strength=item.strength,
+                source=item.source,
+                evidence=item.evidence,
+                text=item.format_text(
+                    name_width=name_width,
+                    strength_width=strength_width,
+                    source_width=source_width,
+                ),
+                provider_id=item.provider_id,
+                provider_name=item.provider_name,
+                provider_kind=item.provider_kind,
+                matched_pattern_id=(
+                    matched_patterns.get(item.provider_id)
+                    if item.source == "provider_pattern" and item.provider_id is not None
+                    else None
+                ),
+            )
+            for concept_id, item in matched
         )
+
+    @property
+    def inferred_signals(self) -> tuple[InferredSignalView, ...]:
+        inferred = [
+            concept
+            for concept in self.concepts
+            if concept.origin == "model"
+        ]
+        name_width = max((len(concept.display_name) for concept in inferred), default=0)
+        signals: list[InferredSignalView] = []
+        for concept in inferred:
+            presentation = concept.presentation
+            text = (
+                presentation["text"]
+                if presentation is not None
+                else f"[{concept.strength}]"
+            )
+            signals.append(InferredSignalView(
+                concept_id=concept.concept_id,
+                display_name=concept.display_name,
+                probability=(
+                    round(concept.probability, 4)
+                    if concept.probability is not None
+                    else None
+                ),
+                text=f"{concept.display_name.ljust(name_width)} {text}",
+            ))
+        return tuple(signals)
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "concepts": [
-                concept.to_dict()
-                for concept in self.concepts
-            ],
-            "providers": [
-                provider.to_dict()
-                for provider in self.providers
-            ],
-            "facts": list(self.facts),
-            "fact_details": self.fact_details,
+            "matched_signals": [signal.to_dict() for signal in self.matched_signals],
+            "inferred_signals": [signal.to_dict() for signal in self.inferred_signals],
+            "facts": [fact.to_dict() for fact in self.facts],
         }

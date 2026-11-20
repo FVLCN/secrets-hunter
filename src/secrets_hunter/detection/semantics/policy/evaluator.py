@@ -68,9 +68,10 @@ class ConceptSecretPolicy:
             analysis=build_semantic_analysis_result(
                 concepts=self.presentation.reported_concepts(groups),
                 providers=provider_matches,
-                facts=tuple(sorted(observation.facts)),
-                hash_algorithm=observation.hash_algorithm,
-                value_entropy=observation.value_entropy,
+                facts=tuple(sorted(
+                    observation.fact_records,
+                    key=lambda fact: fact.name,
+                )),
             ),
             decision=decision,
         )

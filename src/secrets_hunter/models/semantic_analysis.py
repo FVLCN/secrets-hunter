@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from .fact import Fact
+
 
 @dataclass(frozen=True)
 class SemanticKeywordEvidenceResult:
@@ -36,9 +38,7 @@ class SemanticProviderMatchResult:
 class SemanticAnalysisResult:
     concepts: tuple[SemanticConceptResult, ...]
     providers: tuple[SemanticProviderMatchResult, ...]
-    facts: tuple[str, ...]
-    hash_algorithm: str | None = None
-    value_entropy: float | None = None
+    facts: tuple[Fact, ...]
 
     @property
     def pattern_provider_match(self) -> SemanticProviderMatchResult | None:

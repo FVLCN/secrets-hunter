@@ -40,7 +40,7 @@ from secrets_hunter.detection.provider_registry import (
 )
 from secrets_hunter.detection.value_analysis import ValueAnalyzer
 from secrets_hunter.detection.fragmenter.models import SourceContext
-from secrets_hunter.detection.value_context import value_context_facts
+from secrets_hunter.detection.value_context import value_context_fact_records
 
 
 @dataclass(frozen=True)
@@ -70,7 +70,7 @@ def _semantic_input_from_example(
             if example.finding_kind.id in provider_pattern_ids
             else None
         ),
-        usage_facts=value_context_facts(
+        usage_facts=value_context_fact_records(
             SourceContext(example.source_context, 1) if example.source_context is not None else None,
             candidate_line=example.source_line or 1,
             candidate_value=example.value,

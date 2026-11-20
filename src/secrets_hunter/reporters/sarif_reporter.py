@@ -20,6 +20,11 @@ class SARIFReporter:
         for finding in findings:
             location = finding.location
             serialized_location = source_location_to_dict(location)
+            semantic_analysis = (
+                finding.semantic_analysis.to_dict()
+                if finding.semantic_analysis is not None
+                else {"facts": [], "matched_signals": [], "inferred_signals": []}
+            )
             result = {
                 "ruleId": finding.kind.id,
                 "message": {
@@ -43,6 +48,7 @@ class SARIFReporter:
                 }],
                 "properties": {
                     "title": finding.title,
+                    **semantic_analysis,
                     "finding_kind": {
                         "id": finding.kind.id,
                         "display_name": finding.kind.display_name
@@ -58,10 +64,6 @@ class SARIFReporter:
                     },
                     "severity": finding.severity,
                     "confidence_reasoning": finding.confidence_reasoning,
-                    "decision_trace": [
-                        activation.to_dict()
-                        for activation in finding.decision_trace
-                    ],
                 }
             }
             results.append(result)

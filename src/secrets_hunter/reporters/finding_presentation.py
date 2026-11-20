@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from dataclasses import replace
 
 from secrets_hunter.config import FindingPresentationOptions
 from secrets_hunter.config.validation import FindingPresentationOptionsValidator
@@ -90,10 +91,42 @@ def present_findings(
             match = MASKED_VALUE
             context = MASKED_VALUE
 
-        finding_views.append(FindingView.from_finding(
+        view = FindingView.from_finding(
             finding,
             match=match,
             context=context
-        ))
+        )
+        analysis = view.semantic_analysis
+        if not options.reveal_findings and analysis is not None:
+            masked_analysis = replace(
+                analysis,
+                facts=tuple(
+                    replace(fact, evidence=MASKED_VALUE, details={})
+                    if fact.sensitive else fact
+                    for fact in analysis.facts
+                ),
+                concepts=tuple(
+                    replace(
+                        concept,
+                        evidence=tuple(
+                            item.masked(MASKED_VALUE)
+                            for item in concept.evidence
+                        ),
+                    )
+                    for concept in analysis.concepts
+                ),
+                providers=tuple(
+                    replace(
+                        provider,
+                        evidence=tuple(
+                            item.masked(MASKED_VALUE)
+                            for item in provider.evidence
+                        ),
+                    )
+                    for provider in analysis.providers
+                ),
+            )
+            view = replace(view, semantic_analysis=masked_analysis)
+        finding_views.append(view)
 
     return finding_views

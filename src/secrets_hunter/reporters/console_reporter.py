@@ -1,7 +1,6 @@
 from secrets_hunter.models import GitLocation, HttpLocation
 from secrets_hunter.reporters.console_base import BaseConsoleReporter
 from secrets_hunter.reporters.finding_view import FindingView
-from secrets_hunter.reporters.semantic_analysis_view import SemanticConceptView
 
 
 class ConsoleReporter(BaseConsoleReporter):
@@ -11,16 +10,6 @@ class ConsoleReporter(BaseConsoleReporter):
             return ""
         s = s.replace("\n", "\\n")
         return s if len(s) <= max_len else s[: max_len - 3] + "..."
-
-    @staticmethod
-    def _format_concept(concept: SemanticConceptView, name_width: int = 0) -> str:
-        display_name = concept.display_name.ljust(name_width)
-
-        presentation = concept.presentation
-        if presentation is None:
-            return f"{display_name} [{concept.strength}]"
-
-        return f"{display_name} {presentation['text']}"
 
     @staticmethod
     def format_report(findings: list[FindingView]) -> None:
@@ -47,78 +36,26 @@ class ConsoleReporter(BaseConsoleReporter):
             if ctx_str:
                 lines.append(f"    Context:    {ctx_str}")
 
-            decision_summary = f.disposition.value.capitalize()
-            if f.selected_rule_id == "strong_fixture_confidence_cap":
-                decision_summary += " — strong fixture evidence"
-            elif f.confidence_reasoning:
-                decision_summary += f" — {f.confidence_reasoning}"
-
-            lines.append(f"    Decision:   {decision_summary}")
+            lines.append(f"    Decision:   {f.decision_text}")
 
             semantic_analysis = f.semantic_analysis
 
             if semantic_analysis:
-                fact_details = semantic_analysis.fact_details
-                facts: list[str] = []
-                for fact in semantic_analysis.facts:
-                    if fact == "known_pattern_match":
-                        facts.append(f"{fact} ({f.kind.display_name})")
-                    elif fact == "hash_shaped_value" and fact in fact_details:
-                        algorithm = str(fact_details[fact]["algorithm"]).upper()
-                        facts.append(f"{fact} ({algorithm} shape)")
-                    elif fact == "high_entropy" and fact in fact_details:
-                        entropy = float(fact_details[fact]["bits_per_character"])
-                        facts.append(f"{fact} ({entropy:.2f} bits/char)")
-                    else:
-                        facts.append(fact)
-                matched = [
-                    concept
-                    for concept in semantic_analysis.concepts
-                    if concept.origin == "evidence"
-                ]
-                inferred = [
-                    concept
-                    for concept in semantic_analysis.concepts
-                    if concept.origin == "model"
-                ]
-
+                facts = [fact.text for fact in semantic_analysis.facts]
                 if facts:
                     lines.append(f"    Facts:      {', '.join(facts)}")
 
+                matched = semantic_analysis.matched_signals
                 if matched:
                     lines.append("    Matched:")
-                    for concept in matched:
-                        lines.append(f"      {ConsoleReporter._format_concept(concept)}")
-                        keyword_groups = concept.keyword_groups
-                        providers = {
-                            provider["id"]: provider["name"]
-                            for group in keyword_groups
-                            for provider in group["providers"]
-                        }
-                        details: list[tuple[str, str]] = []
-                        if providers:
-                            label = "Provider" if len(providers) == 1 else "Providers"
-                            details.append((label, ", ".join(providers.values())))
-                        details.extend(
-                            (group["label"].capitalize(), ", ".join(group["terms"]))
-                            for group in keyword_groups
-                            if group["terms"]
-                        )
-                        label_width = max(
-                            (len(label) for label, _ in details),
-                            default=0,
-                        )
-                        lines.extend(
-                            f"          {(label + ':').ljust(label_width + 1)} {value}"
-                            for label, value in details
-                        )
+                    lines.extend(f"      {signal.text}" for signal in matched)
 
+                inferred = semantic_analysis.inferred_signals
                 if inferred:
                     lines.append("    Inferred:")
-                    name_width = max(len(concept.display_name) for concept in inferred)
                     lines.extend(
-                        f"      {ConsoleReporter._format_concept(concept, name_width)}"
-                        for concept in inferred
+                        f"      {signal.text}"
+                        for signal in inferred
                     )
 
             location = f.location

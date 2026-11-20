@@ -8,6 +8,7 @@ from secrets_hunter.detection.value_analysis import (
     ValueAnalyzer
 )
 from secrets_hunter.models import Finding, RejectionReason
+from secrets_hunter.models.fact import Fact
 
 
 class CandidateAssessor:
@@ -29,7 +30,7 @@ class CandidateAssessor:
         lexical_subject: str,
         rejection: RejectionReason | None,
         value_analysis: ValueAnalysis,
-        usage_facts: frozenset[FactId] = frozenset()
+        usage_facts: dict[FactId, Fact] | None = None
     ) -> ConceptPolicyResult:
         item = SemanticInput(
             associated_name=associated_name or "",
@@ -45,7 +46,7 @@ class CandidateAssessor:
             ),
             value_rejection=rejection,
             provider_pattern_id=candidate.provider_pattern_id,
-            usage_facts=usage_facts
+            usage_facts=usage_facts or {}
         )
         return self.semantic_runtime.analyze(item)
 
@@ -57,7 +58,7 @@ class CandidateAssessor:
         lexical_subject: str,
         rejection: RejectionReason | None,
         value_analysis: ValueAnalysis,
-        usage_facts: frozenset[FactId] = frozenset()
+        usage_facts: dict[FactId, Fact] | None = None
     ) -> tuple[str | None, ConceptPolicyResult]:
         names = sorted(associated_names)
 
@@ -100,7 +101,7 @@ class CandidateAssessor:
         associated_names: tuple[str, ...],
         *,
         source_text: str | None = None,
-        usage_facts: frozenset[FactId] = frozenset()
+        usage_facts: dict[FactId, Fact] | None = None
     ) -> Finding:
         lexical_subject = self.rejection_analyzer.lexical_subject_for_candidate(
             candidate

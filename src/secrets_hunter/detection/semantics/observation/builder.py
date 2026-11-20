@@ -8,7 +8,7 @@ from secrets_hunter.detection.semantics.lexical import LexicalAnalyzer
 from secrets_hunter.detection.pem import PemDisposition
 from secrets_hunter.models import DetectionMethod, RejectionKind
 
-from .facts import FactId
+from .facts import FactId, make_fact
 from .models import SemanticInput, SemanticObservation
 
 
@@ -110,33 +110,79 @@ class SemanticObservationBuilder:
             dict.fromkeys(public_crypto_shape_tokens + hash_shape_tokens)
         )
         value_entropy = value_analysis.entropy
-        facts: set[FactId] = set(item.usage_facts)
+        facts = dict(item.usage_facts)
 
         if not associated_name:
-            facts.add(FactId.NO_ASSIGNMENT_CONTEXT)
+            facts[FactId.NO_ASSIGNMENT_CONTEXT] = make_fact(
+                FactId.NO_ASSIGNMENT_CONTEXT,
+                "no associated name found",
+            )
         elif len(associated_name) < 3:
-            facts.add(FactId.SHORT_ASSIGNMENT_NAME)
+            unit = "character" if len(associated_name) == 1 else "characters"
+            facts[FactId.SHORT_ASSIGNMENT_NAME] = make_fact(
+                FactId.SHORT_ASSIGNMENT_NAME,
+                f'"{associated_name}": {len(associated_name)} {unit}, fewer than 3',
+                details={
+                    "associated_name": associated_name,
+                    "length": len(associated_name),
+                },
+            )
 
         if detection_method is DetectionMethod.ENTROPY:
-            facts.add(FactId.HIGH_ENTROPY)
+            facts[FactId.HIGH_ENTROPY] = make_fact(
+                FactId.HIGH_ENTROPY,
+                f"{value_entropy:.2f} bits/char",
+                details={"bits_per_character": value_entropy},
+            )
 
         if detection_method is DetectionMethod.PATTERN:
-            facts.add(FactId.KNOWN_PATTERN_MATCH)
+            facts[FactId.KNOWN_PATTERN_MATCH] = make_fact(
+                FactId.KNOWN_PATTERN_MATCH,
+                finding_kind.display_name,
+                details={"finding_kind": finding_kind.id},
+            )
 
         if public_crypto_shape_tokens:
-            facts.add(FactId.PUBLIC_CRYPTO_ARTIFACT)
+            facts[FactId.PUBLIC_CRYPTO_ARTIFACT] = make_fact(
+                FactId.PUBLIC_CRYPTO_ARTIFACT,
+                f"PEM header: BEGIN {pem_analysis.pem_type.value}",
+                details={"pem_type": pem_analysis.pem_type.value},
+            )
 
         if hash_classification is not None:
-            facts.add(FactId.HASH_SHAPED_VALUE)
+            algorithm = hash_classification.algorithm.value
+            facts[FactId.HASH_SHAPED_VALUE] = make_fact(
+                FactId.HASH_SHAPED_VALUE,
+                f"{algorithm.upper()} shape",
+                details={"algorithm": algorithm},
+            )
 
         if has_terminal_identifier_suffix(name_tokens):
-            facts.add(FactId.TERMINAL_IDENTIFIER_SUFFIX)
+            facts[FactId.TERMINAL_IDENTIFIER_SUFFIX] = make_fact(
+                FactId.TERMINAL_IDENTIFIER_SUFFIX,
+                f'ends with "{name_tokens[-1]}"',
+                details={
+                    "associated_name": associated_name,
+                    "suffix": name_tokens[-1],
+                },
+            )
 
         if unknown_tokens:
-            facts.add(FactId.UNKNOWN_IDENTIFIER_CONTEXT)
+            tokens = ", ".join(f'"{token}"' for token in unknown_tokens)
+            facts[FactId.UNKNOWN_IDENTIFIER_CONTEXT] = make_fact(
+                FactId.UNKNOWN_IDENTIFIER_CONTEXT,
+                tokens,
+                details={"tokens": unknown_tokens},
+            )
 
         if english_words_in_value_tokens:
-            facts.add(FactId.ENGLISH_WORDS_IN_VALUE)
+            words = ", ".join(f'"{word}"' for word in english_words_in_value_tokens)
+            facts[FactId.ENGLISH_WORDS_IN_VALUE] = make_fact(
+                FactId.ENGLISH_WORDS_IN_VALUE,
+                words,
+                details={"words": english_words_in_value_tokens},
+                sensitive=True,
+            )
 
         return SemanticObservation(
             finding_kind=finding_kind,
@@ -156,7 +202,7 @@ class SemanticObservationBuilder:
             english_words_in_value_tokens=english_words_in_value_tokens,
             value_rejection=value_rejection,
             provider_pattern_id=item.provider_pattern_id,
-            facts=frozenset(facts),
+            fact_records=tuple(facts.values()),
             hash_algorithm=(
                 hash_classification.algorithm.value
                 if hash_classification is not None

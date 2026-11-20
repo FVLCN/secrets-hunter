@@ -2,14 +2,15 @@ from dataclasses import dataclass
 from typing import Self
 
 from secrets_hunter.models import (
+    Decision,
     DetectionMethod,
     Disposition,
     Finding,
     FindingKind,
     Severity,
-    SourceLocation
+    SourceLocation,
+    severity_for_confidence,
 )
-from secrets_hunter.reporters.rule_activation_view import RuleActivationView
 from secrets_hunter.reporters.semantic_analysis_view import SemanticAnalysisView
 from secrets_hunter.reporters.source_location import (
     format_source_location,
@@ -25,11 +26,7 @@ class FindingView:
     match: str
     context: str
     detection_method: DetectionMethod
-    severity: Severity
-    confidence: int
-    confidence_reasoning: str
-    disposition: Disposition
-    decision_trace: tuple[RuleActivationView, ...]
+    decision: Decision
     associated_name: str | None = None
     semantic_analysis: SemanticAnalysisView | None = None
 
@@ -56,14 +53,7 @@ class FindingView:
             match=match,
             context=context,
             detection_method=finding.detection_method,
-            severity=finding.severity,
-            confidence=finding.confidence,
-            confidence_reasoning=finding.confidence_reasoning,
-            disposition=finding.disposition,
-            decision_trace=tuple(
-                RuleActivationView.from_activation(activation)
-                for activation in finding.decision_trace
-            ),
+            decision=finding.decision,
             associated_name=finding.associated_name,
             semantic_analysis=(
                 SemanticAnalysisView.from_result(finding.semantic_analysis)
@@ -73,12 +63,44 @@ class FindingView:
         )
 
     @property
+    def confidence(self) -> int:
+        return round(self.decision.confidence * 100)
+
+    @property
+    def confidence_reasoning(self) -> str:
+        return self.decision.reasoning
+
+    @property
+    def disposition(self) -> Disposition:
+        return self.decision.disposition
+
+    @property
+    def severity(self) -> Severity:
+        return severity_for_confidence(self.confidence)
+
+    @property
     def selected_rule_id(self) -> str:
-        return next(
-            activation.rule_id
-            for activation in self.decision_trace
-            if activation.selected
-        )
+        return self.decision.selected_rule.rule_id
+
+    @property
+    def decision_text(self) -> str:
+        summary = self.disposition.value.capitalize()
+        if self.selected_rule_id == "strong_fixture_confidence_cap":
+            return f"{summary} — strong fixture evidence"
+        if self.confidence_reasoning:
+            return f"{summary} — {self.confidence_reasoning}"
+        return summary
+
+    def decision_to_dict(self) -> dict[str, object]:
+        selected = self.decision.selected_rule
+        reasoning = selected.reasoning
+        return {
+            "rule_id": selected.rule_id,
+            "phase": selected.phase,
+            "disposition": selected.disposition.value,
+            "confidence": self.confidence,
+            "reasoning": reasoning[:1].upper() + reasoning[1:],
+        }
 
     def to_dict(self) -> dict[str, object]:
         data: dict[str, object] = {
@@ -93,23 +115,10 @@ class FindingView:
             "detection_method": self.detection_method,
             "associated_name": self.associated_name,
             "severity": self.severity,
-            "confidence_reasoning": self.confidence_reasoning,
-            "confidence": self.confidence,
-            "disposition": self.disposition.value,
-            "decision_trace": [
-                activation.to_dict()
-                for activation in self.decision_trace
-            ]
+            "decision": self.decision_to_dict(),
         }
 
         if self.semantic_analysis is not None:
             data["semantic_analysis"] = self.semantic_analysis.to_dict()
-            pattern_provider = self.semantic_analysis.pattern_provider_match
-
-            if pattern_provider is not None:
-                data["provider_pattern_id"] = pattern_provider.matched_pattern_id
-                data["provider_id"] = pattern_provider.id
-                data["provider_name"] = pattern_provider.name
-                data["provider_kind"] = pattern_provider.kind
 
         return data

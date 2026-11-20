@@ -8,8 +8,9 @@ import zlib
 from functools import lru_cache
 
 from secrets_hunter.detection.fragmenter.models import SourceContext
-from secrets_hunter.detection.semantics.observation.facts import FactId
+from secrets_hunter.detection.semantics.observation.facts import FactId, make_fact
 from secrets_hunter.detection.source_languages import is_js_ts_source
+from secrets_hunter.models.fact import Fact
 
 
 MAX_CONTEXT_LINES = 32
@@ -20,13 +21,17 @@ _HASH_NAMES = frozenset({
     "sha256Hash", "hashSecretKey", "hashAPIKey"
 })
 _ACTION_REFERENCE_RE = re.compile(
-    r"\s*(?:-\s*)?uses:\s*[^\s#]+@(?P<pin>[a-fA-F0-9]{40})"
+    r"\s*(?:-\s*)?uses:\s*(?P<action>[^\s#]+)@(?P<pin>[a-fA-F0-9]{40})"
     r"\s*(?:#(?P<comment>[^\n]*))?\s*"
 )
 _JS_TOKEN_RE = re.compile(
     r"(?P<space>\s+)|(?P<comment>//[^\n]*|/\*[\s\S]*?\*/)"
     r'''|(?P<string>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)'''
     r"|(?P<name>[A-Za-z_$][\w$]*)|(?P<symbol>.)"
+)
+_SAML_AUTHN_REQUEST_FACT = make_fact(
+    FactId.SAML_AUTHN_REQUEST_VALUE,
+    "AuthnRequest element in namespace urn:oasis:names:tc:SAML:2.0:protocol",
 )
 
 
@@ -96,6 +101,16 @@ def _hash_operand(node: ast.AST) -> bool:
     )
 
 
+def _hash_call_label(node: ast.Call) -> str:
+    if (
+        isinstance(node.func, ast.Attribute)
+        and node.func.attr in ("hexdigest", "digest")
+        and isinstance(node.func.value, ast.Call)
+    ):
+        return f"{_hash_call_label(node.func.value)}.{node.func.attr}()"
+    return f"{_name(node.func)}()"
+
+
 @lru_cache(maxsize=256)
 def _python_statement(text: str) -> ast.Module | None:
     try:
@@ -109,8 +124,8 @@ def _python_facts(
     lines: list[str],
     line: int,
     value: str
-) -> frozenset[FactId]:
-    facts: set[FactId] = set()
+) -> dict[FactId, Fact]:
+    facts: dict[FactId, Fact] = {}
     index = line - 1
     for start in range(index, -1, -1):
         for end in range(index + 1, len(lines) + 1):
@@ -126,22 +141,33 @@ def _python_facts(
             ]
             for literal in literals:
                 if _is_authn_request(literal.value):
-                    facts.add(FactId.SAML_AUTHN_REQUEST_VALUE)
+                    facts[FactId.SAML_AUTHN_REQUEST_VALUE] = _SAML_AUTHN_REQUEST_FACT
                 for node in ast.walk(tree):
                     if not isinstance(node, ast.Call):
                         continue
                     if _hash_call(node) and any(arg is literal for arg in node.args):
-                        facts.add(FactId.HASH_CALL_ARGUMENT)
+                        facts[FactId.HASH_CALL_ARGUMENT] = make_fact(
+                            FactId.HASH_CALL_ARGUMENT,
+                            _hash_call_label(node),
+                        )
                     if _name(node.func) in ("assertEqual", "assertEquals") and len(node.args) == 2:
                         left, right = node.args
                         for expected, other in ((left, right), (right, left)):
                             if expected is literal and _hash_operand(other):
-                                facts.add(FactId.ASSERTED_HASH_VALUE)
+                                operand = (
+                                    _hash_call_label(other)
+                                    if isinstance(other, ast.Call)
+                                    else f'lookup key "{other.slice.value}"'
+                                )
+                                facts[FactId.ASSERTED_HASH_VALUE] = make_fact(
+                                    FactId.ASSERTED_HASH_VALUE,
+                                    f"{_name(node.func)}() compares the value with {operand}",
+                                )
 
-    return frozenset(facts)
+    return facts
 
 
-def _js_facts(current: str, value: str) -> frozenset[FactId]:
+def _js_facts(current: str, value: str) -> dict[FactId, Fact]:
     tokens = [
         (match.lastgroup, match.group(), match.start())
         for match in _JS_TOKEN_RE.finditer(current)
@@ -152,7 +178,7 @@ def _js_facts(current: str, value: str) -> frozenset[FactId]:
         if kind == "string" and value in text[1:-1] and "${" not in text
     ]
     if len(hits) != 1:
-        return frozenset()
+        return {}
 
     hit = hits[0]
     stack: list[int] = []
@@ -166,7 +192,7 @@ def _js_facts(current: str, value: str) -> frozenset[FactId]:
                 pairs[opening] = index
                 stack.pop()
             else:
-                return frozenset()
+                return {}
 
     calls: list[tuple[int, int, str, list[tuple[int, int]], bool]] = []
     for opening, closing in pairs.items():
@@ -194,22 +220,34 @@ def _js_facts(current: str, value: str) -> frozenset[FactId]:
         )
         calls.append((opening, closing, name, args, is_hash))
 
-    facts: set[FactId] = set()
+    facts: dict[FactId, Fact] = {}
     for _, _, name, args, is_hash in calls:
         if is_hash and args and args[0] == (hit, hit + 1):
-            facts.add(FactId.HASH_CALL_ARGUMENT)
+            label = "createHash(...).update()" if name == "update" else f"{name}()"
+            facts[FactId.HASH_CALL_ARGUMENT] = make_fact(
+                FactId.HASH_CALL_ARGUMENT,
+                label,
+            )
         if name in ("equal", "strictEqual", "deepEqual") and len(args) == 2:
             left, right = args
             for expected, other in ((left, right), (right, left)):
-                if expected == (hit, hit + 1) and any(
-                    hashed and other[0] <= opening - 1 and closing < other[1]
-                    for opening, closing, _, _, hashed in calls
-                ):
-                    facts.add(FactId.ASSERTED_HASH_VALUE)
+                if expected == (hit, hit + 1):
+                    for opening, closing, hash_name, _, hashed in calls:
+                        if hashed and other[0] <= opening - 1 and closing < other[1]:
+                            label = (
+                                "createHash(...).update()"
+                                if hash_name == "update"
+                                else f"{hash_name}()"
+                            )
+                            facts[FactId.ASSERTED_HASH_VALUE] = make_fact(
+                                FactId.ASSERTED_HASH_VALUE,
+                                f"{name}() compares the value with {label}",
+                            )
+                            break
     if _is_authn_request(value):
-        facts.add(FactId.SAML_AUTHN_REQUEST_VALUE)
+        facts[FactId.SAML_AUTHN_REQUEST_VALUE] = _SAML_AUTHN_REQUEST_FACT
 
-    return frozenset(facts)
+    return facts
 
 
 def value_context_facts(
@@ -219,22 +257,37 @@ def value_context_facts(
     candidate_value: str,
     file_path: str
 ) -> frozenset[FactId]:
+    return frozenset(value_context_fact_records(
+        context,
+        candidate_line=candidate_line,
+        candidate_value=candidate_value,
+        file_path=file_path,
+    ))
+
+
+def value_context_fact_records(
+    context: SourceContext | None,
+    *,
+    candidate_line: int,
+    candidate_value: str,
+    file_path: str
+) -> dict[FactId, Fact]:
     if context is None or not candidate_value:
-        return frozenset()
+        return {}
 
     text = context.content
     if len(text.encode("utf-8")) > MAX_CONTEXT_BYTES:
-        return frozenset()
+        return {}
     lines = text.splitlines(keepends=True)
     line = candidate_line - context.start_line + 1
     if len(lines) > MAX_CONTEXT_LINES or not 1 <= line <= len(lines):
-        return frozenset()
+        return {}
     current = lines[line - 1]
     if current.count(candidate_value) != 1:
-        return frozenset()
+        return {}
 
     if candidate_value == text.strip() and _is_authn_request(candidate_value):
-        return frozenset({FactId.SAML_AUTHN_REQUEST_VALUE})
+        return {FactId.SAML_AUTHN_REQUEST_VALUE: _SAML_AUTHN_REQUEST_FACT}
     if file_path.endswith((".yml", ".yaml")):
         match = _ACTION_REFERENCE_RE.fullmatch(current)
         if match and (
@@ -242,12 +295,16 @@ def value_context_facts(
             or match["comment"] and re.fullmatch(r"[a-fA-F0-9]{40}", candidate_value)
             and re.search(r"(?<!\w)" + re.escape(candidate_value) + r"(?!\w)", match["comment"])
         ):
-            return frozenset({FactId.ACTION_REFERENCE_LITERAL})
+            role = "commit pin" if candidate_value == match["pin"] else "comment hash"
+            return {FactId.ACTION_REFERENCE_LITERAL: make_fact(
+                FactId.ACTION_REFERENCE_LITERAL,
+                f"{role} in uses: {match['action']}@…",
+            )}
     if file_path.endswith(".py"):
         return _python_facts(lines, line, candidate_value)
     if is_js_ts_source(file_path):
         return _js_facts(current, candidate_value)
     if _is_authn_request(candidate_value):
-        return frozenset({FactId.SAML_AUTHN_REQUEST_VALUE})
+        return {FactId.SAML_AUTHN_REQUEST_VALUE: _SAML_AUTHN_REQUEST_FACT}
 
-    return frozenset()
+    return {}

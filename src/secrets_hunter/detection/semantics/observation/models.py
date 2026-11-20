@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from secrets_hunter.detection.semantics.evidence_sources import (
     EVIDENCE_SOURCE_SPECS,
@@ -6,6 +6,7 @@ from secrets_hunter.detection.semantics.evidence_sources import (
 )
 from secrets_hunter.detection.pem import PemAnalysis
 from secrets_hunter.detection.value_analysis import ValueAnalysis
+from secrets_hunter.models.fact import Fact
 from secrets_hunter.models import (
     DetectionMethod,
     FindingKind,
@@ -27,7 +28,7 @@ class SemanticInput:
     pem_analysis: PemAnalysis | None = None
     value_rejection: RejectionReason | None = None
     provider_pattern_id: str | None = None
-    usage_facts: frozenset[FactId] = frozenset()
+    usage_facts: dict[FactId, Fact] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -47,11 +48,15 @@ class SemanticObservation:
     value_length_bucket: str
     value_entropy_bucket: str
     english_words_in_value_tokens: tuple[str, ...]
+    fact_records: tuple[Fact, ...]
     value_rejection: RejectionReason | None = None
     provider_pattern_id: str | None = None
-    facts: frozenset[FactId] = frozenset()
     hash_algorithm: str | None = None
     value_entropy: float | None = None
+
+    @property
+    def facts(self) -> frozenset[FactId]:
+        return frozenset(FactId(fact.name) for fact in self.fact_records)
 
     def has_fact(self, fact: FactId) -> bool:
         return fact in self.facts

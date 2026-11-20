@@ -1,3 +1,4 @@
+from .fact import Fact
 from .finding import (
     DetectionMethod,
     Finding,
@@ -21,6 +22,7 @@ from .value_kind import ValueKind
 __all__ = [
     'Decision',
     'Disposition',
+    'Fact',
     'Finding',
     'FindingKind',
     'FileLocation',

@@ -6,7 +6,7 @@ from secrets_hunter.detection.detectors.base import Detector
 from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter.fragmenter import SourceFragmenter
 from secrets_hunter.detection.fragmenter.models import LineFragment, SourceContext, SourceFragment
-from secrets_hunter.detection.value_context import value_context_facts
+from secrets_hunter.detection.value_context import value_context_fact_records
 from secrets_hunter.models import Finding, SourceLocation
 
 
@@ -96,7 +96,7 @@ class DetectionEngine:
                     candidate_context=candidate.context
                 ),
                 source_text=source_fragment.content,
-                usage_facts=value_context_facts(
+                usage_facts=value_context_fact_records(
                     source_context,
                     candidate_line=candidate.location.line,
                     candidate_value=candidate.match,
