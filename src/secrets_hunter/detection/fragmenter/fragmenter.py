@@ -3,25 +3,18 @@ import re
 from collections.abc import Callable
 
 from secrets_hunter.detection.pem import PEM_BEGIN_RE, analyze_pem_header
-from secrets_hunter.detection.value_patterns import (
+from secrets_hunter.detection.patterns.fragments import (
+    IDENTIFIER_RE,
+    QUOTED_STRING_RE,
+    compile_chunk_regex,
+)
+from secrets_hunter.detection.patterns.values import (
     CREDENTIAL_URI_RE,
     VALUE_BOUNDARY_CHARS
 )
 from secrets_hunter.detection.fragmenter.models import (
     LineFragment, GenericStringFragment, DBConnectionFragment, PEMKeyFragment, SourceFragment
 )
-
-
-_IDENTIFIER_RE = re.compile(
-    r"^(?:[a-z][a-z0-9]*(?:_[a-z0-9]+)*|[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*|[a-z][a-zA-Z0-9]*)$"
-)
-_QUOTED_STRING_RE = re.compile(
-    r'"((?:\\.|[^"\\]){5,})"|\'((?:\\.|[^\'\\]){5,})\'|`((?:\\.|[^`\\]){5,})`'
-)
-
-
-def _chunk_re(min_token_length: int) -> re.Pattern[str]:
-    return re.compile(rf"\S{{{min_token_length},}}")
 
 
 class SourceFragmenter:
@@ -37,7 +30,7 @@ class SourceFragmenter:
         self.min_token_length = min_token_length
         self.max_identifier_len = 40
         self.is_high_entropy = is_high_entropy
-        self._chunk_re = _chunk_re(min_token_length)
+        self._chunk_re = compile_chunk_regex(min_token_length)
 
     @staticmethod
     def _extract_and_blank[_FragmentT: LineFragment](
@@ -100,7 +93,7 @@ class SourceFragmenter:
         return content, fragments
 
     def _looks_like_identifier(self, s: str) -> bool:
-        if not _IDENTIFIER_RE.match(s):
+        if not IDENTIFIER_RE.match(s):
             return False
 
         if len(s) > self.max_identifier_len:
@@ -136,7 +129,7 @@ class SourceFragmenter:
 
         # 1) collect quoted strings + blank them out
         line_wo_quotes = line
-        for m in _QUOTED_STRING_RE.finditer(line):
+        for m in QUOTED_STRING_RE.finditer(line):
             s = m.group(1) or m.group(2) or m.group(3)
 
             if s:

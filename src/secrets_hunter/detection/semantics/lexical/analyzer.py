@@ -1,4 +1,4 @@
-import re
+from secrets_hunter.detection.patterns.text import NON_LOWERCASE_ASCII_RE
 
 from ..bigrams import BIGRAM_MODEL
 from ..corpus import CORPUS
@@ -30,7 +30,7 @@ class LexicalAnalyzer:
 
     @classmethod
     def bigram_score(cls, s: str) -> float:
-        cleaned = re.sub(r"[^a-z]", "", s.lower())
+        cleaned = NON_LOWERCASE_ASCII_RE.sub("", s.lower())
 
         if len(cleaned) < 2:
             return 0.0

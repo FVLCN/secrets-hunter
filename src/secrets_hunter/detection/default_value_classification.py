@@ -3,7 +3,7 @@ from secrets_hunter.detection.value_classification import (
     ValueClassificationPlan,
     ValueKindSpec
 )
-from secrets_hunter.detection.value_patterns import (
+from secrets_hunter.detection.patterns.values import (
     BASE64_STANDARD_VALUE_RE,
     BASE64URL_VALUE_RE,
     CREDENTIAL_URI_RE,

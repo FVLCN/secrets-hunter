@@ -1,7 +1,6 @@
-import re
-
 from pathlib import PurePath
 
+from secrets_hunter.detection.patterns.text import TEXT_TOKEN_RE
 from secrets_hunter.detection.semantics.catalog import SemanticCatalog
 from secrets_hunter.detection.semantics.corpus import CORPUS
 from secrets_hunter.detection.semantics.lexical import LexicalAnalyzer
@@ -10,9 +9,6 @@ from secrets_hunter.models import DetectionMethod, RejectionKind
 
 from .facts import FactId, make_fact
 from .models import SemanticInput, SemanticObservation
-
-
-_TEXT_TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9_]{0,63}")
 
 
 class SemanticObservationBuilder:
@@ -277,7 +273,7 @@ def unknown_identifier_tokens(
 def tokens_from_text(text: str, catalog: SemanticCatalog) -> tuple[str, ...]:
     tokens: list[str] = []
 
-    for raw_token in _TEXT_TOKEN_RE.findall(text or ""):
+    for raw_token in TEXT_TOKEN_RE.findall(text or ""):
         tokens.extend(catalog.tokens_for_name(raw_token))
 
     return tuple(dict.fromkeys(tokens))

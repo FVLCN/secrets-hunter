@@ -41,3 +41,10 @@ POSTGRES_LOCAL_DEFAULT_URI_RE = re.compile(
 HEX_VALUE_RE = re.compile(r"^[0-9A-Fa-f]+$")
 BASE64_STANDARD_VALUE_RE = re.compile(r"^[A-Za-z0-9+/]+={0,2}$")
 BASE64URL_VALUE_RE = re.compile(r"^[A-Za-z0-9_-]+={0,2}$")
+BASE64URL_UNPADDED_RE = re.compile(r"[A-Za-z0-9_-]+")
+BASE64_WITH_WHITESPACE_BYTES_RE = re.compile(rb"[A-Za-z0-9+/=\s]+")
+WHITESPACE_BYTES_RE = re.compile(rb"\s+")
+ABBREVIATED_JWT_REFERENCE_PATTERN = (
+    r"(?<![A-Za-z0-9_.-]){value}"
+    r"\.\.\.(?![A-Za-z0-9_.-])"
+)

@@ -1,6 +1,9 @@
-import re
-
 from pathlib import Path
+
+from secrets_hunter.detection.patterns.git_references import (
+    GIT_COMMIT_SHA_RE,
+    GIT_DIFF_HUNK_RE,
+)
 
 from secrets_hunter.scanning.cancellation import (
     ScanCancellation,
@@ -13,10 +16,6 @@ from secrets_hunter.scanning.read_result import (
     SourceReadFailure
 )
 from secrets_hunter.scanning.modes.git_history.process import GitProcessRunner
-
-
-_DIFF_HUNK_RE = re.compile(r"@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
-_COMMIT_SHA_RE = re.compile(r"\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 
 
 class GitHistoryReader:
@@ -145,7 +144,7 @@ class GitHistoryReader:
         added_lines: set[int] = set()
 
         for line in diff.splitlines():
-            match = _DIFF_HUNK_RE.match(line)
+            match = GIT_DIFF_HUNK_RE.match(line)
 
             if not match:
                 continue
@@ -217,5 +216,5 @@ class GitHistoryReader:
 
     @staticmethod
     def _validate_commit_sha(commit_sha: str) -> None:
-        if not _COMMIT_SHA_RE.fullmatch(commit_sha):
+        if not GIT_COMMIT_SHA_RE.fullmatch(commit_sha):
             raise ValueError(f"invalid git commit sha: {commit_sha!r}")

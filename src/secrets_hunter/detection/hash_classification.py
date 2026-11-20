@@ -3,7 +3,7 @@ import re
 from dataclasses import dataclass
 from enum import StrEnum
 
-from secrets_hunter.detection.value_patterns import HEX_VALUE_RE
+from secrets_hunter.detection.patterns.values import HEX_VALUE_RE
 from secrets_hunter.models.rejection import RejectionKind, RejectionReason
 
 

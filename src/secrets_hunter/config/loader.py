@@ -5,8 +5,8 @@ from pathlib import Path
 
 from secrets_hunter.config.specs import RejectionPatternSpec
 from secrets_hunter.config.validation import RejectionPatternSpecValidator
-from secrets_hunter.detection.assignment_resolver import (
-    DEFAULT_ASSIGNMENT_PATTERN_SOURCES
+from secrets_hunter.detection.patterns.assignments import (
+    DEFAULT_ASSIGNMENT_PATTERN_SOURCES,
 )
 from secrets_hunter.detection.regex import compile_regex
 from secrets_hunter.immutability import frozen_mapping
@@ -136,7 +136,7 @@ def _load_known_public_secrets() -> tuple[RejectionPattern, ...]:
         seen_values.add(secret_value)
         patterns.append(RejectionPattern(
             pattern=compile_regex(
-                rf"\A{re.escape(secret_value)}\Z",
+                re.escape(secret_value),
                 source=f"known_public_secrets[{entry_id}]"
             ),
             reason=RejectionReason(

@@ -8,6 +8,19 @@ import zlib
 from functools import lru_cache
 
 from secrets_hunter.detection.fragmenter.models import SourceContext
+from secrets_hunter.detection.patterns.git_references import (
+    ACTION_COMMIT_SHA_RE,
+    ACTION_REFERENCE_RE,
+    COMMENT_VALUE_REFERENCE_PATTERN,
+)
+from secrets_hunter.detection.patterns.javascript import (
+    JS_CREATE_HASH_UPDATE_RE,
+    JS_TOKEN_RE,
+)
+from secrets_hunter.detection.patterns.values import (
+    BASE64_WITH_WHITESPACE_BYTES_RE,
+    WHITESPACE_BYTES_RE,
+)
 from secrets_hunter.detection.semantics.observation.facts import FactId, make_fact
 from secrets_hunter.detection.source_languages import is_js_ts_source
 from secrets_hunter.models.fact import Fact
@@ -16,19 +29,11 @@ from secrets_hunter.models.fact import Fact
 MAX_CONTEXT_LINES = 32
 MAX_CONTEXT_BYTES = 4096
 MAX_DECODED_BYTES = 16384
+_MAX_CACHED_JS_LINE_CHARS = 1024
 _HASH_NAMES = frozenset({
     "hash", "md5", "sha1", "sha224", "sha256", "sha384", "sha512",
     "sha256Hash", "hashSecretKey", "hashAPIKey"
 })
-_ACTION_REFERENCE_RE = re.compile(
-    r"\s*(?:-\s*)?uses:\s*(?P<action>[^\s#]+)@(?P<pin>[a-fA-F0-9]{40})"
-    r"\s*(?:#(?P<comment>[^\n]*))?\s*"
-)
-_JS_TOKEN_RE = re.compile(
-    r"(?P<space>\s+)|(?P<comment>//[^\n]*|/\*[\s\S]*?\*/)"
-    r'''|(?P<string>"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`)'''
-    r"|(?P<name>[A-Za-z_$][\w$]*)|(?P<symbol>.)"
-)
 _SAML_AUTHN_REQUEST_FACT = make_fact(
     FactId.SAML_AUTHN_REQUEST_VALUE,
     "AuthnRequest element in namespace urn:oasis:names:tc:SAML:2.0:protocol",
@@ -41,9 +46,9 @@ def _is_authn_request(value: str) -> bool:
         return False
 
     candidates = [raw]
-    if re.fullmatch(rb"[A-Za-z0-9+/=\s]+", raw):
+    if BASE64_WITH_WHITESPACE_BYTES_RE.fullmatch(raw):
         try:
-            decoded = base64.b64decode(re.sub(rb"\s+", b"", raw), validate=True)
+            decoded = base64.b64decode(WHITESPACE_BYTES_RE.sub(b"", raw), validate=True)
             candidates.append(decoded)
             decoder = zlib.decompressobj(-15)
             inflated = decoder.decompress(decoded, MAX_DECODED_BYTES + 1)
@@ -167,12 +172,23 @@ def _python_facts(
     return facts
 
 
-def _js_facts(current: str, value: str) -> dict[FactId, Fact]:
-    tokens = [
+def _tokenize_js(current: str) -> tuple[tuple[str | None, str, int], ...]:
+    return tuple(
         (match.lastgroup, match.group(), match.start())
-        for match in _JS_TOKEN_RE.finditer(current)
+        for match in JS_TOKEN_RE.finditer(current)
         if match.lastgroup not in ("space", "comment")
-    ]
+    )
+
+
+_cached_js_tokens = lru_cache(maxsize=256)(_tokenize_js)
+
+
+def _js_facts(current: str, value: str) -> dict[FactId, Fact]:
+    tokens = (
+        _cached_js_tokens(current)
+        if len(current) <= _MAX_CACHED_JS_LINE_CHARS
+        else _tokenize_js(current)
+    )
     hits = [
         index for index, (kind, text, _) in enumerate(tokens)
         if kind == "string" and value in text[1:-1] and "${" not in text
@@ -213,8 +229,7 @@ def _js_facts(current: str, value: str) -> dict[FactId, Fact]:
         if arg_start < closing:
             args.append((arg_start, closing))
         is_hash = name in _HASH_NAMES or (
-            name == "update" and bool(re.search(
-                r"\bcreateHash\s*\([^)]*\)\s*\.\s*update\s*$",
+            name == "update" and bool(JS_CREATE_HASH_UPDATE_RE.search(
                 current[:tokens[opening][2]]
             ))
         )
@@ -289,11 +304,14 @@ def value_context_fact_records(
     if candidate_value == text.strip() and _is_authn_request(candidate_value):
         return {FactId.SAML_AUTHN_REQUEST_VALUE: _SAML_AUTHN_REQUEST_FACT}
     if file_path.endswith((".yml", ".yaml")):
-        match = _ACTION_REFERENCE_RE.fullmatch(current)
+        match = ACTION_REFERENCE_RE.fullmatch(current)
         if match and (
             candidate_value == match["pin"]
-            or match["comment"] and re.fullmatch(r"[a-fA-F0-9]{40}", candidate_value)
-            and re.search(r"(?<!\w)" + re.escape(candidate_value) + r"(?!\w)", match["comment"])
+            or match["comment"] and ACTION_COMMIT_SHA_RE.fullmatch(candidate_value)
+            and re.search(
+                COMMENT_VALUE_REFERENCE_PATTERN.format(value=re.escape(candidate_value)),
+                match["comment"],
+            )
         ):
             role = "commit pin" if candidate_value == match["pin"] else "comment hash"
             return {FactId.ACTION_REFERENCE_LITERAL: make_fact(

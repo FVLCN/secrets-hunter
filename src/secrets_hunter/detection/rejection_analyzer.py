@@ -6,18 +6,44 @@ import zlib
 
 from collections.abc import Iterable
 from binascii import Error as BinasciiError
+from functools import lru_cache
 from pathlib import PurePath
 
 from secrets_hunter.detection.pem import (
     MIN_PEM_BODY_BYTES,
-    PEM_BASE64_BODY_RE,
     PemDisposition
 )
-from secrets_hunter.detection.value_patterns import (
+from secrets_hunter.detection.patterns.darktable import (
+    DARKTABLE_COMPRESSED_VALUE_RE,
+    DARKTABLE_HEX_VALUE_RE,
+    DARKTABLE_PARAMETER_RE,
+)
+from secrets_hunter.detection.patterns.git_references import (
+    ACTION_COMMENT_COMMIT_PATTERN,
+    ACTION_COMMIT_PIN_PATTERN,
+    COMMIT_ID_RE,
+    COMMIT_URL_REFERENCE_PATTERN,
+    GPG_KEY_ID_RE,
+)
+from secrets_hunter.detection.patterns.javascript import (
+    JS_AS_CONTEXT_RE,
+    JS_DECLARATION_CONTEXT_RE,
+    JS_IDENTIFIER_OCCURRENCE_PATTERN,
+    JS_IDENTIFIER_RE,
+    JS_IMPORT_CONTEXT_RE,
+    JS_NON_CODE_RE,
+    JS_REFERENCE_ARRAY_CONTEXT_RE,
+    JS_TYPE_PREDICATE_CONTEXT_RE,
+    JS_TYPE_UNION_CONTEXT_RE,
+)
+from secrets_hunter.detection.patterns.values import (
+    ABBREVIATED_JWT_REFERENCE_PATTERN,
+    BASE64_STANDARD_VALUE_RE,
+    BASE64URL_UNPADDED_RE,
     DB_EXAMPLE_URI_RE,
     DB_PASSWORD_IN_URI_RE,
     DB_PLACEHOLDER_RE,
-    POSTGRES_LOCAL_DEFAULT_URI_RE
+    POSTGRES_LOCAL_DEFAULT_URI_RE,
 )
 from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter import DBConnectionFragment, PEMKeyFragment
@@ -31,17 +57,9 @@ from secrets_hunter.models import (
 )
 
 
-_JS_IDENTIFIER_RE = re.compile(r"[A-Za-z_$][A-Za-z0-9_$]*\Z")
-_JS_NON_CODE_RE = re.compile(
-    r""""(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\x60(?:\\.|[^\x60\\])*\x60|//[^\n]*|/\*[\s\S]*?\*/"""
-)
-_GPG_KEY_ID_RE = re.compile(r"(?:0x)?(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{16}|[0-9a-fA-F]{40}|[0-9a-fA-F]{64})!?\Z")
-_COMMIT_ID_RE = re.compile(r"(?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\Z")
-_DARKTABLE_PARAMETER_RE = re.compile(
-    r'''(?<![\w:.-])darktable:(?:blendop_params|params)\s*=\s*(["'])([^"'<>]*)\1'''
-)
 _MAX_DARKTABLE_PARAMETER_BYTES = 1024 * 1024
 _MAX_ABBREVIATED_JWT_HEADER_CHARS = 4096
+_MAX_CACHED_JS_SOURCE_CHARS = 1024
 _BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 
 MISSING_PEM_BODY = RejectionReason(
@@ -74,6 +92,13 @@ DB_CONN_PLACEHOLDER = RejectionPattern(
 )
 
 
+def _mask_js_non_code(source_text: str) -> str:
+    return JS_NON_CODE_RE.sub(lambda match: " " * len(match.group()), source_text)
+
+
+_cached_js_code = lru_cache(maxsize=256)(_mask_js_non_code)
+
+
 class CandidateRejectionAnalyzer:
     def __init__(
         self,
@@ -95,13 +120,12 @@ class CandidateRejectionAnalyzer:
             "..." not in source_text
             or len(value) > _MAX_ABBREVIATED_JWT_HEADER_CHARS
             or source_text.count(value) != 1
-            or not re.fullmatch(r"[A-Za-z0-9_-]+", value)
+            or not BASE64URL_UNPADDED_RE.fullmatch(value)
         ):
             return False
 
         if not re.search(
-            rf"(?<![A-Za-z0-9_.-]){re.escape(value)}"
-            r"\.\.\.(?![A-Za-z0-9_.-])",
+            ABBREVIATED_JWT_REFERENCE_PATTERN.format(value=re.escape(value)),
             source_text,
         ):
             return False
@@ -126,12 +150,16 @@ class CandidateRejectionAnalyzer:
 
     @staticmethod
     def is_code_reference(value: str, source_text: str, path: PurePath) -> bool:
-        if not is_js_ts_source(path) or not _JS_IDENTIFIER_RE.fullmatch(value):
+        if not is_js_ts_source(path) or not JS_IDENTIFIER_RE.fullmatch(value):
             return False
 
-        code = _JS_NON_CODE_RE.sub(lambda match: " " * len(match.group()), source_text)
+        code = (
+            _cached_js_code(source_text)
+            if len(source_text) <= _MAX_CACHED_JS_SOURCE_CHARS
+            else _mask_js_non_code(source_text)
+        )
         occurrences = list(re.finditer(
-            rf"(?<![\w$]){re.escape(value)}(?![\w$])", source_text
+            JS_IDENTIFIER_OCCURRENCE_PATTERN.format(value=re.escape(value)), source_text
         ))
         if not occurrences or any(
             code[match.start():match.end()] != value for match in occurrences
@@ -144,16 +172,12 @@ class CandidateRejectionAnalyzer:
             if (
                 before.endswith((".", ":", "="))
                 or after.startswith((":", "("))
-                or re.search(r"\bimport\b[^;]*$", before)
-                or re.search(r"\b(?:typeof|const|let|var|function|class|interface|type)\s*$", before)
-                or re.search(r":\s*[A-Za-z_$][\w$]*\s+is\s*$", before)
-                or re.search(r"\bas\s*$", before)
-                or re.search(r"\btype\s+[A-Za-z_$][\w$]*\s*=[^;]*\|\s*$", before)
-                or re.search(
-                    r"\b(?:exports|providers|type)\s*:\s*\[\s*"
-                    r"(?:[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*,\s*)*$",
-                    before,
-                )
+                or JS_IMPORT_CONTEXT_RE.search(before)
+                or JS_DECLARATION_CONTEXT_RE.search(before)
+                or JS_TYPE_PREDICATE_CONTEXT_RE.search(before)
+                or JS_AS_CONTEXT_RE.search(before)
+                or JS_TYPE_UNION_CONTEXT_RE.search(before)
+                or JS_REFERENCE_ARRAY_CONTEXT_RE.search(before)
             ):
                 return True
 
@@ -183,14 +207,14 @@ class CandidateRejectionAnalyzer:
 
     @staticmethod
     def is_commit_reference(value: str, source_text: str) -> bool:
-        if not _COMMIT_ID_RE.fullmatch(value):
+        if not COMMIT_ID_RE.fullmatch(value):
             return False
 
         escaped = re.escape(value)
         return any(re.search(pattern, source_text) for pattern in (
-            rf"https?://(?:github\.com|gitlab\.com|bitbucket\.org)/[^\s'\x22\x60]+/commits?/{escaped}\b",
-            rf"(?m)^\s*(?:#\s*)?(?:-\s*)?uses\s*:\s*[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+@{escaped}\b",
-            rf"(?m)^\s*#\s*-\s+[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+@\S+\s+\({escaped}\)",
+            COMMIT_URL_REFERENCE_PATTERN.format(value=escaped),
+            ACTION_COMMIT_PIN_PATTERN.format(value=escaped),
+            ACTION_COMMENT_COMMIT_PATTERN.format(value=escaped),
         ))
 
     @classmethod
@@ -199,15 +223,15 @@ class CandidateRejectionAnalyzer:
     ) -> bool:
         if path.suffix.lower() != ".xmp" or not any(
             match.group(2) == value
-            for match in _DARKTABLE_PARAMETER_RE.finditer(source_text)
+            for match in DARKTABLE_PARAMETER_RE.finditer(source_text)
         ):
             return False
 
-        if re.fullmatch(r"(?:[0-9a-fA-F]{2})+", value):
+        if DARKTABLE_HEX_VALUE_RE.fullmatch(value):
             return len(value) // 2 <= _MAX_DARKTABLE_PARAMETER_BYTES
 
         # Darktable stores compressed parameters as gz + two-digit factor + Base64.
-        if not re.fullmatch(r"gz(?:0[1-9]|[1-9][0-9])[A-Za-z0-9+/]+={0,2}", value):
+        if not DARKTABLE_COMPRESSED_VALUE_RE.fullmatch(value):
             return False
         compressed = cls.decode_base64_body(value[4:])
         if compressed is None:
@@ -322,7 +346,7 @@ class CandidateRejectionAnalyzer:
         if (
             git_config
             and any(name.replace("_", "").lower() == "signingkey" for name in associated_names)
-            and _GPG_KEY_ID_RE.fullmatch(value)
+            and GPG_KEY_ID_RE.fullmatch(value)
         ):
             return RejectionReason(
                 kind=RejectionKind.STRUCTURAL_VALUE,
@@ -394,7 +418,7 @@ class CandidateRejectionAnalyzer:
         if len(body) % 4 != 0:
             return None
 
-        if not PEM_BASE64_BODY_RE.fullmatch(body):
+        if not BASE64_STANDARD_VALUE_RE.fullmatch(body):
             return None
 
         try:

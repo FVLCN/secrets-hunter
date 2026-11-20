@@ -107,7 +107,6 @@ PEM_TYPE_SPECS: dict[PemType, PemTypeSpec] = {
 PEM_GROUP_PATTERN = "|".join(re.escape(pem_type.value) for pem_type in PemType)
 PEM_BEGIN_RE = re.compile(rf"-----BEGIN ({PEM_GROUP_PATTERN})-----")
 PEM_END_RE = re.compile(rf"-----END ({PEM_GROUP_PATTERN})-----")
-PEM_BASE64_BODY_RE = re.compile(r"[A-Za-z0-9+/]*={0,2}")
 MIN_PEM_BODY_BYTES = 16
 
 

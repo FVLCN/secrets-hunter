@@ -10,7 +10,7 @@ from secrets_hunter.detection.pattern_plan import (
 )
 from secrets_hunter.detection.regex import compile_regex
 from secrets_hunter.detection.semantics.catalog import SemanticCatalog
-from secrets_hunter.detection.value_patterns import JWT_TOKEN_RE
+from secrets_hunter.detection.patterns.values import JWT_TOKEN_RE
 from secrets_hunter.models import FindingKind
 
 
