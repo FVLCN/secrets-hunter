@@ -11,7 +11,8 @@ from pathlib import PurePath
 
 from secrets_hunter.detection.pem import (
     MIN_PEM_BODY_BYTES,
-    PemDisposition
+    PemDisposition,
+    normalize_pem_body
 )
 from secrets_hunter.detection.patterns.darktable import (
     DARKTABLE_COMPRESSED_VALUE_RE,
@@ -385,14 +386,14 @@ class CandidateRejectionAnalyzer:
         if not pem_key.body:
             return MISSING_PEM_BODY
 
-        normalized_body = (
-            pem_key.body
-            .replace("\\r\\n", "\n")
-            .replace("\\n", "\n")
-            .replace("\\r", "\n")
-        )
-        normalized_body = "".join(normalized_body.split())
+        if pem_key.pem_analysis.disposition is PemDisposition.PUBLIC_ARTIFACT:
+            return RejectionReason(
+                kind=RejectionKind.PUBLIC_CRYPTO,
+                name="Public",
+                category=pem_key.pem_analysis.display_category
+            )
 
+        normalized_body = normalize_pem_body(pem_key.body)
         decoded_body = self.decode_base64_body(normalized_body)
 
         if decoded_body is None:
@@ -400,13 +401,6 @@ class CandidateRejectionAnalyzer:
 
         if len(decoded_body) < MIN_PEM_BODY_BYTES:
             return TOO_SHORT_PEM_BODY
-
-        if pem_key.pem_analysis.disposition is PemDisposition.PUBLIC_ARTIFACT:
-            return RejectionReason(
-                kind=RejectionKind.PUBLIC_CRYPTO,
-                name="Public",
-                category=pem_key.pem_analysis.display_category
-            )
 
         return None
 

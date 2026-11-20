@@ -89,10 +89,7 @@ class SecretDecisionPolicy:
                 priority=0,
                 disposition=Disposition.REVIEW,
                 confidence=min(winner.outcome.confidence, confidence_cap),
-                reasoning=(
-                    "strong fixture evidence caps confidence "
-                    f"at {confidence_cap:.0%}"
-                ),
+                reasoning="strong fixture evidence",
                 selected=True,
             )
 

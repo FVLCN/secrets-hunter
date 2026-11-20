@@ -110,6 +110,18 @@ PEM_END_RE = re.compile(rf"-----END ({PEM_GROUP_PATTERN})-----")
 MIN_PEM_BODY_BYTES = 16
 
 
+_PEM_ESCAPED_NEWLINE_RE = re.compile(r"\\+[rn]")
+_PEM_STRING_JOIN_RE = re.compile(
+    r"""(?P<quote>["'])\s*(?:\+\s*)?(?P=quote)"""
+)
+
+
+def normalize_pem_body(raw_body: str) -> str:
+    body = _PEM_ESCAPED_NEWLINE_RE.sub("\n", raw_body)
+    body = _PEM_STRING_JOIN_RE.sub("", body)
+    return "".join(body.split())
+
+
 @dataclass(frozen=True)
 class PemAnalysis:
     pem_type: PemType
