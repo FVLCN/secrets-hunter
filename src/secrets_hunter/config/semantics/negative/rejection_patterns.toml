@@ -1,0 +1,171 @@
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "test"
+pattern = 'test'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "example"
+pattern = 'example'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "sample"
+pattern = 'sample'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "demo"
+pattern = 'demo'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "placeholder"
+pattern = 'placeholder'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "dummy"
+pattern = 'dummy'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "fake"
+pattern = 'fake'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "password"
+pattern = 'password'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "mock"
+pattern = 'mock'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "12345"
+pattern = '12345'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "abc123"
+pattern = 'abc123'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "123abc"
+pattern = '123abc'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "aabbcc"
+pattern = 'aabbcc'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "abcd1234"
+pattern = 'abcd1234'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "a1b2c3"
+pattern = 'a1b2c3'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "1a2b3c"
+pattern = '1a2b3c'
+
+[[rejection_patterns]]
+kind = "placeholder"
+category = "placeholder"
+name = "abcde"
+pattern = 'abcde'
+
+# AI/model artifacts
+
+[[rejection_patterns]]
+category = "model name"
+name = "Claude"
+pattern = 'claude'
+
+[[rejection_patterns]]
+category = "model name"
+name = "Llama"
+pattern = 'llama'
+
+[[rejection_patterns]]
+category = "model name"
+name = "Qwen"
+pattern = 'qwen'
+
+[[rejection_patterns]]
+category = "model name"
+name = "Mistral"
+pattern = 'mistral'
+
+[[rejection_patterns]]
+category = "model name"
+name = "Ministral"
+pattern = 'ministral'
+
+[[rejection_patterns]]
+category = "model name"
+name = "Hugging Face"
+pattern = 'huggingface'
+flags = ['IGNORECASE']
+
+[[rejection_patterns]]
+category = "call"
+name = "OpenAI tool"
+pattern = '''\bcall_[a-z0-9]{20,}\b'''
+
+[[rejection_patterns]]
+category = "call"
+name = "Anthropic tool"
+pattern = '''\btoolu_[A-Za-z0-9]{15,}\b'''
+
+[[rejection_patterns]]
+category = "call"
+name = "Anthropic server tool"
+pattern = '''\bsrvtoolu_[A-Za-z0-9]{15,}\b'''
+
+[[rejection_patterns]]
+category = "call"
+name = "Anthropic message"
+pattern = '''\bmsg_[A-Za-z0-9]{20,}\b'''
+
+# Misc
+
+[[rejection_patterns]]
+category = "(misc)"
+name = "blob"
+pattern = 'blob'
+
+[[rejection_patterns]]
+category = "(misc)"
+name = "webpack"
+pattern = 'webpack'
+
+[[rejection_patterns]]
+category = "ID"
+name = "Stripe price"
+pattern = '\bprice_[A-Za-z0-9]{24}\b'

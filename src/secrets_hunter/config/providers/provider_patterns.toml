@@ -1,0 +1,59 @@
+[[provider_patterns]]
+id = "gitlab_personal_access_token"
+provider = "gitlab"
+name = "GitLab Personal Access Token"
+regex = '''\bglpat-[A-Za-z0-9_-]{20}\b'''
+
+[[provider_patterns]]
+id = "stripe_api_key"
+provider = "stripe"
+name = "Stripe API Key"
+regex = '''\bsk_(?:live|test)_[A-Za-z0-9]{24,}\b'''
+
+[[provider_patterns]]
+id = "twilio_sid"
+provider = "twilio"
+name = "Twilio SID"
+regex = '''\bSK[A-Z0-9]{32}\b'''
+
+[[provider_patterns]]
+id = "telegram_bot_token"
+provider = "telegram"
+name = "Telegram Bot Token"
+regex = '''\b\d{9,10}:[A-Za-z0-9_-]{35,}\b'''
+
+[[provider_patterns]]
+id = "posthog_secret_api_token"
+provider = "posthog"
+name = "PostHog Secret API Token"
+regex = '''\bphs_[A-Za-z0-9]{47,49}\b'''
+
+[[provider_patterns]]
+id = "posthog_personal_api_key"
+provider = "posthog"
+name = "PostHog Personal API Key"
+regex = '''\bphx_[A-Za-z0-9]{47,49}\b'''
+
+[[provider_patterns]]
+id = "posthog_oauth_access_token"
+provider = "posthog"
+name = "PostHog OAuth Access Token"
+regex = '''\bpha_[A-Za-z0-9]{43,44}\b'''
+
+[[provider_patterns]]
+id = "posthog_oauth_refresh_token"
+provider = "posthog"
+name = "PostHog OAuth Refresh Token"
+regex = '''\bphr_[A-Za-z0-9]{43,44}\b'''
+
+[[provider_patterns]]
+id = "azure_devops_pat"
+provider = "azure_devops"
+name = "Azure DevOps Personal Access Token"
+regex = '''\b[A-Za-z0-9]{76}AZDO[A-Za-z0-9]{4}\b'''
+
+[[provider_patterns]]
+id = "gcp_api_key"
+provider = "gcp"
+name = "Google Cloud API Key"
+regex = '''(?<![A-Za-z0-9_-])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9_-])'''
