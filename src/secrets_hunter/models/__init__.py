@@ -14,6 +14,7 @@ from .rejection import (
     RejectionEvidenceKind,
     RejectionKind,
     RejectionPattern,
+    ProviderPatternRejection,
     RejectionReason,
     RejectionId,
 )
@@ -45,6 +46,7 @@ __all__ = [
     'RejectionEvidenceKind',
     'RejectionId',
     'RejectionPattern',
+    'ProviderPatternRejection',
     'RejectionReason',
     'RuleActivation',
     'ScanFailure',

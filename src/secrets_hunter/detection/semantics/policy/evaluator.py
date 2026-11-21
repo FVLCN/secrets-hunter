@@ -72,6 +72,7 @@ class ConceptSecretPolicy:
                     observation.fact_records,
                     key=lambda fact: fact.name,
                 )),
+                value_rejection=observation.value_rejection,
             ),
             decision=decision,
         )

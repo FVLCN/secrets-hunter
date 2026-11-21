@@ -55,6 +55,14 @@ class RejectionEvidence:
 
 
 @dataclass(frozen=True)
+class ProviderPatternRejection:
+    pattern_name: str
+    classification: str
+    provider_id: str | None = None
+    provider_name: str | None = None
+
+
+@dataclass(frozen=True)
 class RejectionReason:
     kind: RejectionKind
     name: str
@@ -62,6 +70,7 @@ class RejectionReason:
     detail: str | None = None
     reason_id: RejectionId | None = None
     evidence: tuple[RejectionEvidence, ...] = ()
+    provider_pattern: ProviderPatternRejection | None = None
 
 
 @dataclass(frozen=True)

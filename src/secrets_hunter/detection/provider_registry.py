@@ -19,6 +19,7 @@ from secrets_hunter.detection.semantics.catalog import (
 from secrets_hunter.detection.patterns.values import JWT_TOKEN_RE
 from secrets_hunter.models import (
     FindingKind,
+    ProviderPatternRejection,
     RejectionKind,
     RejectionPattern,
     RejectionReason,
@@ -69,6 +70,7 @@ def provider_pattern_rejection_patterns(
     catalog: SemanticCatalog,
 ) -> tuple[RejectionPattern, ...]:
     rejection_patterns: list[RejectionPattern] = []
+    providers_by_id = {provider.id: provider for provider in catalog.providers}
 
     for provider_pattern in catalog.provider_patterns:
         if (
@@ -86,6 +88,11 @@ def provider_pattern_rejection_patterns(
         else:
             continue
 
+        provider = (
+            providers_by_id.get(provider_pattern.provider_id)
+            if provider_pattern.provider_id is not None
+            else None
+        )
         rejection_patterns.append(RejectionPattern(
             pattern=compile_provider_pattern(provider_pattern),
             reason=RejectionReason(
@@ -93,6 +100,14 @@ def provider_pattern_rejection_patterns(
                 name=provider_pattern.id,
                 category=category,
                 detail=provider_pattern.reason or provider_pattern.name,
+                provider_pattern=ProviderPatternRejection(
+                    pattern_name=provider_pattern.name,
+                    classification=provider_pattern.classification.value,
+                    provider_id=provider_pattern.provider_id,
+                    provider_name=(
+                        provider.name if provider is not None else None
+                    ),
+                ),
             ),
         ))
 
@@ -111,6 +126,12 @@ def provider_detection_plan(
     ]
 
     for provider_pattern in catalog.provider_patterns:
+        if (
+            provider_pattern.classification
+            is not ProviderPatternClassification.SECRET
+        ):
+            continue
+
         patterns.append(DetectionPattern(
             kind=finding_kinds.require(
                 provider_pattern.id,
