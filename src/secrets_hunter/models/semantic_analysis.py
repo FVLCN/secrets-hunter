@@ -32,7 +32,11 @@ class SemanticProviderMatchResult:
     target_concept_id: str
     strongest_keywords: tuple[SemanticKeywordEvidenceResult, ...]
     matched_pattern_id: str | None = None
-    public: bool = False
+    classification: str | None = None
+
+    @property
+    def public(self) -> bool:
+        return self.classification == "public_credential"
 
 
 @dataclass(frozen=True)

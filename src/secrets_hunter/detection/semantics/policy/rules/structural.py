@@ -25,6 +25,13 @@ def short_assignment_name(context: DecisionContext) -> bool:
 def _rejection_reasoning(context: DecisionContext) -> str:
     rejection = context.observation.value_rejection
 
+    if (
+        rejection is not None
+        and rejection.kind is RejectionKind.PROVIDER_IDENTIFIER
+    ):
+        detail = rejection.detail or rejection.name
+        return f"known non-secret provider identifier ({detail})"
+
     if rejection is not None and rejection.kind is RejectionKind.KNOWN_PUBLIC_SECRET:
         reasoning = "known public value"
         return f"{reasoning} ({rejection.detail})" if rejection.detail else reasoning
@@ -77,6 +84,20 @@ def exact_value_rejection(context: DecisionContext) -> bool:
 def known_public_secret(context: DecisionContext) -> bool:
     rejection = context.observation.value_rejection
     return rejection is not None and rejection.kind is RejectionKind.KNOWN_PUBLIC_SECRET
+
+
+@rules.when(
+    priority=175,
+    disposition=Disposition.REJECT,
+    confidence=lambda values: values.value_rejected_blocking,
+    reasoning=_rejection_reasoning,
+)
+def known_provider_identifier(context: DecisionContext) -> bool:
+    rejection = context.observation.value_rejection
+    return (
+        rejection is not None
+        and rejection.kind is RejectionKind.PROVIDER_IDENTIFIER
+    )
 
 
 @rules.when(

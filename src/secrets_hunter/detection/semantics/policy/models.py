@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 
-from secrets_hunter.detection.semantics.catalog import ConceptId, EvidenceStrength, Provider
+from secrets_hunter.detection.semantics.catalog import (
+    ConceptId,
+    EvidenceStrength,
+    Provider,
+    ProviderPatternClassification,
+)
 from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.models import Decision, SemanticAnalysisResult
 
@@ -19,7 +24,12 @@ class ProviderMatch:
     provider: Provider
     strongest_keywords: tuple[ConceptKeywordEvidence, ...]
     matched_pattern_id: str | None = None
-    public: bool = False
+    classification: ProviderPatternClassification | None = None
+
+    @property
+    def public(self) -> bool:
+        return self.classification is ProviderPatternClassification.PUBLIC_CREDENTIAL
+
 
     @property
     def id(self) -> str:

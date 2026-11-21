@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from secrets_hunter.detection.semantics.catalog import (
     ConceptId,
     EvidenceStrength,
+    ProviderPatternClassification,
     SemanticCatalog,
     SemanticConcept,
 )
@@ -111,7 +112,10 @@ class EvidenceCollector:
         }
 
         for provider_match in provider_matches:
-            if provider_match.public:
+            if provider_match.classification in {
+                ProviderPatternClassification.PUBLIC_CREDENTIAL,
+                ProviderPatternClassification.NON_SECRET_IDENTIFIER,
+            }:
                 continue
             target_concept_id = provider_match.target_concept_id
             evidence_by_concept[target_concept_id] = self._rank_evidence((

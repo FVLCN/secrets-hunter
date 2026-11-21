@@ -1,7 +1,13 @@
 from collections import Counter
 from collections.abc import Iterable
 
-from .models import Provider, ProviderPattern, SemanticConcept, SemanticEvidenceRule
+from .models import (
+    Provider,
+    ProviderPattern,
+    ProviderPatternClassification,
+    SemanticConcept,
+    SemanticEvidenceRule,
+)
 from .taxonomy import ConceptId
 
 
@@ -62,10 +68,30 @@ def _validate_provider_pattern_references(
     source: str
 ) -> None:
     provider_ids = {provider.id for provider in providers}
+    invalid_providerless = sorted(
+        pattern.id
+        for pattern in provider_patterns
+        if (
+            pattern.provider_id is None
+            and pattern.classification
+            is not ProviderPatternClassification.NON_SECRET_IDENTIFIER
+        )
+    )
+
+    if invalid_providerless:
+        raise ValueError(
+            f"Provider patterns in {source} require a provider unless they "
+            "are non-secret identifiers: "
+            f"{', '.join(invalid_providerless)}"
+        )
+
     unknown = sorted({
         pattern.provider_id
         for pattern in provider_patterns
-        if pattern.provider_id not in provider_ids
+        if (
+            pattern.provider_id is not None
+            and pattern.provider_id not in provider_ids
+        )
     })
 
     if unknown:

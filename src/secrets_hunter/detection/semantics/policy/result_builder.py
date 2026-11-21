@@ -43,6 +43,11 @@ def build_semantic_analysis_result(
             details={
                 "provider_id": provider.id,
                 "provider_pattern_id": provider.matched_pattern_id,
+                "provider_pattern_classification": (
+                    provider.classification.value
+                    if provider.classification is not None
+                    else "secret"
+                ),
             },
         )
         for provider in providers
@@ -73,7 +78,11 @@ def build_semantic_analysis_result(
                     for keyword in provider.strongest_keywords
                 ),
                 matched_pattern_id=provider.matched_pattern_id,
-                public=provider.public,
+                classification=(
+                    provider.classification.value
+                    if provider.classification is not None
+                    else None
+                ),
             )
             for provider in providers
         ),

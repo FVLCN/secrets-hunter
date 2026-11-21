@@ -2,14 +2,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from secrets_hunter.config import RuntimeConfig, load_runtime_config
-from secrets_hunter.detection.default_value_classification import (
-    build_default_value_classifier
-)
+from secrets_hunter.detection.default_value_classification import build_default_value_classifier
 from secrets_hunter.detection.finding_kinds import FindingKindRegistry
 from secrets_hunter.detection.pattern_plan import PatternDetectionPlan
 from secrets_hunter.detection.provider_registry import (
     finding_kind_registry_for_catalog,
-    public_value_rejection_patterns,
+    provider_pattern_rejection_patterns,
     provider_detection_plan
 )
 from secrets_hunter.detection.semantics import SemanticRuntime
@@ -21,7 +19,7 @@ from secrets_hunter.models import RejectionPattern
 @dataclass(frozen=True)
 class ApplicationRuntime:
     config: RuntimeConfig
-    public_value_patterns: tuple[RejectionPattern, ...]
+    provider_pattern_rejections: tuple[RejectionPattern, ...]
     semantics: SemanticRuntime
     finding_kinds: FindingKindRegistry
     pattern_plan: PatternDetectionPlan
@@ -36,7 +34,7 @@ def load_application_runtime(
 
     return ApplicationRuntime(
         config=load_runtime_config(user_configs),
-        public_value_patterns=public_value_rejection_patterns(semantic_catalog),
+        provider_pattern_rejections=provider_pattern_rejection_patterns(semantic_catalog),
         semantics=SemanticRuntime.from_catalog(semantic_catalog),
         finding_kinds=finding_kinds,
         pattern_plan=provider_detection_plan(

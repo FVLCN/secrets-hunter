@@ -40,12 +40,12 @@ class SemanticConceptView:
         percent = round(probability * 100)
         filled_cells = min(total_cells, max(0, round(probability * total_cells)))
         bar = "▇" * filled_cells + "·" * (total_cells - filled_cells)
-        return {
-            "percent": percent,
-            "filled_cells": filled_cells,
-            "total_cells": total_cells,
-            "text": f"[{bar}] {percent}%",
-        }
+        return SemanticConceptPresentation(
+            percent=percent,
+            filled_cells=filled_cells,
+            total_cells=total_cells,
+            text=f"[{bar}] {percent}%",
+        )
 
     @classmethod
     def from_result(
@@ -77,7 +77,11 @@ class SemanticProviderView:
     target_concept_id: str
     evidence: tuple[MatchedEvidenceView, ...]
     matched_pattern_id: str | None = None
-    public: bool = False
+    classification: str | None = None
+
+    @property
+    def public(self) -> bool:
+        return self.classification == "public_credential"
 
     @classmethod
     def from_result(
@@ -97,7 +101,7 @@ class SemanticProviderView:
                 for keyword in provider.strongest_keywords
             ),
             matched_pattern_id=provider.matched_pattern_id,
-            public=provider.public,
+            classification=provider.classification,
         )
 
 

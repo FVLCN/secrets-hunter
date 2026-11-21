@@ -12,6 +12,7 @@ class RejectionKind(StrEnum):
     STRUCTURAL_VALUE = "structural_value"
     PUBLIC_CRYPTO = "public_crypto"
     KNOWN_PUBLIC_SECRET = "known_public_secret"
+    PROVIDER_IDENTIFIER = "provider_identifier"
 
 
 class RejectionId(StrEnum):

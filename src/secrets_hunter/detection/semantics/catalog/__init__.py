@@ -1,6 +1,7 @@
 from .loader import load_semantic_catalog
 from .models import (
     Provider,
+    ProviderPatternClassification,
     ProviderPattern,
     SemanticCatalog,
     SemanticConcept,
@@ -36,6 +37,7 @@ __all__ = [
     "ConceptPolicy",
     "EvidenceStrength",
     "Provider",
+    "ProviderPatternClassification",
     "ProviderPattern",
     "SemanticCatalog",
     "SemanticConcept",

@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from dataclasses import dataclass, field
+from enum import StrEnum
 
 from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.detection.semantics.tokenization import split_identifier
@@ -39,15 +40,28 @@ class Provider:
     terms: tuple[str, ...]
 
 
+class ProviderPatternClassification(StrEnum):
+    SECRET = "secret"
+    PUBLIC_CREDENTIAL = "public_credential"
+    NON_SECRET_IDENTIFIER = "non_secret_identifier"
+
+
 @dataclass(frozen=True)
 class ProviderPattern:
     id: str
-    provider_id: str
+    provider_id: str | None
     name: str
     regex: str | None
     value: str | None
-    public: bool
+    classification: ProviderPatternClassification
     reason: str | None = None
+
+    @property
+    def public(self) -> bool:
+        return (
+            self.classification
+            is ProviderPatternClassification.PUBLIC_CREDENTIAL
+        )
 
 
 @dataclass(frozen=True)

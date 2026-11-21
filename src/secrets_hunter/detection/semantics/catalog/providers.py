@@ -7,7 +7,11 @@ from secrets_hunter.detection.semantics.parsing import (
     require_table
 )
 
-from .models import Provider, ProviderPattern
+from .models import (
+    Provider,
+    ProviderPattern,
+    ProviderPatternClassification,
+)
 from .taxonomy import (
     ConceptId,
     require_concept_id,
@@ -123,9 +127,6 @@ def _load_provider_patterns(
             source
         )
 
-        provider_id = normalize_token(
-            require_string(pattern_data.get("provider"), "provider", source)
-        )
         raw_regex = pattern_data.get("regex")
         raw_value = pattern_data.get("value")
         if (raw_regex is None) == (raw_value is None):
@@ -142,15 +143,48 @@ def _load_provider_patterns(
             if raw_value is not None
             else None
         )
-        raw_public = pattern_data.get("public", False)
-        if not isinstance(raw_public, bool):
-            raise ValueError(f"'public' must be a boolean in {source}")
+        raw_classification = pattern_data.get(
+            "classification",
+            ProviderPatternClassification.SECRET.value,
+        )
+        if not isinstance(raw_classification, str):
+            raise ValueError(f"'classification' must be a string in {source}")
+        try:
+            classification = ProviderPatternClassification(
+                raw_classification.strip().lower().replace("-", "_")
+            )
+        except ValueError as error:
+            expected = ", ".join(
+                item.value for item in ProviderPatternClassification
+            )
+            raise ValueError(
+                f"Unknown provider pattern classification "
+                f"{raw_classification!r} in {source}; expected one of: {expected}"
+            ) from error
+        raw_provider = pattern_data.get("provider")
+        if raw_provider is None:
+            if (
+                classification
+                is not ProviderPatternClassification.NON_SECRET_IDENTIFIER
+            ):
+                raise ValueError(
+                    f"Provider pattern in {source} may omit 'provider' only "
+                    "when classification is 'non_secret_identifier'"
+                )
+            provider_id = None
+        else:
+            provider_id = normalize_token(
+                require_string(raw_provider, "provider", source)
+            )
         raw_reason = pattern_data.get("reason")
         if raw_reason is not None and (
             not isinstance(raw_reason, str) or not raw_reason.strip()
         ):
             raise ValueError(f"'reason' must be a non-empty string in {source}")
-        if raw_public and value is not None:
+        if (
+            classification is ProviderPatternClassification.PUBLIC_CREDENTIAL
+            and value is not None
+        ):
             if value in seen_public_values:
                 raise ValueError(f"Duplicate public value in {source}")
             seen_public_values.add(value)
@@ -162,7 +196,7 @@ def _load_provider_patterns(
                 name=require_string(pattern_data.get("name"), "name", source),
                 regex=regex,
                 value=value,
-                public=raw_public,
+                classification=classification,
                 reason=raw_reason,
             )
         )

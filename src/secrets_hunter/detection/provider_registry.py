@@ -12,6 +12,7 @@ from secrets_hunter.detection.pattern_plan import (
 )
 from secrets_hunter.detection.regex import compile_regex
 from secrets_hunter.detection.semantics.catalog import (
+    ProviderPatternClassification,
     ProviderPattern,
     SemanticCatalog,
 )
@@ -64,22 +65,38 @@ def _exact_value_regex(value: str) -> str:
     return f"{before_token}{escaped_value}{after_token}"
 
 
-def public_value_rejection_patterns(
+def provider_pattern_rejection_patterns(
     catalog: SemanticCatalog,
 ) -> tuple[RejectionPattern, ...]:
-    return tuple(
-        RejectionPattern(
+    rejection_patterns: list[RejectionPattern] = []
+
+    for provider_pattern in catalog.provider_patterns:
+        if (
+            provider_pattern.classification
+            is ProviderPatternClassification.PUBLIC_CREDENTIAL
+        ):
+            kind = RejectionKind.KNOWN_PUBLIC_SECRET
+            category = "known public value"
+        elif (
+            provider_pattern.classification
+            is ProviderPatternClassification.NON_SECRET_IDENTIFIER
+        ):
+            kind = RejectionKind.PROVIDER_IDENTIFIER
+            category = "provider identifier"
+        else:
+            continue
+
+        rejection_patterns.append(RejectionPattern(
             pattern=compile_provider_pattern(provider_pattern),
             reason=RejectionReason(
-                kind=RejectionKind.KNOWN_PUBLIC_SECRET,
+                kind=kind,
                 name=provider_pattern.id,
-                category="known public value",
+                category=category,
                 detail=provider_pattern.reason or provider_pattern.name,
             ),
-        )
-        for provider_pattern in catalog.provider_patterns
-        if provider_pattern.public
-    )
+        ))
+
+    return tuple(rejection_patterns)
 
 
 def provider_detection_plan(

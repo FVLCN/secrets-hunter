@@ -108,16 +108,20 @@ class CandidateRejectionAnalyzer:
     def __init__(
         self,
         rejection_patterns: Iterable[RejectionPattern],
-        public_value_patterns: Iterable[RejectionPattern] = (),
+        provider_pattern_rejections: Iterable[RejectionPattern] = (),
     ) -> None:
         patterns = tuple(rejection_patterns)
-        self.known_public_patterns = tuple(
+        exact_provider_kinds = {
+            RejectionKind.KNOWN_PUBLIC_SECRET,
+            RejectionKind.PROVIDER_IDENTIFIER,
+        }
+        self.exact_provider_rejections = tuple(
             pattern for pattern in patterns
-            if pattern.reason.kind is RejectionKind.KNOWN_PUBLIC_SECRET
-        ) + tuple(public_value_patterns)
+            if pattern.reason.kind in exact_provider_kinds
+        ) + tuple(provider_pattern_rejections)
         self.rejection_patterns = tuple(
             pattern for pattern in patterns
-            if pattern.reason.kind is not RejectionKind.KNOWN_PUBLIC_SECRET
+            if pattern.reason.kind not in exact_provider_kinds
         )
 
     @staticmethod
@@ -561,15 +565,21 @@ class CandidateRejectionAnalyzer:
         source_text: str | None = None,
         associated_names: tuple[str, ...] = (),
     ) -> RejectionReason | None:
-        known_public = next((
+        exact_provider_rejection = next((
             pattern.reason
-            for pattern in self.known_public_patterns
+            for pattern in self.exact_provider_rejections
             if pattern.pattern.fullmatch(candidate.match)
         ), None)
+        if (
+            exact_provider_rejection is not None
+            and exact_provider_rejection.kind is RejectionKind.PROVIDER_IDENTIFIER
+        ):
+            return exact_provider_rejection
+
         fragment = candidate.fragment
 
         if isinstance(fragment, PEMKeyFragment):
-            return self.rejection_for_pem_key(fragment) or known_public
+            return self.rejection_for_pem_key(fragment) or exact_provider_rejection
         elif isinstance(fragment, DBConnectionFragment):
             if DB_EXAMPLE_URI_RE.fullmatch(candidate.match):
                 return DB_CONN_PLACEHOLDER.reason
@@ -580,7 +590,10 @@ class CandidateRejectionAnalyzer:
                     category="local default credentials",
                     detail="postgres:postgres",
                 )
-            return self.rejection_for_db_password(lexical_subject) or known_public
+            return (
+                self.rejection_for_db_password(lexical_subject)
+                or exact_provider_rejection
+            )
 
         if candidate.finding_kind.id == "jwt_token":
             segments = candidate.match.split(".")
@@ -623,4 +636,4 @@ class CandidateRejectionAnalyzer:
                 ),),
             )
 
-        return known_public or rejection
+        return exact_provider_rejection or rejection

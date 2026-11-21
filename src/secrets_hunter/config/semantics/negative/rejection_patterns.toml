@@ -133,26 +133,6 @@ name = "Hugging Face"
 pattern = 'huggingface'
 flags = ['IGNORECASE']
 
-[[rejection_patterns]]
-category = "call"
-name = "OpenAI tool"
-pattern = '''\bcall_[a-z0-9]{20,}\b'''
-
-[[rejection_patterns]]
-category = "call"
-name = "Anthropic tool"
-pattern = '''\btoolu_[A-Za-z0-9]{15,}\b'''
-
-[[rejection_patterns]]
-category = "call"
-name = "Anthropic server tool"
-pattern = '''\bsrvtoolu_[A-Za-z0-9]{15,}\b'''
-
-[[rejection_patterns]]
-category = "call"
-name = "Anthropic message"
-pattern = '''\bmsg_[A-Za-z0-9]{20,}\b'''
-
 # Misc
 
 [[rejection_patterns]]
@@ -164,8 +144,3 @@ pattern = 'blob'
 category = "(misc)"
 name = "webpack"
 pattern = 'webpack'
-
-[[rejection_patterns]]
-category = "ID"
-name = "Stripe price"
-pattern = '\bprice_[A-Za-z0-9]{24}\b'

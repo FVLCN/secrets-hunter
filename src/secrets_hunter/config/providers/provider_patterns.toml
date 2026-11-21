@@ -15,8 +15,16 @@ id = "stripe_publishable_key"
 provider = "stripe"
 name = "Stripe Publishable Key"
 regex = '''\bpk_(?:live|test)_[A-Za-z0-9]{16,}\b'''
-public = true
+classification = "public_credential"
 reason = "Stripe publishable keys are designed for client-side use"
+
+[[provider_patterns]]
+id = "stripe_price_id"
+provider = "stripe"
+name = "Stripe Price ID"
+regex = '''\bprice_[A-Za-z0-9]{24}\b'''
+classification = "non_secret_identifier"
+reason = "Stripe price identifiers are resource IDs, not credentials"
 
 [[provider_patterns]]
 id = "twilio_sid"
@@ -47,7 +55,7 @@ id = "posthog_project_token"
 provider = "posthog"
 name = "PostHog Project Token"
 regex = '''\bphc_[A-Za-z0-9]{20,}\b'''
-public = true
+classification = "public_credential"
 reason = "PostHog public client-side project token"
 
 [[provider_patterns]]
@@ -79,5 +87,72 @@ id = "google_recaptcha_v2_test_secret"
 provider = "google"
 name = "Google reCAPTCHA v2 Test Secret"
 value = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
-public = true
+classification = "public_credential"
 reason = "Google's published universal test secret"
+
+[[provider_patterns]]
+id = "anthropic_api_key"
+provider = "anthropic"
+name = "Anthropic API Key"
+regex = '''\bsk-ant-api03-[A-Za-z0-9_-]{93}AA\b'''
+
+[[provider_patterns]]
+id = "anthropic_admin_api_key"
+provider = "anthropic"
+name = "Anthropic Admin API Key"
+regex = '''\bsk-ant-admin01-[A-Za-z0-9_-]{93}AA\b'''
+
+[[provider_patterns]]
+id = "anthropic_tool_id"
+provider = "anthropic"
+name = "Anthropic Tool ID"
+regex = '''\btoolu_[A-Za-z0-9]{15,}\b'''
+classification = "non_secret_identifier"
+reason = "Anthropic tool-use identifier"
+
+[[provider_patterns]]
+id = "anthropic_server_tool_id"
+provider = "anthropic"
+name = "Anthropic Server Tool ID"
+regex = '''\bsrvtoolu_[A-Za-z0-9]{15,}\b'''
+classification = "non_secret_identifier"
+reason = "Anthropic server tool-use identifier"
+
+[[provider_patterns]]
+id = "generic_message_id"
+name = "Message ID"
+regex = '''\bmsg_[A-Za-z0-9]{20,}\b'''
+classification = "non_secret_identifier"
+reason = "Message identifier prefix is shared by multiple providers"
+
+[[provider_patterns]]
+id = "openai_tool_call_id"
+provider = "openai"
+name = "OpenAI Tool Call ID"
+regex = '''(?<![A-Za-z0-9_-])call_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI function or tool call identifier"
+
+[[provider_patterns]]
+id = "openai_function_call_item_id"
+provider = "openai"
+name = "OpenAI Function Call Item ID"
+regex = '''(?<![A-Za-z0-9_-])fc_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI Responses function-call item identifier"
+
+[[provider_patterns]]
+id = "openai_response_id"
+provider = "openai"
+name = "OpenAI Response ID"
+regex = '''(?<![A-Za-z0-9_-])resp_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI response identifier"
+
+[[provider_patterns]]
+id = "openai_conversation_id"
+provider = "openai"
+name = "OpenAI Conversation ID"
+regex = '''(?<![A-Za-z0-9_-])conv_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI conversation identifier"
