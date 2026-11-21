@@ -122,7 +122,7 @@ def value_rejection(context: DecisionContext) -> bool:
 def english_text_value(context: DecisionContext) -> bool:
     return (
         context.has_fact(FactId.ENGLISH_WORDS_IN_VALUE)
-        and not context.strong_secret_context
+        and not context.has_strong_direct_credential_evidence
     )
 
 
