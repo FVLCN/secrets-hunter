@@ -43,6 +43,7 @@ class ConfidencePolicy:
     contextual_high_entropy_identifier: float
     unknown_high_entropy_identifier: float
     high_entropy_assigned: float
+    weak_name_credential_with_target: float
     strong_credential: float
     credential_with_neutral: float
     credential_with_value_signal: float

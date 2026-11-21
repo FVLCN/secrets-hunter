@@ -32,6 +32,7 @@ neutral_high_entropy_identifier = 0.25
 contextual_high_entropy_identifier = 0.30
 unknown_high_entropy_identifier = 0.55
 high_entropy_assigned = 0.45
+weak_name_credential_with_target = 0.75
 strong_credential = 0.55
 credential_with_neutral = 0.25
 credential_with_value_signal = 0.75

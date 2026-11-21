@@ -1,3 +1,5 @@
+import re
+
 from secrets_hunter.detection.detectors.models import DetectionPattern
 from secrets_hunter.detection.finding_kinds import (
     JWT_TOKEN_KIND,
@@ -9,9 +11,17 @@ from secrets_hunter.detection.pattern_plan import (
     build_pattern_detection_plan
 )
 from secrets_hunter.detection.regex import compile_regex
-from secrets_hunter.detection.semantics.catalog import SemanticCatalog
+from secrets_hunter.detection.semantics.catalog import (
+    ProviderPattern,
+    SemanticCatalog,
+)
 from secrets_hunter.detection.patterns.values import JWT_TOKEN_RE
-from secrets_hunter.models import FindingKind
+from secrets_hunter.models import (
+    FindingKind,
+    RejectionKind,
+    RejectionPattern,
+    RejectionReason,
+)
 
 
 def finding_kind_registry_for_catalog(
@@ -23,6 +33,52 @@ def finding_kind_registry_for_catalog(
             display_name=provider_pattern.name
         )
         for provider_pattern in catalog.provider_patterns
+    )
+
+
+def compile_provider_pattern(
+    provider_pattern: ProviderPattern,
+) -> re.Pattern[str]:
+    if provider_pattern.regex is not None:
+        regex = provider_pattern.regex
+    else:
+        value = provider_pattern.value
+        if value is None:
+            raise ValueError(
+                f"Provider pattern {provider_pattern.id!r} has no match value"
+            )
+        regex = _exact_value_regex(value)
+
+    return compile_regex(
+        regex,
+        source=f"provider_patterns[{provider_pattern.id}]"
+    )
+
+
+def _exact_value_regex(value: str) -> str:
+    """Match a literal value only when it is a complete provider token."""
+    escaped_value = re.escape(value)
+    token_characters = "A-Za-z0-9_-"
+    before_token = rf"(?<![{token_characters}])"
+    after_token = rf"(?![{token_characters}])"
+    return f"{before_token}{escaped_value}{after_token}"
+
+
+def public_value_rejection_patterns(
+    catalog: SemanticCatalog,
+) -> tuple[RejectionPattern, ...]:
+    return tuple(
+        RejectionPattern(
+            pattern=compile_provider_pattern(provider_pattern),
+            reason=RejectionReason(
+                kind=RejectionKind.KNOWN_PUBLIC_SECRET,
+                name=provider_pattern.id,
+                category="known public value",
+                detail=provider_pattern.reason or provider_pattern.name,
+            ),
+        )
+        for provider_pattern in catalog.provider_patterns
+        if provider_pattern.public
     )
 
 
@@ -43,10 +99,7 @@ def provider_detection_plan(
                 provider_pattern.id,
                 source="provider patterns"
             ),
-            compiled=compile_regex(
-                provider_pattern.regex,
-                source=f"provider_patterns[{provider_pattern.id}]"
-            ),
+            compiled=compile_provider_pattern(provider_pattern),
             provider_pattern_id=provider_pattern.id
         ))
 

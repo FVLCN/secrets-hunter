@@ -77,6 +77,7 @@ class SemanticProviderView:
     target_concept_id: str
     evidence: tuple[MatchedEvidenceView, ...]
     matched_pattern_id: str | None = None
+    public: bool = False
 
     @classmethod
     def from_result(
@@ -96,6 +97,7 @@ class SemanticProviderView:
                 for keyword in provider.strongest_keywords
             ),
             matched_pattern_id=provider.matched_pattern_id,
+            public=provider.public,
         )
 
 
@@ -191,7 +193,7 @@ class SemanticAnalysisView:
             for provider in self.providers
             if provider.matched_pattern_id is not None
         }
-        return tuple(
+        concept_signals = tuple(
             MatchedSignalView(
                 concept_id=concept_id,
                 display_name=item.concept_label,
@@ -214,6 +216,7 @@ class SemanticAnalysisView:
             )
             for concept_id, item in matched
         )
+        return tuple(concept_signals)
 
     @property
     def inferred_signals(self) -> tuple[InferredSignalView, ...]:

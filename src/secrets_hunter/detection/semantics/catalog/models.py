@@ -6,7 +6,12 @@ from secrets_hunter.detection.semantics.tokenization import split_identifier
 from secrets_hunter.immutability import frozen_mapping
 
 from .policy import SemanticPolicyConfig
-from .taxonomy import ConceptCategory, ConceptId, ConceptPolicy, EvidenceStrength
+from .taxonomy import (
+    ConceptCategory,
+    ConceptId,
+    ConceptPolicy,
+    EvidenceStrength,
+)
 
 
 @dataclass(frozen=True)
@@ -39,7 +44,10 @@ class ProviderPattern:
     id: str
     provider_id: str
     name: str
-    regex: str
+    regex: str | None
+    value: str | None
+    public: bool
+    reason: str | None = None
 
 
 @dataclass(frozen=True)

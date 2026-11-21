@@ -25,7 +25,7 @@ def _rejection_reasoning(context: DecisionContext) -> str:
     rejection = context.observation.value_rejection
 
     if rejection is not None and rejection.kind is RejectionKind.KNOWN_PUBLIC_SECRET:
-        reasoning = "known public secret"
+        reasoning = "known public value"
         return f"{reasoning} ({rejection.detail})" if rejection.detail else reasoning
 
     if (

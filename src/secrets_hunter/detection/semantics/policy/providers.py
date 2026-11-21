@@ -82,10 +82,12 @@ class ProviderMatcher:
         for provider in self.catalog.providers:
             evidence = self._provider_evidence(provider, tokens_by_source)
             matched_pattern_id = None
+            public = False
             if matched_pattern is not None:
                 if provider.id == matched_pattern.provider_id:
                     evidence = (provider_evidence_for_pattern(provider), *evidence)
                     matched_pattern_id = matched_pattern.id
+                    public = matched_pattern.public
                 else:
                     evidence = tuple(
                         replace(item, strength=EvidenceStrength.WEAK)
@@ -96,6 +98,7 @@ class ProviderMatcher:
                     provider=provider,
                     strongest_keywords=evidence,
                     matched_pattern_id=matched_pattern_id,
+                    public=public,
                 ))
 
         return tuple(sorted(

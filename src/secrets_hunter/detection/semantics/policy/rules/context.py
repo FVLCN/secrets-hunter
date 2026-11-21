@@ -27,6 +27,9 @@ class DecisionContext:
     def has_fact(self, fact: FactId) -> bool:
         return self.observation.has_fact(fact)
 
+    def has_name_token(self, token: str) -> bool:
+        return token.casefold() in self.observation.name_tokens
+
     @property
     def has_credential_context(self) -> bool:
         return (

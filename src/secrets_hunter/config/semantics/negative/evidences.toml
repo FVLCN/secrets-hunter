@@ -5,6 +5,7 @@ terms = [
     "test",
     "tests",
     "testing",
+    "e2e",
     "mock",
     "mocks",
     "fixture",
@@ -68,6 +69,7 @@ terms = [
     "idempotence",
     "idempotent",
     "identifier",
+    "slug",
     "uuid",
     "guid"
 ]
@@ -98,8 +100,10 @@ terms = [
     "commit",
     "version",
     "reference",
+    "ref",
     "path",
     "timestamp",
+    "date",
     "build",
     "block",
     "object",

@@ -1,4 +1,4 @@
-from secrets_hunter.detection.semantics.catalog import ConceptId
+from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.detection.semantics.observation import FactId
 from secrets_hunter.models import Disposition, RejectionKind, ValueKind
 
@@ -29,7 +29,7 @@ def value_rejection_classification(context: DecisionContext) -> bool:
 )
 def public_credential_name(context: DecisionContext) -> bool:
     return (
-        "public" in context.observation.name_tokens
+        context.has_name_token("public")
         and context.has_strong_direct_credential_evidence
     )
 
@@ -152,35 +152,68 @@ def context_reject(context: DecisionContext) -> bool:
 
 
 @rules.when(
-    priority=2515,
-    disposition=Disposition.REPORT,
-    confidence=lambda values: values.credential_with_hash_shaped_value,
-    reasoning="credential evidence with hash-shaped value",
+    priority=2520,
+    disposition=Disposition.REVIEW,
+    confidence=lambda values: values.weak_name_credential_with_target,
+    reasoning="weak name credential with direct name target",
 )
-def hash_shaped_key_assignment(context: DecisionContext) -> bool:
-    rejection = context.observation.value_rejection
+def weak_name_credential_with_target(context: DecisionContext) -> bool:
+    has_ordinary_name_evidence = context.groups.matched_from_source(
+        context.groups.ordinary,
+        source=EvidenceSource.VAR_NAME,
+        strong_only=False,
+    )
     return (
-        (
-            context.has_fact(FactId.HASH_SHAPED_VALUE)
-            or (
-                rejection is not None
-                and rejection.kind is RejectionKind.HASH
-            )
+        context.has_fact(FactId.HIGH_ENTROPY)
+        and not context.has_fact(FactId.NO_ASSIGNMENT_CONTEXT)
+        and context.groups.has_weak_only_name_credential_evidence()
+        and context.groups.matched_from_source(
+            context.groups.targets,
+            source=EvidenceSource.VAR_NAME,
+            strong_only=True,
         )
-        and context.groups.matched(
-            (ConceptId.KEY_CREDENTIAL,),
-            strong_only=False,
-        )
-        and not context.has_strong_direct_credential_evidence
+        and not has_ordinary_name_evidence
         and not context.has_fact(FactId.TERMINAL_IDENTIFIER_SUFFIX)
-        and "public" not in context.observation.name_tokens
+        and not context.has_name_token("public")
         and not context.groups.matched(
             context.groups.artifacts + context.groups.identifiers
         )
-        and not context.groups.matched(
-            context.groups.ordinary,
-            strong_only=False,
+        and not context.groups.matched(context.groups.value_rejections)
+    )
+
+
+@rules.when(
+    priority=2515,
+    disposition=Disposition.REVIEW,
+    confidence=lambda values: values.high_entropy_assigned,
+    reasoning="assigned high-entropy value",
+)
+def weak_name_credential_with_hash_shape(context: DecisionContext) -> bool:
+    rejection = context.observation.value_rejection
+    has_hash_shape = (
+        context.has_fact(FactId.HASH_SHAPED_VALUE)
+        or (
+            rejection is not None
+            and rejection.kind is RejectionKind.HASH
         )
+    )
+    has_ordinary_name_evidence = context.groups.matched_from_source(
+        context.groups.ordinary,
+        source=EvidenceSource.VAR_NAME,
+        strong_only=False,
+    )
+    return (
+        context.has_fact(FactId.HIGH_ENTROPY)
+        and not context.has_fact(FactId.NO_ASSIGNMENT_CONTEXT)
+        and has_hash_shape
+        and context.groups.has_weak_only_name_credential_evidence()
+        and not context.has_fact(FactId.TERMINAL_IDENTIFIER_SUFFIX)
+        and not context.has_name_token("public")
+        and not context.groups.matched(
+            context.groups.artifacts + context.groups.identifiers
+        )
+        and not context.groups.matched(context.groups.value_rejections)
+        and not has_ordinary_name_evidence
     )
 
 

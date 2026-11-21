@@ -69,7 +69,8 @@ def compose_scan_session(
         ),
         candidate_assessor=CandidateAssessor(
             rejection_analyzer=CandidateRejectionAnalyzer(
-                rejection_patterns=runtime_config.rejection_patterns
+                rejection_patterns=runtime_config.rejection_patterns,
+                public_value_patterns=runtime.public_value_patterns,
             ),
             semantic_runtime=runtime.semantics,
             value_analyzer=ValueAnalyzer(runtime.value_classifier)

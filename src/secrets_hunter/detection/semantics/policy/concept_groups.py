@@ -8,6 +8,7 @@ from secrets_hunter.detection.semantics.catalog import (
     SemanticPolicyConfig,
 )
 from secrets_hunter.detection.semantics.classification import ConceptScores
+from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.immutability import frozen_mapping
 
 from .indexes import PolicyIndexes
@@ -128,6 +129,48 @@ class PolicyConceptGroups:
             )
             for concept_id in concept_ids
             for signal in (self.concepts.get(concept_id),)
+        )
+
+    def matched_from_source(
+        self,
+        concept_ids: tuple[ConceptId, ...],
+        *,
+        source: EvidenceSource,
+        strong_only: bool = True,
+    ) -> bool:
+        return any(
+            signal is not None
+            and signal.origin == "evidence"
+            and any(
+                evidence.source is source
+                and (
+                    not strong_only
+                    or evidence.strength is EvidenceStrength.STRONG
+                )
+                for evidence in signal.strongest_keywords
+            )
+            for concept_id in concept_ids
+            for signal in (self.concepts.get(concept_id),)
+        )
+
+    def has_weak_only_name_credential_evidence(self) -> bool:
+        name_evidence = tuple(
+            evidence
+            for concept_id in self.credentials
+            for concept in (self.concepts.get(concept_id),)
+            if concept is not None and concept.origin == "evidence"
+            for evidence in concept.strongest_keywords
+            if evidence.source is EvidenceSource.VAR_NAME
+        )
+        return (
+            any(
+                evidence.strength is EvidenceStrength.WEAK
+                for evidence in name_evidence
+            )
+            and not any(
+                evidence.strength is EvidenceStrength.STRONG
+                for evidence in name_evidence
+            )
         )
 
     def inferred_probability(self, concept_ids: tuple[ConceptId, ...]) -> float:

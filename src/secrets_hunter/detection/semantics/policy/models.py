@@ -19,6 +19,7 @@ class ProviderMatch:
     provider: Provider
     strongest_keywords: tuple[ConceptKeywordEvidence, ...]
     matched_pattern_id: str | None = None
+    public: bool = False
 
     @property
     def id(self) -> str:

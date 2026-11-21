@@ -11,6 +11,14 @@ name = "Stripe API Key"
 regex = '''\bsk_(?:live|test)_[A-Za-z0-9]{24,}\b'''
 
 [[provider_patterns]]
+id = "stripe_publishable_key"
+provider = "stripe"
+name = "Stripe Publishable Key"
+regex = '''\bpk_(?:live|test)_[A-Za-z0-9]{16,}\b'''
+public = true
+reason = "Stripe publishable keys are designed for client-side use"
+
+[[provider_patterns]]
 id = "twilio_sid"
 provider = "twilio"
 name = "Twilio SID"
@@ -35,6 +43,14 @@ name = "PostHog Personal API Key"
 regex = '''\bphx_[A-Za-z0-9]{47,49}\b'''
 
 [[provider_patterns]]
+id = "posthog_project_token"
+provider = "posthog"
+name = "PostHog Project Token"
+regex = '''\bphc_[A-Za-z0-9]{20,}\b'''
+public = true
+reason = "PostHog public client-side project token"
+
+[[provider_patterns]]
 id = "posthog_oauth_access_token"
 provider = "posthog"
 name = "PostHog OAuth Access Token"
@@ -57,3 +73,11 @@ id = "gcp_api_key"
 provider = "gcp"
 name = "Google Cloud API Key"
 regex = '''(?<![A-Za-z0-9_-])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9_-])'''
+
+[[provider_patterns]]
+id = "google_recaptcha_v2_test_secret"
+provider = "google"
+name = "Google reCAPTCHA v2 Test Secret"
+value = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+public = true
+reason = "Google's published universal test secret"

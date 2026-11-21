@@ -1,5 +1,3 @@
-import re
-
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -10,13 +8,12 @@ from secrets_hunter.detection.patterns.assignments import (
 )
 from secrets_hunter.detection.regex import compile_regex
 from secrets_hunter.immutability import frozen_mapping
-from secrets_hunter.models import RejectionKind, RejectionPattern, RejectionReason
+from secrets_hunter.models import RejectionPattern, RejectionReason
 from secrets_hunter.models.config import RuntimeConfig
 from secrets_hunter.resources import LoadedToml, TomlTable, load_toml
 
 
 REJECTION_PATTERNS_RESOURCE = "semantics/negative/rejection_patterns.toml"
-KNOWN_PUBLIC_SECRETS_RESOURCE = "semantics/negative/known_public_secrets.toml"
 SUPPORTED_USER_CONFIG_KEYS = frozenset({
     "ignore",
     "remove_ignore_files",
@@ -105,51 +102,6 @@ def reject_unsupported_user_config(
         )
 
 
-def _load_known_public_secrets() -> tuple[RejectionPattern, ...]:
-    document = load_toml(fallback_resource=KNOWN_PUBLIC_SECRETS_RESOURCE)
-    entries = document.data.get("credentials", [])
-    if not isinstance(entries, list):
-        raise ValueError(f"'credentials' must be a list in {document.source}")
-
-    patterns: list[RejectionPattern] = []
-    seen_ids: set[str] = set()
-    seen_values: set[str] = set()
-    for index, item in enumerate(entries):
-        entry = require_table(item, f"credentials[{index}]", document.source)
-        fields: dict[str, str] = {}
-        for field in ("id", "value", "reason"):
-            value = entry.get(field)
-            if not isinstance(value, str) or not value.strip():
-                raise ValueError(
-                    f"'credentials[{index}].{field}' must be a non-empty string "
-                    f"in {document.source}"
-                )
-            fields[field] = value
-
-        entry_id = fields["id"]
-        secret_value = fields["value"]
-        if entry_id in seen_ids:
-            raise ValueError(f"Duplicate public secret id {entry_id!r} in {document.source}")
-        if secret_value in seen_values:
-            raise ValueError(f"Duplicate public secret value for {entry_id!r} in {document.source}")
-        seen_ids.add(entry_id)
-        seen_values.add(secret_value)
-        patterns.append(RejectionPattern(
-            pattern=compile_regex(
-                re.escape(secret_value),
-                source=f"known_public_secrets[{entry_id}]"
-            ),
-            reason=RejectionReason(
-                kind=RejectionKind.KNOWN_PUBLIC_SECRET,
-                name=entry_id,
-                category="known public secret",
-                detail=fields["reason"]
-            )
-        ))
-
-    return tuple(patterns)
-
-
 def load_runtime_config(user_configs: list[str | Path] | None = None) -> RuntimeConfig:
     """
     Loads packaged detection resources and ignore settings.
@@ -234,10 +186,7 @@ def load_runtime_config(user_configs: list[str | Path] | None = None) -> Runtime
     )
 
     return RuntimeConfig(
-        rejection_patterns=(
-            *compiled_rejection_patterns,
-            *_load_known_public_secrets()
-        ),
+        rejection_patterns=compiled_rejection_patterns,
         compiled_assignment_patterns=compiled_assignment_patterns,
         ignore_files=tuple(ignore_files),
         ignore_extensions=tuple(ignore_ext),

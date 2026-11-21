@@ -1,6 +1,7 @@
 from secrets_hunter.models import GitLocation, HttpLocation
 from secrets_hunter.reporters.console_base import BaseConsoleReporter
 from secrets_hunter.reporters.finding_view import FindingView
+from secrets_hunter.reporters.semantic_analysis_view import SemanticConceptView
 
 
 class ConsoleReporter(BaseConsoleReporter):
@@ -10,6 +11,50 @@ class ConsoleReporter(BaseConsoleReporter):
             return ""
         s = s.replace("\n", "\\n")
         return s if len(s) <= max_len else s[: max_len - 3] + "..."
+
+    @staticmethod
+    def _format_matched_concept(concept: SemanticConceptView) -> list[str]:
+        terms_by_source: dict[str, list[str]] = {}
+        providers: list[tuple[str, str]] = []
+        for evidence in concept.evidence:
+            term = evidence.term
+            if not term:
+                continue
+
+            source = (
+                "name"
+                if evidence.source == "var_name"
+                else evidence.source.replace("_", " ")
+            )
+            terms = terms_by_source.setdefault(source, [])
+            if term not in terms:
+                terms.append(term)
+
+            if evidence.provider_id is not None:
+                provider = (
+                    evidence.provider_id,
+                    evidence.provider_name or evidence.provider_id,
+                )
+                if provider not in providers:
+                    providers.append(provider)
+
+        details: list[tuple[str, str]] = []
+        if providers:
+            label = "Provider" if len(providers) == 1 else "Providers"
+            details.append((label, ", ".join(name for _, name in providers)))
+        details.extend(
+            (source.capitalize(), ", ".join(terms))
+            for source, terms in terms_by_source.items()
+            if terms
+        )
+
+        label_width = max((len(label) for label, _ in details), default=0)
+        lines = [f"      {concept.concept_id} [{concept.strength}]"]
+        lines.extend(
+            f"          {(label + ':').ljust(label_width + 1)} {value}"
+            for label, value in details
+        )
+        return lines
 
     @staticmethod
     def format_report(findings: list[FindingView]) -> None:
@@ -45,10 +90,17 @@ class ConsoleReporter(BaseConsoleReporter):
                 if facts:
                     lines.append(f"    Facts:      {', '.join(facts)}")
 
-                matched = semantic_analysis.matched_signals
+                matched = tuple(
+                    concept
+                    for concept in semantic_analysis.concepts
+                    if concept.origin == "evidence"
+                )
                 if matched:
                     lines.append("    Matched:")
-                    lines.extend(f"      {signal.text}" for signal in matched)
+                    for concept in matched:
+                        lines.extend(
+                            ConsoleReporter._format_matched_concept(concept)
+                        )
 
                 inferred = semantic_analysis.inferred_signals
                 if inferred:

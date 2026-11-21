@@ -34,6 +34,20 @@ def build_semantic_analysis_result(
     providers: tuple[ProviderMatch, ...],
     facts: tuple[Fact, ...],
 ) -> SemanticAnalysisResult:
+    provider_facts = tuple(
+        Fact(
+            name="known_provider",
+            display_name="Known provider",
+            evidence=provider.name,
+            source="provider_pattern",
+            details={
+                "provider_id": provider.id,
+                "provider_pattern_id": provider.matched_pattern_id,
+            },
+        )
+        for provider in providers
+        if provider.matched_pattern_id is not None
+    )
     return SemanticAnalysisResult(
         concepts=tuple(
             SemanticConceptResult(
@@ -59,8 +73,9 @@ def build_semantic_analysis_result(
                     for keyword in provider.strongest_keywords
                 ),
                 matched_pattern_id=provider.matched_pattern_id,
+                public=provider.public,
             )
             for provider in providers
         ),
-        facts=facts,
+        facts=tuple(sorted((*facts, *provider_facts), key=lambda fact: fact.name)),
     )

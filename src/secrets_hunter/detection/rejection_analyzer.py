@@ -103,13 +103,14 @@ _cached_js_code = lru_cache(maxsize=256)(_mask_js_non_code)
 class CandidateRejectionAnalyzer:
     def __init__(
         self,
-        rejection_patterns: Iterable[RejectionPattern]
+        rejection_patterns: Iterable[RejectionPattern],
+        public_value_patterns: Iterable[RejectionPattern] = (),
     ) -> None:
         patterns = tuple(rejection_patterns)
         self.known_public_patterns = tuple(
             pattern for pattern in patterns
             if pattern.reason.kind is RejectionKind.KNOWN_PUBLIC_SECRET
-        )
+        ) + tuple(public_value_patterns)
         self.rejection_patterns = tuple(
             pattern for pattern in patterns
             if pattern.reason.kind is not RejectionKind.KNOWN_PUBLIC_SECRET
