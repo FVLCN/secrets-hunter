@@ -15,6 +15,9 @@ class FactId(StrEnum):
     KNOWN_PATTERN_MATCH = "known_pattern_match"
     NO_ASSIGNMENT_CONTEXT = "no_assignment_context"
     PUBLIC_CRYPTO_ARTIFACT = "public_crypto_artifact"
+    REJECTION_PATH_EVIDENCE = "rejection_path_evidence"
+    REJECTION_SOURCE_EVIDENCE = "rejection_source_evidence"
+    REJECTION_VALUE_EVIDENCE = "rejection_value_evidence"
     SAML_AUTHN_REQUEST_VALUE = "saml_authn_request_value"
     SHORT_ASSIGNMENT_NAME = "short_assignment_name"
     TERMINAL_IDENTIFIER_SUFFIX = "terminal_identifier_suffix"
@@ -66,6 +69,18 @@ _FACT_PRESENTATIONS = {
         "Public cryptographic artifact in value",
         EvidenceSource.VALUE_SHAPE,
     ),
+    FactId.REJECTION_PATH_EVIDENCE: (
+        "Path contains",
+        EvidenceSource.PATH,
+    ),
+    FactId.REJECTION_SOURCE_EVIDENCE: (
+        "Source matches",
+        None,
+    ),
+    FactId.REJECTION_VALUE_EVIDENCE: (
+        "Value matches",
+        EvidenceSource.VALUE_SHAPE,
+    ),
     FactId.SAML_AUTHN_REQUEST_VALUE: (
         "SAML authentication request in value",
         None,
@@ -91,6 +106,7 @@ def make_fact(
     *,
     details: Mapping[str, FactDetail] | None = None,
     sensitive: bool = False,
+    text_template: str | None = None,
 ) -> Fact:
     display_name, source = _FACT_PRESENTATIONS[name]
     return Fact(
@@ -100,4 +116,5 @@ def make_fact(
         source=source.value if source is not None else None,
         details=details or {},
         sensitive=sensitive,
+        text_template=text_template,
     )

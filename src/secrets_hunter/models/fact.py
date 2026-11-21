@@ -15,12 +15,15 @@ class Fact:
     source: str | None = None
     details: Mapping[str, FactDetail] = field(default_factory=dict)
     sensitive: bool = False
+    text_template: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "details", frozen_mapping(self.details))
 
     @property
     def text(self) -> str:
+        if self.text_template is not None:
+            return self.text_template.format(evidence=self.evidence)
         if not self.evidence:
             return self.display_name
         return f"{self.display_name} ({self.evidence})"

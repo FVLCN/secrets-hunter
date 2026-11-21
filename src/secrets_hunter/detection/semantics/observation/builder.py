@@ -5,7 +5,12 @@ from secrets_hunter.detection.semantics.catalog import SemanticCatalog
 from secrets_hunter.detection.semantics.corpus import CORPUS
 from secrets_hunter.detection.semantics.lexical import LexicalAnalyzer
 from secrets_hunter.detection.pem import PemDisposition
-from secrets_hunter.models import DetectionMethod, RejectionKind
+from secrets_hunter.models import (
+    DetectionMethod,
+    RejectionEvidenceKind,
+    RejectionKind,
+)
+from secrets_hunter.detection.rejection_catalog import present_rejection_evidence
 
 from .facts import FactId, make_fact
 from .models import SemanticInput, SemanticObservation
@@ -107,6 +112,24 @@ class SemanticObservationBuilder:
         )
         value_entropy = value_analysis.entropy
         facts = dict(item.usage_facts)
+        rejection_facts = []
+
+        if value_rejection is not None:
+            rejection_fact_ids = {
+                RejectionEvidenceKind.PATH: FactId.REJECTION_PATH_EVIDENCE,
+                RejectionEvidenceKind.SOURCE_CONTEXT: FactId.REJECTION_SOURCE_EVIDENCE,
+                RejectionEvidenceKind.VALUE_SHAPE: FactId.REJECTION_VALUE_EVIDENCE,
+            }
+            for evidence in value_rejection.evidence:
+                kind, match, template, evidence_id = present_rejection_evidence(
+                    evidence
+                )
+                rejection_facts.append(make_fact(
+                    rejection_fact_ids[kind],
+                    match,
+                    details={"evidence_id": evidence_id.value, "match": match},
+                    text_template=template,
+                ))
 
         if not associated_name:
             facts[FactId.NO_ASSIGNMENT_CONTEXT] = make_fact(
@@ -198,7 +221,7 @@ class SemanticObservationBuilder:
             english_words_in_value_tokens=english_words_in_value_tokens,
             value_rejection=value_rejection,
             provider_pattern_id=item.provider_pattern_id,
-            fact_records=tuple(facts.values()),
+            fact_records=(*facts.values(), *rejection_facts),
             hash_algorithm=(
                 hash_classification.algorithm.value
                 if hash_classification is not None

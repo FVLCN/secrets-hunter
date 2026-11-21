@@ -1,5 +1,6 @@
 from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.detection.semantics.observation import FactId
+from secrets_hunter.detection.rejection_catalog import rejection_label
 from secrets_hunter.models import Disposition, RejectionKind, ValueKind
 
 from .context import DecisionContext
@@ -81,6 +82,10 @@ def _value_rejection_reasoning(context: DecisionContext) -> str:
     rejection = context.observation.value_rejection
     if rejection is None:
         return "value matched a rejection pattern"
+
+    label = rejection_label(rejection)
+    if label is not None:
+        return label
 
     return (
         f"value matched a rejection pattern: {rejection.name} "

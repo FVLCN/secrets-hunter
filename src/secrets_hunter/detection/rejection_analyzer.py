@@ -50,8 +50,12 @@ from secrets_hunter.detection.detectors.models import DetectionCandidate
 from secrets_hunter.detection.fragmenter import DBConnectionFragment, PEMKeyFragment
 from secrets_hunter.detection.hash_classification import HashValueClassification
 from secrets_hunter.detection.source_languages import is_js_ts_source
+from secrets_hunter.detection.rejection_catalog import make_rejection_reason
 from secrets_hunter.models import (
     DetectionMethod,
+    RejectionEvidence,
+    RejectionEvidenceId,
+    RejectionId,
     RejectionKind,
     RejectionPattern,
     RejectionReason,
@@ -208,47 +212,89 @@ class CandidateRejectionAnalyzer:
         return decoded[-4:] == checksum
 
     @staticmethod
-    def is_commit_reference(value: str, source_text: str) -> bool:
+    def commit_reference_context(
+        value: str, source_text: str
+    ) -> RejectionEvidenceId | None:
         if not COMMIT_ID_RE.fullmatch(value):
-            return False
+            return None
 
         escaped = re.escape(value)
-        return any(re.search(pattern, source_text) for pattern in (
-            COMMIT_URL_REFERENCE_PATTERN.format(value=escaped),
-            ACTION_COMMIT_PIN_PATTERN.format(value=escaped),
-            ACTION_COMMENT_COMMIT_PATTERN.format(value=escaped),
-        ))
+        for evidence_id, pattern in (
+            (
+                RejectionEvidenceId.GIT_COMMIT_URL_CONTEXT,
+                COMMIT_URL_REFERENCE_PATTERN.format(value=escaped),
+            ),
+            (
+                RejectionEvidenceId.ACTION_COMMIT_PIN_CONTEXT,
+                ACTION_COMMIT_PIN_PATTERN.format(value=escaped),
+            ),
+            (
+                RejectionEvidenceId.ACTION_COMMIT_COMMENT_CONTEXT,
+                ACTION_COMMENT_COMMIT_PATTERN.format(value=escaped),
+            ),
+        ):
+            if re.search(pattern, source_text):
+                return evidence_id
+        return None
 
     @classmethod
-    def is_darktable_processing_value(
+    def darktable_processing_evidence(
         cls, value: str, source_text: str, path: PurePath
-    ) -> bool:
-        if path.suffix.lower() != ".xmp" or not any(
-            match.group(2) == value
-            for match in DARKTABLE_PARAMETER_RE.finditer(source_text)
-        ):
-            return False
+    ) -> tuple[RejectionEvidence, ...] | None:
+        if path.suffix.lower() != ".xmp":
+            return None
+
+        parameter_match = next(
+            (
+                match
+                for match in DARKTABLE_PARAMETER_RE.finditer(source_text)
+                if match.group(2) == value
+            ),
+            None,
+        )
+        if parameter_match is None:
+            return None
+
+        parameter_name = parameter_match.group(0).split("=", 1)[0].strip()
 
         if DARKTABLE_HEX_VALUE_RE.fullmatch(value):
-            return len(value) // 2 <= _MAX_DARKTABLE_PARAMETER_BYTES
+            if len(value) // 2 > _MAX_DARKTABLE_PARAMETER_BYTES:
+                return None
+            value_shape = RejectionEvidenceId.DARKTABLE_HEX_PARAMETER
+        else:
+            # Darktable stores compressed parameters as gz + two-digit factor + Base64.
+            if not DARKTABLE_COMPRESSED_VALUE_RE.fullmatch(value):
+                return None
+            compressed = cls.decode_base64_body(value[4:])
+            if compressed is None:
+                return None
 
-        # Darktable stores compressed parameters as gz + two-digit factor + Base64.
-        if not DARKTABLE_COMPRESSED_VALUE_RE.fullmatch(value):
-            return False
-        compressed = cls.decode_base64_body(value[4:])
-        if compressed is None:
-            return False
+            decoder = zlib.decompressobj()
+            try:
+                decoded = decoder.decompress(
+                    compressed, _MAX_DARKTABLE_PARAMETER_BYTES + 1
+                )
+            except zlib.error:
+                return None
+            if not (
+                0 < len(decoded) <= _MAX_DARKTABLE_PARAMETER_BYTES
+                and decoder.eof
+                and not decoder.unused_data
+                and not decoder.unconsumed_tail
+            ):
+                return None
+            value_shape = RejectionEvidenceId.DARKTABLE_COMPRESSED_PARAMETER
 
-        decoder = zlib.decompressobj()
-        try:
-            decoded = decoder.decompress(compressed, _MAX_DARKTABLE_PARAMETER_BYTES + 1)
-        except zlib.error:
-            return False
         return (
-            0 < len(decoded) <= _MAX_DARKTABLE_PARAMETER_BYTES
-            and decoder.eof
-            and not decoder.unused_data
-            and not decoder.unconsumed_tail
+            RejectionEvidence(
+                RejectionEvidenceId.DARKTABLE_FILE_EXTENSION,
+                path.suffix.lower(),
+            ),
+            RejectionEvidence(
+                RejectionEvidenceId.DARKTABLE_PARAMETER_NAME,
+                parameter_name,
+            ),
+            RejectionEvidence(value_shape),
         )
 
     @classmethod
@@ -320,52 +366,85 @@ class CandidateRejectionAnalyzer:
     ) -> RejectionReason | None:
         value = candidate.match
         if self.is_ssh_public_key(value):
-            return RejectionReason(
-                kind=RejectionKind.PUBLIC_CRYPTO,
-                name="Public",
-                category="SSH key",
+            return make_rejection_reason(
+                RejectionId.PUBLIC_SSH_KEY,
+                RejectionKind.PUBLIC_CRYPTO,
+                evidence=(RejectionEvidence(
+                    RejectionEvidenceId.SSH_PUBLIC_KEY_FORMAT,
+                ),),
             )
         if candidate.detection_method is not DetectionMethod.ENTROPY:
             return None
 
         if self.is_public_payment_address(value):
-            return RejectionReason(
-                kind=RejectionKind.PUBLIC_CRYPTO,
-                name="Public",
-                category="payment address",
+            return make_rejection_reason(
+                RejectionId.PUBLIC_PAYMENT_ADDRESS,
+                RejectionKind.PUBLIC_CRYPTO,
+                evidence=(RejectionEvidence(
+                    RejectionEvidenceId.BASE58CHECK_PAYMENT_ADDRESS,
+                ),),
             )
         path = PurePath(candidate.location.locator)
-        if source_text and self.is_darktable_processing_value(value, source_text, path):
-            return RejectionReason(
-                kind=RejectionKind.STRUCTURAL_VALUE,
-                name="Darktable",
-                category="image-processing parameters",
+        darktable_evidence = (
+            self.darktable_processing_evidence(value, source_text, path)
+            if source_text
+            else None
+        )
+        if darktable_evidence is not None:
+            return make_rejection_reason(
+                RejectionId.DARKTABLE_PARAMETER,
+                RejectionKind.STRUCTURAL_VALUE,
+                evidence=darktable_evidence,
             )
-        git_config = (
-            path.name in {"gitconfig", ".gitconfig"}
-            or path.parts[-2:] == (".git", "config")
+        git_config_path = (
+            path.name
+            if path.name in {"gitconfig", ".gitconfig"}
+            else ".git/config"
+            if path.parts[-2:] == (".git", "config")
+            else None
         )
         if (
-            git_config
+            git_config_path is not None
             and any(name.replace("_", "").lower() == "signingkey" for name in associated_names)
             and GPG_KEY_ID_RE.fullmatch(value)
         ):
-            return RejectionReason(
-                kind=RejectionKind.STRUCTURAL_VALUE,
-                name="Git signing key",
-                category="key reference",
+            return make_rejection_reason(
+                RejectionId.GIT_SIGNING_KEY_REFERENCE,
+                RejectionKind.STRUCTURAL_VALUE,
+                evidence=(
+                    RejectionEvidence(
+                        RejectionEvidenceId.GIT_CONFIG_PATH,
+                        git_config_path,
+                    ),
+                    RejectionEvidence(
+                        RejectionEvidenceId.GPG_KEY_ID_FORMAT,
+                    ),
+                ),
             )
         if source_text and self.is_code_reference(value, source_text, path):
-            return RejectionReason(
-                kind=RejectionKind.STRUCTURAL_VALUE,
-                name="Code",
-                category="identifier reference",
+            return make_rejection_reason(
+                RejectionId.CODE_IDENTIFIER_REFERENCE,
+                RejectionKind.STRUCTURAL_VALUE,
+                evidence=(
+                    RejectionEvidence(
+                        RejectionEvidenceId.CODE_FILE_EXTENSION,
+                        path.suffix.lower(),
+                    ),
+                    RejectionEvidence(
+                        RejectionEvidenceId.JS_TS_IDENTIFIER_USE,
+                    ),
+                ),
             )
-        if source_text and self.is_commit_reference(value, source_text):
-            return RejectionReason(
-                kind=RejectionKind.STRUCTURAL_VALUE,
-                name="Git commit",
-                category="reference",
+        commit_context = (
+            self.commit_reference_context(value, source_text)
+            if source_text
+            else None
+        )
+        if commit_context is not None:
+            return make_rejection_reason(
+                RejectionId.GIT_COMMIT_REFERENCE,
+                RejectionKind.STRUCTURAL_VALUE,
+                evidence=(RejectionEvidence(commit_context),),
             )
         return None
 
@@ -536,10 +615,12 @@ class CandidateRejectionAnalyzer:
             and source_text
             and self.is_abbreviated_jwt(candidate.match, source_text)
         ):
-            return RejectionReason(
-                kind=RejectionKind.STRUCTURAL_VALUE,
-                name="Abbreviated",
-                category="JWT example",
+            return make_rejection_reason(
+                RejectionId.ABBREVIATED_JWT_EXAMPLE,
+                RejectionKind.STRUCTURAL_VALUE,
+                evidence=(RejectionEvidence(
+                    RejectionEvidenceId.ABBREVIATED_JWT_CONTEXT,
+                ),),
             )
 
         return known_public or rejection

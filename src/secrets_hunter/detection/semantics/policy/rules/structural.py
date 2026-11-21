@@ -1,4 +1,5 @@
 from secrets_hunter.detection.semantics.observation import FactId
+from secrets_hunter.detection.rejection_catalog import rejection_label
 from secrets_hunter.models import Disposition, RejectionKind
 
 from .context import DecisionContext
@@ -36,6 +37,10 @@ def _rejection_reasoning(context: DecisionContext) -> str:
 
     if rejection is None:
         return "rejected structured value"
+
+    label = rejection_label(rejection)
+    if label is not None:
+        return label
 
     reasoning = " ".join(
         part.strip().lower()

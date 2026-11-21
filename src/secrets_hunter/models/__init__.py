@@ -8,7 +8,15 @@ from .finding import (
 from .finding_kind import FindingKind
 from .scan_result import ScanFailure, ScanFailureKind, ScanResult, ScanSkip, ScanStatus
 from .decision import Decision, Disposition, RuleActivation
-from .rejection import RejectionKind, RejectionPattern, RejectionReason
+from .rejection import (
+    RejectionEvidence,
+    RejectionEvidenceId,
+    RejectionEvidenceKind,
+    RejectionKind,
+    RejectionPattern,
+    RejectionReason,
+    RejectionId,
+)
 from .semantic_analysis import SemanticAnalysisResult
 from .source_location import (
     FileLocation,
@@ -32,6 +40,10 @@ __all__ = [
     'Severity',
     'severity_for_confidence',
     'RejectionKind',
+    'RejectionEvidence',
+    'RejectionEvidenceId',
+    'RejectionEvidenceKind',
+    'RejectionId',
     'RejectionPattern',
     'RejectionReason',
     'RuleActivation',
