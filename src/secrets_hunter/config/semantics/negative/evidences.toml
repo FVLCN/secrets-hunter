@@ -62,6 +62,12 @@ terms = ["public"]
 strength = "weak"
 
 [[evidence]]
+concept = "public_crypto_artifact"
+sources = ["var_name"]
+terms = ["signature"]
+strength = "weak"
+
+[[evidence]]
 concept = "identifier_context"
 sources = ["var_name"]
 terms = [

@@ -24,7 +24,7 @@ CREDENTIAL_URI_RE = re.compile(
 )
 DB_PASSWORD_IN_URI_RE = re.compile(r"://[^:/@]+:([^@/\s]+)@")
 DB_PLACEHOLDER_RE = re.compile(
-    r"%[A-Za-z]|\$\{[^}]+}|\{[^}]+}|<[^<>]+>"
+    r"%[A-Za-z]|\$\{[^}]+}|\$\([A-Za-z_][A-Za-z0-9_]*\)|\{[^}]+}|<[^<>]+>"
 )
 DB_EXAMPLE_URI_RE = re.compile(
     r"[a-z][a-z0-9+.-]*(?::[a-z][a-z0-9+.-]*)?://"
@@ -33,8 +33,8 @@ DB_EXAMPLE_URI_RE = re.compile(
     re.IGNORECASE,
 )
 POSTGRES_LOCAL_DEFAULT_URI_RE = re.compile(
-    r"(?i:postgres(?:ql)?)://postgres:postgres@"
-    r"(?:(?i:localhost)|"
+    r"(?i:postgres(?:ql)?)://postgres:(?:postgres|dev)@"
+    r"(?:(?i:localhost|postgres)|"
     r"127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}|\[::1\])"
     r"(?::[0-9]+)?(?:[/?#][^\s]*)?"
 )
