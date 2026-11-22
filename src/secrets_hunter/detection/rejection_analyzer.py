@@ -597,7 +597,7 @@ class CandidateRejectionAnalyzer:
 
         if candidate.finding_kind.id == "jwt_token":
             segments = candidate.match.split(".")
-            if len(segments) == 3 and segments[2] == "signature":
+            if len(segments) == 3 and "signature" in segments[2].casefold():
                 return RejectionReason(
                     kind=RejectionKind.PLACEHOLDER,
                     name="JWT signature",
