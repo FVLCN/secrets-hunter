@@ -102,12 +102,12 @@ class ConsoleReporter(BaseConsoleReporter):
                             ConsoleReporter._format_matched_concept(concept)
                         )
 
-                inferred = semantic_analysis.inferred_signals
-                if inferred:
-                    lines.append("    Inferred:")
+                model_signals = semantic_analysis.model_signals
+                if model_signals:
+                    lines.append("    Model signals (Beta):")
                     lines.extend(
-                        f"      {signal.text}"
-                        for signal in inferred
+                        f"      {model_signal.text}"
+                        for model_signal in model_signals
                     )
 
             location = f.location

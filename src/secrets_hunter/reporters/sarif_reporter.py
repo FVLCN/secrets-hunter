@@ -23,7 +23,7 @@ class SARIFReporter:
             semantic_analysis = (
                 finding.semantic_analysis.to_dict()
                 if finding.semantic_analysis is not None
-                else {"facts": [], "matched_signals": [], "inferred_signals": []}
+                else {"facts": [], "matched_signals": [], "model_signals": []}
             )
             result = {
                 "ruleId": finding.kind.id,

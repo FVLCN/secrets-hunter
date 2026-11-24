@@ -137,7 +137,7 @@ class MatchedSignalView:
 
 
 @dataclass(frozen=True)
-class InferredSignalView:
+class ModelSignalView:
     concept_id: str
     display_name: str
     probability: float | None
@@ -223,22 +223,22 @@ class SemanticAnalysisView:
         return tuple(concept_signals)
 
     @property
-    def inferred_signals(self) -> tuple[InferredSignalView, ...]:
-        inferred = [
+    def model_signals(self) -> tuple[ModelSignalView, ...]:
+        model_concepts = [
             concept
             for concept in self.concepts
             if concept.origin == "model"
         ]
-        name_width = max((len(concept.display_name) for concept in inferred), default=0)
-        signals: list[InferredSignalView] = []
-        for concept in inferred:
+        name_width = max((len(concept.display_name) for concept in model_concepts), default=0)
+        signals: list[ModelSignalView] = []
+        for concept in model_concepts:
             presentation = concept.presentation
             text = (
                 presentation["text"]
                 if presentation is not None
                 else f"[{concept.strength}]"
             )
-            signals.append(InferredSignalView(
+            signals.append(ModelSignalView(
                 concept_id=concept.concept_id,
                 display_name=concept.display_name,
                 probability=(
@@ -253,6 +253,6 @@ class SemanticAnalysisView:
     def to_dict(self) -> dict[str, object]:
         return {
             "matched_signals": [signal.to_dict() for signal in self.matched_signals],
-            "inferred_signals": [signal.to_dict() for signal in self.inferred_signals],
+            "model_signals": [signal.to_dict() for signal in self.model_signals],
             "facts": [fact.to_dict() for fact in self.facts],
         }
