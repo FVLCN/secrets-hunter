@@ -70,13 +70,14 @@ class EvidenceCollector:
             for rule in concept.evidence:
                 if source not in rule.sources:
                     continue
+                strength = rule.strength_for(source)
 
                 for phrase in rule.phrases:
                     if contains_phrase(tokens, phrase):
                         evidence.append(ConceptKeywordEvidence(
                             term="_".join(phrase),
                             source=source,
-                            strength=rule.strength,
+                            strength=strength,
                         ))
 
                 for term in rule.terms:
@@ -92,7 +93,7 @@ class EvidenceCollector:
                     evidence.append(ConceptKeywordEvidence(
                         term=term,
                         source=source,
-                        strength=rule.strength,
+                        strength=strength,
                     ))
 
         return self._rank_evidence(evidence)

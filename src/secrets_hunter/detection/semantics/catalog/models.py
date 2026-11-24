@@ -21,6 +21,19 @@ class SemanticEvidenceRule:
     terms: tuple[str, ...] = ()
     phrases: tuple[tuple[str, ...], ...] = ()
     strength: EvidenceStrength = EvidenceStrength.STRONG
+    source_strengths: Mapping[EvidenceSource, EvidenceStrength] = field(
+        default_factory=dict
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(
+            self,
+            "source_strengths",
+            frozen_mapping(self.source_strengths),
+        )
+
+    def strength_for(self, source: EvidenceSource) -> EvidenceStrength:
+        return self.source_strengths.get(source, self.strength)
 
 
 @dataclass(frozen=True)

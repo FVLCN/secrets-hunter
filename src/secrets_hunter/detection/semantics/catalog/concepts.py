@@ -87,7 +87,21 @@ def _load_evidence_rule(
     raw_rule: Mapping[str, object],
     source: str
 ) -> SemanticEvidenceRule:
-    raw_sources = require_string_list(raw_rule, "sources", source)
+    raw_source_strengths = raw_rule.get("source_strengths")
+    source_strength_data = (
+        require_table(raw_source_strengths, "source_strengths", source)
+        if raw_source_strengths is not None
+        else None
+    )
+    if source_strength_data is not None and not source_strength_data:
+        raise ValueError(f"'source_strengths' must not be empty in {source}")
+
+    if "sources" in raw_rule:
+        raw_sources = require_string_list(raw_rule, "sources", source)
+    elif source_strength_data is not None:
+        raw_sources = tuple(source_strength_data)
+    else:
+        raw_sources = require_string_list(raw_rule, "sources", source)
 
     if not raw_sources:
         raise ValueError(f"'sources' must not be empty in {source}")
@@ -116,6 +130,41 @@ def _load_evidence_rule(
             f"{', '.join(sorted(set(unknown_sources)))}"
         )
 
+    parsed_source_strengths: dict[EvidenceSource, EvidenceStrength] = {}
+    if source_strength_data is not None:
+        for raw_source, raw_strength in source_strength_data.items():
+            normalized_source = normalize_token(raw_source)
+            try:
+                evidence_source = EvidenceSource(normalized_source)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Unknown evidence source in 'source_strengths' in {source}: "
+                    f"{normalized_source}"
+                ) from exc
+
+            if (
+                not evidence_source_spec(evidence_source).catalog_allowed
+                or evidence_source not in sources
+            ):
+                raise ValueError(
+                    f"'source_strengths' key {normalized_source!r} must name an "
+                    f"allowed source listed in 'sources' in {source}"
+                )
+
+            try:
+                parsed_source_strengths[evidence_source] = EvidenceStrength(
+                    normalize_token(require_string(
+                        raw_strength,
+                        f"source_strengths.{raw_source}",
+                        source,
+                    ))
+                )
+            except ValueError as exc:
+                raise ValueError(
+                    f"Evidence strength for {normalized_source!r} in {source} "
+                    "must be 'weak' or 'strong'"
+                ) from exc
+
     terms = tuple(
         normalize_token(term)
         for term in require_string_list(raw_rule, "terms", source)
@@ -142,6 +191,7 @@ def _load_evidence_rule(
         terms=tuple(dict.fromkeys(terms)),
         phrases=tuple(dict.fromkeys(phrases)),
         strength=strength,
+        source_strengths=parsed_source_strengths,
     )
 
 

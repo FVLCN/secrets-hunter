@@ -27,7 +27,7 @@ terms = ["example", "test", "tests", "spec", "sample", "template"]
 
 [[evidence]]
 concept = "hash_artifact"
-sources = ["var_name", "path"]
+source_strengths = { var_name = "strong", path = "weak" }
 terms = [
     "checksum",
     "hash",
@@ -47,7 +47,7 @@ terms = [
 
 [[evidence]]
 concept = "public_crypto_artifact"
-sources = ["var_name", "path", "value_shape"]
+source_strengths = { var_name = "strong", path = "weak", value_shape = "strong" }
 terms = [
     "certificate",
     "cert",
@@ -101,7 +101,7 @@ terms = [
 
 [[evidence]]
 concept = "version_or_reference_artifact"
-sources = ["var_name", "path"]
+source_strengths = { var_name = "strong", path = "weak" }
 terms = [
     "commit",
     "version",
