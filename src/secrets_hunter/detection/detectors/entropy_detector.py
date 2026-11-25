@@ -28,7 +28,7 @@ class EntropyDetector:
 
             candidates.append(DetectionCandidate(
                 location=source_location.at_line(line_num),
-                finding_kind=classification.finding_kind,
+                finding_kind=classification.spec.finding_kind,
                 match=fragment.content,
                 context=line.strip()[:100],
                 detection_method=DetectionMethod.ENTROPY,

@@ -148,10 +148,27 @@ class SemanticObservationBuilder:
             )
 
         if detection_method is DetectionMethod.ENTROPY:
+            entropy_spec = value_analysis.entropy_spec
+            entropy_family = value_analysis.classification.entropy_family
+
+            if entropy_spec is not None and entropy_family is not None:
+                entropy_evidence = (
+                    f"{value_entropy:.2f} bits/char >= "
+                    f"{entropy_spec.threshold:.2f} {entropy_family.value} threshold"
+                )
+                entropy_details = {
+                    "bits_per_character": value_entropy,
+                    "threshold": entropy_spec.threshold,
+                    "entropy_family": entropy_family.value,
+                }
+            else:
+                entropy_evidence = f"{value_entropy:.2f} bits/char"
+                entropy_details = {"bits_per_character": value_entropy}
+
             facts[FactId.HIGH_ENTROPY] = make_fact(
                 FactId.HIGH_ENTROPY,
-                f"{value_entropy:.2f} bits/char",
-                details={"bits_per_character": value_entropy},
+                entropy_evidence,
+                details=entropy_details,
             )
 
         if detection_method is DetectionMethod.PATTERN:
