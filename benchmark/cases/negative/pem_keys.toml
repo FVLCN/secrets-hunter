@@ -1,0 +1,22 @@
+case_id = "pem-keys-negative"
+description = "Malformed and invalid PEM-shaped values"
+
+[[files]]
+path = "services/auth-gateway/config/tls/server-key.pem"
+content = """
+-----BEGIN PRIVATE KEY-----
+data
+-----END PRIVATE KEY-----
+"""
+
+[[entries]]
+id = "short-private-key"
+expected_associated_name = ""
+file = "services/auth-gateway/config/tls/server-key.pem"
+line = 1
+value = """-----BEGIN PRIVATE KEY-----
+data
+-----END PRIVATE KEY-----"""
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5

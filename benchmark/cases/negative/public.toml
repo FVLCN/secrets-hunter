@@ -1,0 +1,61 @@
+case_id = "public"
+description = "Public and non-secret values."
+
+[[files]]
+path = ".env.example"
+content = """
+STRIPE_PUBLIC_KEY=pk_test_8HRzncJce5Ichi8TF6ul
+"""
+
+[[entries]]
+id = "stripe-public-key"
+expected_associated_name = "STRIPE_PUBLIC_KEY"
+file = ".env.example"
+line = 1
+confidence_min = 0
+confidence_max = 10
+value = "pk_test_8HRzncJce5Ichi8TF6ul"
+expected_disposition = "reject"
+
+[[files]]
+path = "infra/puppet/hieradata/common.yaml"
+content = "sshkey: 'AAAAB3NzaC1yc2EAAAADAQABAAABgQC06hNy87+yjPv0VJt38XNEcvnKaJ7CdoGftxKTJl6EROGjCoAZBB+BjT2Q/BW6zLhy5B07aYUJ/kHUv5tpU4/M4pVE2JnLcS/yHd94frKM6mxXKd7zJwOVPLwSnmV+NzCWzJkPdopcEveh2/sJ24G1UIvupDH+AsFnXX8MJfgWK+OzISPZ9lGjbNfX5JWTNM8968bC1OweXc4v4thADcaUvYmXKtlHnJRmnr/vD7FkRU1SRWInM8I06SPIvfTCOLdqf3AIo6NCUBFBH9R5ubbKxT/4CZnHNUIxL6+/KilTSol8ctMjZTftEyYkJ/m5VHPGQpUOKuJDf53xuMC1s/2L90WL4Ih0jdTBooq2Qc+JF+q2MQILtUGCWJuH/aNzAtO1MsemW5I4p05rVkxGWiY9r/r32hRFYoRGUxvk7ToR+wxhnYYBWynltVh9n8sn3hD6h+F8AWxGEjFmgYKVU2haXWoX2eJBIYww1+Ydy5rTGU+DO/ceMdA2fenlQ8Bgwy8='\n"
+
+[[entries]]
+id = "ssh-public-key"
+expected_associated_name = "sshkey"
+file = "infra/puppet/hieradata/common.yaml"
+line = 1
+value = "AAAAB3NzaC1yc2EAAAADAQABAAABgQC06hNy87+yjPv0VJt38XNEcvnKaJ7CdoGftxKTJl6EROGjCoAZBB+BjT2Q/BW6zLhy5B07aYUJ/kHUv5tpU4/M4pVE2JnLcS/yHd94frKM6mxXKd7zJwOVPLwSnmV+NzCWzJkPdopcEveh2/sJ24G1UIvupDH+AsFnXX8MJfgWK+OzISPZ9lGjbNfX5JWTNM8968bC1OweXc4v4thADcaUvYmXKtlHnJRmnr/vD7FkRU1SRWInM8I06SPIvfTCOLdqf3AIo6NCUBFBH9R5ubbKxT/4CZnHNUIxL6+/KilTSol8ctMjZTftEyYkJ/m5VHPGQpUOKuJDf53xuMC1s/2L90WL4Ih0jdTBooq2Qc+JF+q2MQILtUGCWJuH/aNzAtO1MsemW5I4p05rVkxGWiY9r/r32hRFYoRGUxvk7ToR+wxhnYYBWynltVh9n8sn3hD6h+F8AWxGEjFmgYKVU2haXWoX2eJBIYww1+Ydy5rTGU+DO/ceMdA2fenlQ8Bgwy8="
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5
+
+[[files]]
+path = "services/auth-gateway/stages/captcha/tests.py"
+content = "RECAPTCHA_SECRET_KEY = \"6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe\"\n"
+
+[[entries]]
+id = "recaptcha-v2-test-secret-key"
+expected_associated_name = "RECAPTCHA_SECRET_KEY"
+file = "services/auth-gateway/stages/captcha/tests.py"
+line = 1
+confidence_min = 5
+confidence_max = 10
+value = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+expected_disposition = "reject"
+
+[[files]]
+path = "cli/build.rs"
+content = "const POSTHOG_API_TOKEN: &str = \"phc_raG2H9V246hkNZk6K89DZGG98qQyPrKKlicifGlpOXA\";"
+
+[[entries]]
+id = "posthog-public-token"
+expected_associated_name = "POSTHOG_API_TOKEN"
+file = "cli/build.rs"
+line = 1
+known_problem = true
+confidence_min = 5
+confidence_max = 10
+value = "phc_raG2H9V246hkNZk6K89DZGG98qQyPrKKlicifGlpOXA"
+expected_disposition = "reject"

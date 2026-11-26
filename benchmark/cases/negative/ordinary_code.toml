@@ -1,0 +1,76 @@
+case_id = "ordinary-code"
+description = "Ordinary code expressions and template references should not be detected."
+
+[[files]]
+path = "src/cache/key_builder.py"
+content = "cache_key = build_cache_key(user_id)\n"
+
+[[files]]
+path = "src/http/auth_headers.py"
+content = "token = response.headers.get(\"Authorization\")\n"
+
+[[files]]
+path = "config/application.conf"
+content = "password = ${password}\n"
+
+[[files]]
+path = "src/config/settings.py"
+content = "secret = os.getenv(\"APP_SECRET\")\n"
+
+[[files]]
+path = "src/cache/cache_repository.py"
+content = "return cache.get(cache_key)\n"
+
+[[entries]]
+id = "cache-key-expression"
+expected_associated_name = ""
+file = "src/cache/key_builder.py"
+line = 1
+value = "cache_key = build_cache_key(user_id)"
+expected_disposition = "no_finding"
+
+[[entries]]
+id = "authorization-header-reference"
+expected_associated_name = ""
+file = "src/http/auth_headers.py"
+line = 1
+value = 'token = response.headers.get("Authorization")'
+expected_disposition = "no_finding"
+
+[[entries]]
+id = "password-template-reference"
+expected_associated_name = ""
+file = "config/application.conf"
+line = 1
+value = "password = ${password}"
+expected_disposition = "no_finding"
+
+[[entries]]
+id = "environment-variable-reference"
+expected_associated_name = ""
+file = "src/config/settings.py"
+line = 1
+value = 'secret = os.getenv("APP_SECRET")'
+expected_disposition = "no_finding"
+
+[[entries]]
+id = "cache-return-expression"
+expected_associated_name = ""
+file = "src/cache/cache_repository.py"
+line = 1
+value = "return cache.get(cache_key)"
+expected_disposition = "no_finding"
+
+[[files]]
+path = "apps/client/components/KeyboardShortcutsModal.tsx"
+content = "descriptionKey: 'Keyboard_Shortcuts_Move_To_Beginning_Of_Message',\n"
+
+[[entries]]
+id = "keyboard-shortcut-description-key"
+expected_associated_name = "descriptionKey"
+file = "apps/client/components/KeyboardShortcutsModal.tsx"
+line = 1
+confidence_min = 0
+confidence_max = 10
+value = "Keyboard_Shortcuts_Move_To_Beginning_Of_Message"
+expected_disposition = "reject"

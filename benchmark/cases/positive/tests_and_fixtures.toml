@@ -1,0 +1,30 @@
+case_id = "tests-and-fixtures"
+description = "Secret looking value in tests and fixtures."
+
+[[files]]
+path = "blueprints/testing/oidc-conformance.yaml"
+content = "client_secret: f14eb80a7af6b811ad517e348d3ed74058487af4cf2566486b40a71f724b74abeaf335e676736b354ffbc5241a5fbe41abb56d111c9c2dbcf96c65fecb524369\n"
+
+[[entries]]
+id = "oidc-conformance-client-secret"
+expected_associated_name = "client_secret"
+file = "blueprints/testing/oidc-conformance.yaml"
+line = 1
+value = "f14eb80a7af6b811ad517e348d3ed74058487af4cf2566486b40a71f724b74abeaf335e676736b354ffbc5241a5fbe41abb56d111c9c2dbcf96c65fecb524369"
+expected_disposition = "review"
+confidence_min = 15
+confidence_max = 30
+
+[[files]]
+path = "tests/signals/test_render.py"
+content = "authorization_header = \"Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzeW50aGV0aWMtdGVzdC11c2VyLTEyMyIsImF1ZCI6ImJlbmNobWFyay1jbGllbnQiLCJpYXQiOjE3OTU0NTg0MTgsImV4cCI6MTc5NTQ2MjAxOH0.Lkx7cvOixah2FDTI5tsA4R7mnLZEQBoYKI16kqvKwrI\"\n"
+
+[[entries]]
+id = "bearer-jwt-test"
+expected_associated_name = "authorization_header"
+file = "tests/signals/test_render.py"
+line = 1
+value = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJzeW50aGV0aWMtdGVzdC11c2VyLTEyMyIsImF1ZCI6ImJlbmNobWFyay1jbGllbnQiLCJpYXQiOjE3OTU0NTg0MTgsImV4cCI6MTc5NTQ2MjAxOH0.Lkx7cvOixah2FDTI5tsA4R7mnLZEQBoYKI16kqvKwrI"
+expected_disposition = "review"
+confidence_min = 15
+confidence_max = 30

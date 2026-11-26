@@ -1,0 +1,16 @@
+case_id = "database-connection-placeholders"
+description = "Database connection strings with placeholder credentials should be rejected."
+
+[[files]]
+path = "docs/integrations/databases/mongodb.mdx"
+content = "\"connection_string\": \"mongodb+srv://user:pass@cluster.example.net\",\n"
+
+[[entries]]
+id = "mongodb-connection-string-placeholder"
+expected_associated_name = "connection_string"
+file = "docs/integrations/databases/mongodb.mdx"
+line = 1
+value = "mongodb+srv://user:pass@cluster.example.net"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5
