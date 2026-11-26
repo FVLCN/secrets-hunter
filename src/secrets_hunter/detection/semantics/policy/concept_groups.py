@@ -10,6 +10,7 @@ from secrets_hunter.detection.semantics.catalog import (
 from secrets_hunter.detection.semantics.classification import ConceptScores
 from secrets_hunter.detection.semantics.evidence_sources import EvidenceSource
 from secrets_hunter.immutability import frozen_mapping
+from secrets_hunter.models.semantic_analysis import DecisionGate
 
 from .indexes import PolicyIndexes
 from .models import ConceptKeywordEvidence, ResolvedConcept
@@ -178,6 +179,32 @@ class PolicyConceptGroups:
             self.inferred_probabilities.get(concept_id, 0.0)
             for concept_id in concept_ids
         ), default=0.0)
+
+    def decision_gate(self, concept_id: ConceptId) -> DecisionGate | None:
+        thresholds = self.policy.decision_thresholds
+        if concept_id in self.credentials:
+            return DecisionGate(
+                label="credential context",
+                threshold=thresholds.credential,
+                secondary_label="strong inferred credential",
+                secondary_threshold=thresholds.strong_credential,
+            )
+        if concept_id in self.targets:
+            return DecisionGate("target context", thresholds.target)
+        if concept_id is ConceptId.PUBLIC_CRYPTO_ARTIFACT:
+            # This concept only enters the decision path through direct evidence.
+            return None
+        if concept_id in self.artifacts or concept_id in self.value_rejections:
+            return DecisionGate("reject context", thresholds.reject)
+        if concept_id in self.identifiers:
+            return DecisionGate("identifier context", thresholds.context_reject)
+        if concept_id in self.neutral:
+            return DecisionGate("neutral context", thresholds.neutral)
+        if concept_id in self.ordinary:
+            return DecisionGate("ordinary context", thresholds.neutral_reject)
+        if concept_id is ConceptId.TEST_FIXTURE:
+            return DecisionGate("fixture context", thresholds.reject)
+        return None
 
     def active(
         self,

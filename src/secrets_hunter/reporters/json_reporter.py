@@ -1,12 +1,11 @@
 import json
 import logging
 
-from secrets_hunter import __version__
 from secrets_hunter.config import (
     FindingPresentationOptions,
     FindingSelectionOptions
 )
-from secrets_hunter.models import ScanFailure, ScanResult
+from secrets_hunter.models import DEFAULT_TOOL_INFO, ScanFailure, ScanResult
 from secrets_hunter.reporters.finding_view import FindingView
 from secrets_hunter.scanning.modes import ScanSourceDescription
 
@@ -45,10 +44,7 @@ class JSONReporter:
 
         return {
             "schema_version": 2,
-            "tool": {
-                "name": "secrets-hunter",
-                "version": __version__
-            },
+            "tool": DEFAULT_TOOL_INFO.to_dict(),
             "scan": {
                 "source": {
                     "kind": source.kind,

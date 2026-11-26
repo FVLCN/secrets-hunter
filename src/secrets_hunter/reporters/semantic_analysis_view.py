@@ -3,6 +3,7 @@ from typing import Self, TypedDict
 
 from secrets_hunter.models.fact import Fact
 from secrets_hunter.models.semantic_analysis import (
+    DecisionGate,
     SemanticAnalysisResult,
     SemanticConceptResult,
     SemanticProviderMatchResult,
@@ -18,6 +19,7 @@ class SemanticConceptPresentation(TypedDict):
     percent: int
     filled_cells: int
     total_cells: int
+    threshold_hit: bool | None
     text: str
 
 
@@ -29,6 +31,13 @@ class SemanticConceptView:
     evidence: tuple[MatchedEvidenceView, ...]
     origin: str
     strength: str
+    decision_gate: DecisionGate | None
+
+    @property
+    def threshold_hit(self) -> bool | None:
+        if self.decision_gate is None:
+            return None
+        return self.decision_gate.is_met(self.probability)
 
     @property
     def presentation(self) -> SemanticConceptPresentation | None:
@@ -44,6 +53,7 @@ class SemanticConceptView:
             percent=percent,
             filled_cells=filled_cells,
             total_cells=total_cells,
+            threshold_hit=self.threshold_hit,
             text=f"[{bar}] {percent}%",
         )
 
@@ -59,6 +69,7 @@ class SemanticConceptView:
             probability=concept.probability,
             origin=concept.origin,
             strength=concept.strength,
+            decision_gate=concept.decision_gate,
             evidence=tuple(
                 MatchedEvidenceView.from_result(
                     keyword,
@@ -141,13 +152,34 @@ class ModelSignalView:
     concept_id: str
     display_name: str
     probability: float | None
+    decision_gate: DecisionGate | None
     text: str
 
+    @property
+    def threshold_hit(self) -> bool | None:
+        if self.decision_gate is None:
+            return None
+        return self.decision_gate.is_met(self.probability)
+
     def to_dict(self) -> dict[str, object]:
+        gate = self.decision_gate
         return {
             "concept_id": self.concept_id,
             "display_name": self.display_name,
-            "probability": self.probability,
+            "probability": (
+                round(self.probability, 4)
+                if self.probability is not None
+                else None
+            ),
+            "decision_gate": gate.label if gate is not None else None,
+            "decision_threshold": gate.threshold if gate is not None else None,
+            "threshold_hit": self.threshold_hit,
+            "secondary_decision_gate": (
+                gate.secondary_label if gate is not None else None
+            ),
+            "secondary_decision_threshold": (
+                gate.secondary_threshold if gate is not None else None
+            ),
             "text": self.text,
         }
 
@@ -241,11 +273,8 @@ class SemanticAnalysisView:
             signals.append(ModelSignalView(
                 concept_id=concept.concept_id,
                 display_name=concept.display_name,
-                probability=(
-                    round(concept.probability, 4)
-                    if concept.probability is not None
-                    else None
-                ),
+                probability=concept.probability,
+                decision_gate=concept.decision_gate,
                 text=f"{concept.display_name.ljust(name_width)} {text}",
             ))
         return tuple(signals)

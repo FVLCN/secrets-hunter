@@ -64,9 +64,15 @@ class ConceptSecretPolicy:
             groups,
         )
 
+        reported_concepts = self.presentation.reported_concepts(groups)
         return ConceptPolicyResult(
             analysis=build_semantic_analysis_result(
-                concepts=self.presentation.reported_concepts(groups),
+                concepts=reported_concepts,
+                decision_gates={
+                    concept.concept_id: groups.decision_gate(concept.concept_id)
+                    for concept in reported_concepts
+                    if concept.origin == "model"
+                },
                 providers=provider_matches,
                 facts=tuple(sorted(
                     observation.fact_records,

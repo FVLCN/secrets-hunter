@@ -4,6 +4,19 @@ from .fact import Fact
 
 
 @dataclass(frozen=True)
+class DecisionGate:
+    label: str
+    threshold: float
+    secondary_label: str | None = None
+    secondary_threshold: float | None = None
+
+    def is_met(self, probability: float | None) -> bool | None:
+        if probability is None:
+            return None
+        return probability >= self.threshold
+
+
+@dataclass(frozen=True)
 class SemanticKeywordEvidenceResult:
     term: str
     source: str
@@ -22,6 +35,7 @@ class SemanticConceptResult:
     origin: str
     strength: str
     display_name: str | None = None
+    decision_gate: DecisionGate | None = None
 
 
 @dataclass(frozen=True)

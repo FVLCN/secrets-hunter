@@ -26,9 +26,11 @@ from .source_location import (
     SourceLocation,
     TextLocation
 )
+from .tool import DEFAULT_TOOL_INFO, ToolInfo
 from .value_kind import ValueKind
 
 __all__ = [
+    'DEFAULT_TOOL_INFO',
     'Decision',
     'Disposition',
     'Fact',
@@ -57,5 +59,6 @@ __all__ = [
     'SemanticAnalysisResult',
     'SourceLocation',
     'TextLocation',
+    'ToolInfo',
     'ValueKind'
 ]

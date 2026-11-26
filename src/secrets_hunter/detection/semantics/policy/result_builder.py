@@ -1,5 +1,8 @@
+from collections.abc import Mapping
+
 from secrets_hunter.models.fact import Fact
 from secrets_hunter.models.semantic_analysis import (
+    DecisionGate,
     SemanticAnalysisResult,
     SemanticConceptResult,
     SemanticKeywordEvidenceResult,
@@ -7,6 +10,7 @@ from secrets_hunter.models.semantic_analysis import (
 )
 from secrets_hunter.models.rejection import RejectionReason
 
+from ..catalog import ConceptId
 from ..observation.facts import FactId, make_fact
 from .models import (
     ConceptKeywordEvidence,
@@ -80,6 +84,7 @@ def _keyword_result(
 def build_semantic_analysis_result(
     *,
     concepts: tuple[ResolvedConcept, ...],
+    decision_gates: Mapping[ConceptId, DecisionGate | None] | None = None,
     providers: tuple[ProviderMatch, ...],
     facts: tuple[Fact, ...],
     value_rejection: RejectionReason | None = None,
@@ -99,20 +104,26 @@ def build_semantic_analysis_result(
         if provider.matched_pattern_id is not None
     )
     rejection_facts = _provider_pattern_rejection_facts(value_rejection)
+    concept_results: list[SemanticConceptResult] = []
+    for concept in concepts:
+        gate = (
+            decision_gates.get(concept.concept_id)
+            if decision_gates is not None
+            else None
+        )
+        concept_results.append(SemanticConceptResult(
+            concept_id=concept.concept_id.value,
+            probability=concept.probability,
+            origin=concept.origin,
+            strength=concept.strength.value,
+            decision_gate=gate,
+            strongest_keywords=tuple(
+                _keyword_result(keyword)
+                for keyword in concept.strongest_keywords
+            ),
+        ))
     return SemanticAnalysisResult(
-        concepts=tuple(
-            SemanticConceptResult(
-                concept_id=concept.concept_id.value,
-                probability=concept.probability,
-                origin=concept.origin,
-                strength=concept.strength.value,
-                strongest_keywords=tuple(
-                    _keyword_result(keyword)
-                    for keyword in concept.strongest_keywords
-                ),
-            )
-            for concept in concepts
-        ),
+        concepts=tuple(concept_results),
         providers=tuple(
             SemanticProviderMatchResult(
                 id=provider.id,
