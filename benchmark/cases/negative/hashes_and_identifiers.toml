@@ -1,0 +1,60 @@
+case_id = "hashes-and-identifiers"
+description = "Hashes and identifiers."
+
+[[files]]
+path = "src/release_metadata.py"
+content = """
+BUILD_COMMIT_SHA = "c25e2cfb1ea6fe0c97c2755ed06d9a64c7b51a9c"
+IMAGE_DIGEST = "f50d3c7ea95b4c826098ad1fe702c35d8b41a9ef6240dc7c35a82be916d0473c"
+"""
+
+[[entries]]
+id = "commit-sha"
+expected_associated_name = "BUILD_COMMIT_SHA"
+file = "src/release_metadata.py"
+confidence_min = 0
+confidence_max = 10
+line = 1
+value = "c25e2cfb1ea6fe0c97c2755ed06d9a64c7b51a9c"
+expected_disposition = "reject"
+
+[[entries]]
+id = "image-digest"
+expected_associated_name = "IMAGE_DIGEST"
+file = "src/release_metadata.py"
+confidence_min = 0
+confidence_max = 10
+line = 2
+value = "f50d3c7ea95b4c826098ad1fe702c35d8b41a9ef6240dc7c35a82be916d0473c"
+expected_disposition = "reject"
+
+[[files]]
+path = "src/ai/streaming/sse-logs/tool-call.sse"
+content = '''
+data: {"id":"a41b7d2e-5f08-4c93-9a61-3b0e7d2c8f15","object":"chat.completion.chunk","created":1753480000,"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call_W1qGRkYGP4ZmuFd3hDBAgAWU","type":"function","function":{"name":"think","arguments":""}}]}}]}
+'''
+
+[[entries]]
+id = "openai-tool-call-id"
+expected_associated_name = "id"
+file = "src/ai/streaming/sse-logs/tool-call.sse"
+line = 1
+value = "call_W1qGRkYGP4ZmuFd3hDBAgAWU"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 10
+
+[[files]]
+path = "tools/sim/key_frame_check.py"
+content = "KEY_FRAME = \"fda202b49c36b8fb505d117d9955e93bbcec3657b2e8fe47a2d68bef6db2b19f\"\n"
+
+[[entries]]
+id = "key-frame-hash"
+expected_associated_name = "KEY_FRAME"
+file = "tools/sim/key_frame_check.py"
+line = 1
+value = "fda202b49c36b8fb505d117d9955e93bbcec3657b2e8fe47a2d68bef6db2b19f"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 10
+

@@ -26,5 +26,10 @@ ENV/
 # Results
 *.json
 
+!/benchmark/benchmark_report.json
+
+# Preserve the model
+!src/secrets_hunter/config/semantics/semantic_concept_model.json
+
 # Misc
 .DS_Store

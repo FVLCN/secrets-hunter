@@ -1,0 +1,158 @@
+[[provider_patterns]]
+id = "gitlab_personal_access_token"
+provider = "gitlab"
+name = "GitLab Personal Access Token"
+regex = '''\bglpat-[A-Za-z0-9_-]{20}\b'''
+
+[[provider_patterns]]
+id = "stripe_api_key"
+provider = "stripe"
+name = "Stripe API Key"
+regex = '''\bsk_(?:live|test)_[A-Za-z0-9]{24,}\b'''
+
+[[provider_patterns]]
+id = "stripe_publishable_key"
+provider = "stripe"
+name = "Stripe Publishable Key"
+regex = '''\bpk_(?:live|test)_[A-Za-z0-9]{16,}\b'''
+classification = "public_credential"
+reason = "Stripe publishable keys are designed for client-side use"
+
+[[provider_patterns]]
+id = "stripe_price_id"
+provider = "stripe"
+name = "Stripe Price ID"
+regex = '''\bprice_[A-Za-z0-9]{24}\b'''
+classification = "non_secret_identifier"
+reason = "Stripe price identifiers are resource IDs, not credentials"
+
+[[provider_patterns]]
+id = "twilio_sid"
+provider = "twilio"
+name = "Twilio SID"
+regex = '''\bSK[A-Z0-9]{32}\b'''
+
+[[provider_patterns]]
+id = "telegram_bot_token"
+provider = "telegram"
+name = "Telegram Bot Token"
+regex = '''\b\d{9,10}:[A-Za-z0-9_-]{35,}\b'''
+
+[[provider_patterns]]
+id = "posthog_secret_api_token"
+provider = "posthog"
+name = "PostHog Secret API Token"
+regex = '''\bphs_[A-Za-z0-9]{47,49}\b'''
+
+[[provider_patterns]]
+id = "posthog_personal_api_key"
+provider = "posthog"
+name = "PostHog Personal API Key"
+regex = '''\bphx_[A-Za-z0-9]{47,49}\b'''
+
+[[provider_patterns]]
+id = "posthog_project_token"
+provider = "posthog"
+name = "PostHog Project Token"
+regex = '''\bphc_[A-Za-z0-9]{20,}\b'''
+classification = "public_credential"
+reason = "PostHog public client-side project token"
+
+[[provider_patterns]]
+id = "posthog_oauth_access_token"
+provider = "posthog"
+name = "PostHog OAuth Access Token"
+regex = '''\bpha_[A-Za-z0-9]{43,44}\b'''
+
+[[provider_patterns]]
+id = "posthog_oauth_refresh_token"
+provider = "posthog"
+name = "PostHog OAuth Refresh Token"
+regex = '''\bphr_[A-Za-z0-9]{43,44}\b'''
+
+[[provider_patterns]]
+id = "azure_devops_pat"
+provider = "azure_devops"
+name = "Azure DevOps Personal Access Token"
+regex = '''\b[A-Za-z0-9]{76}AZDO[A-Za-z0-9]{4}\b'''
+
+[[provider_patterns]]
+id = "gcp_api_key"
+provider = "gcp"
+name = "Google Cloud API Key"
+regex = '''(?<![A-Za-z0-9_-])AIza[A-Za-z0-9_-]{35}(?![A-Za-z0-9_-])'''
+
+[[provider_patterns]]
+id = "google_recaptcha_v2_test_secret"
+provider = "google"
+name = "Google reCAPTCHA v2 Test Secret"
+value = "6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe"
+classification = "public_credential"
+reason = "Google's published universal test secret"
+
+[[provider_patterns]]
+id = "anthropic_api_key"
+provider = "anthropic"
+name = "Anthropic API Key"
+regex = '''\bsk-ant-api03-[A-Za-z0-9_-]{93}AA\b'''
+
+[[provider_patterns]]
+id = "anthropic_admin_api_key"
+provider = "anthropic"
+name = "Anthropic Admin API Key"
+regex = '''\bsk-ant-admin01-[A-Za-z0-9_-]{93}AA\b'''
+
+[[provider_patterns]]
+id = "anthropic_tool_id"
+provider = "anthropic"
+name = "Anthropic Tool ID"
+regex = '''\btoolu_[A-Za-z0-9]{15,}\b'''
+classification = "non_secret_identifier"
+reason = "Anthropic tool-use identifier"
+
+[[provider_patterns]]
+id = "anthropic_server_tool_id"
+provider = "anthropic"
+name = "Anthropic Server Tool ID"
+regex = '''\bsrvtoolu_[A-Za-z0-9]{15,}\b'''
+classification = "non_secret_identifier"
+reason = "Anthropic server tool-use identifier"
+
+[[provider_patterns]]
+id = "generic_message_id"
+name = "Message ID"
+regex = '''\bmsg_[A-Za-z0-9]{20,}\b'''
+classification = "non_secret_identifier"
+reason = "Message identifier prefix is shared by multiple providers"
+
+[[provider_patterns]]
+id = "openai_tool_call_id"
+provider = "openai"
+name = "OpenAI Tool Call ID"
+regex = '''(?<![A-Za-z0-9_-])call_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI function or tool call identifier"
+
+[[provider_patterns]]
+id = "openai_function_call_item_id"
+provider = "openai"
+name = "OpenAI Function Call Item ID"
+regex = '''(?<![A-Za-z0-9_-])fc_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI Responses function-call item identifier"
+
+[[provider_patterns]]
+id = "openai_response_id"
+provider = "openai"
+name = "OpenAI Response ID"
+regex = '''(?<![A-Za-z0-9_-])resp_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI response identifier"
+
+[[provider_patterns]]
+id = "openai_conversation_id"
+provider = "openai"
+name = "OpenAI Conversation ID"
+regex = '''(?<![A-Za-z0-9_-])conv_[A-Za-z0-9]+(?![A-Za-z0-9_-])'''
+classification = "non_secret_identifier"
+reason = "OpenAI conversation identifier"

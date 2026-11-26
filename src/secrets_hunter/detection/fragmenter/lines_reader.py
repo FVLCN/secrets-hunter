@@ -1,22 +1,24 @@
 from collections import deque
-from typing import Iterable
+from collections.abc import Iterable, Iterator
+from typing import override
 
-from secrets_hunter.config import PEM_BEGIN_RE
+from secrets_hunter.detection.pem import PEM_BEGIN_RE, PemType
 from secrets_hunter.detection.fragmenter.models import SourceFragment
 
 
 class LinesReader:
-    def read(self, lines: Iterable[str]):
+    def read(self, lines: Iterable[str]) -> Iterator[SourceFragment]:
         for line_num, line in enumerate(lines, 1):
             yield SourceFragment(
                 content=line,
                 start_line=line_num,
-                end_line=line_num,
+                end_line=line_num
             )
 
 
 class PEMAwareLinesReader(LinesReader):
-    def read(self, lines: Iterable[str]):
+    @override
+    def read(self, lines: Iterable[str]) -> Iterator[SourceFragment]:
         iterator = enumerate(lines, 1)
         pending: deque[tuple[int, str]] = deque()
 
@@ -30,7 +32,7 @@ class PEMAwareLinesReader(LinesReader):
             return SourceFragment(
                 content="".join(text for _, text in fragment_lines),
                 start_line=fragment_lines[0][0],
-                end_line=fragment_lines[-1][0],
+                end_line=fragment_lines[-1][0]
             )
 
         def replay(items: list[tuple[int, str]]) -> None:
@@ -50,13 +52,13 @@ class PEMAwareLinesReader(LinesReader):
                 yield SourceFragment(
                     content=current_line,
                     start_line=current_line_num,
-                    end_line=current_line_num,
+                    end_line=current_line_num
                 )
                 continue
 
             pem_candidate = [(current_line_num, current_line)]
-            pem_type = header_match.group(1)
-            expected_footer = f"-----END {pem_type}-----"
+            pem_type = PemType(header_match.group(1))
+            expected_footer = pem_type.footer_marker
 
             if expected_footer in current_line:
                 yield make_fragment(pem_candidate)

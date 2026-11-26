@@ -1,5 +1,2 @@
-from abc import ABC
-
-
-class BaseConsoleReporter(ABC):
+class BaseConsoleReporter:
     WIDTH = 88

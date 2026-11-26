@@ -1,0 +1,44 @@
+case_id = "placeholders"
+description = "Credential-like placeholder values that should be rejected."
+
+[[files]]
+path = "packages/server/annotate-bundle.scenarios.ts"
+content = "const HOST_TOKEN = \"annotate-bundle-scenarios-host-token-0123456789abcdef\";\n"
+
+[[entries]]
+id = "host-token-placeholder"
+expected_associated_name = "HOST_TOKEN"
+file = "packages/server/annotate-bundle.scenarios.ts"
+line = 1
+value = "annotate-bundle-scenarios-host-token-0123456789abcdef"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5
+
+[[files]]
+path = "test/api/payment.test.ts"
+content = "cardNum: 12345678876543210,\n"
+
+[[entries]]
+id = "card-number-placeholder"
+expected_associated_name = "cardNum"
+file = "test/api/payment.test.ts"
+line = 1
+value = "12345678876543210"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5
+
+[[files]]
+path = "packages/server/annotate-bundle.scenarios.test.ts"
+content = "const APP_TOKEN = \"app-token-0123456789abcdef\";\n"
+
+[[entries]]
+id = "app-token-test-placeholder"
+expected_associated_name = "APP_TOKEN"
+file = "packages/server/annotate-bundle.scenarios.test.ts"
+line = 1
+value = "app-token-0123456789abcdef"
+expected_disposition = "reject"
+confidence_min = 0
+confidence_max = 5
