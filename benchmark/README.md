@@ -16,10 +16,12 @@ line, and check result. Failed checks and unexpected findings appear below it.
 
 To save a JSON report and print a short summary:
 
-    PYTHONPATH=src python3 benchmark/run_benchmark.py --json benchmark-report.json
+    PYTHONPATH=src python3 benchmark/run_benchmark.py --json path/to/report.json
 
 JSON includes case metadata, checks, mismatches, findings, and a case-data
 checksum. It contains fixture values and source lines.
+
+Visualize the benchmark report at [https://fvlcn.dev/secrets-hunter/benchmark/](https://fvlcn.dev/secrets-hunter/benchmark/).
 
 ## Add a case
 
